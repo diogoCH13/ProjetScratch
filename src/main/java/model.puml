@@ -1,0 +1,104 @@
+@startuml
+skinparam style strictuml
+skinparam classAttributeIconSize 0
+
+package "Diagramme de classes – Modèle (Cursor World)" {
+
+abstract class Action {
+  -cursor : Cursor
+  +Action(cursor:Cursor)
+  {abstract} +execute()
+  {abstract} +toString() : String
+}
+
+class MoveForward {
+  -distance : int
+  +MoveForward(cursor:Cursor, distance:int)
+  +execute()
+  +isValid() : boolean
+  +toString() : String
+}
+
+class TurnLeft {
+  -angle : int
+  +TurnLeft(cursor:Cursor, angle:int)
+  +execute()
+  +isValid() : boolean
+  +toString() : String
+}
+
+class TurnRight {
+  -angle : int
+  +TurnRight(cursor:Cursor, angle:int)
+  +execute()
+  +isValid() : boolean
+  +toString() : String
+}
+
+class PenUp {
+  +PenUp(cursor:Cursor)
+  +execute()
+  +toString() : String
+}
+
+class PenDown {
+  +PenDown(cursor:Cursor)
+  +execute()
+  +toString() : String
+}
+
+Action <|-- MoveForward
+Action <|-- TurnLeft
+Action <|-- TurnRight
+Action <|-- PenUp
+Action <|-- PenDown
+
+class Program {
+  -actions : List<Action>
+  -currentIndex : int
+  +addAction(act:Action)
+  +removeAction(index:int)
+  +removeAll()
+  +executeNext() : boolean
+}
+
+Program *-- "0..*" Action
+
+class CursorWorld {
+  -cursor : Cursor
+  -segments : List<Segment>
+  +getCursor() : Cursor
+  +addSegment(seg:Segment)
+  +getSegments() : List<Segment>
+}
+
+CursorWorld *-- Cursor
+CursorWorld *-- "0..*" Segment
+
+class Cursor {
+  -position : Point
+  -angle : int
+  -penDown : boolean
+  +moveForward(distance:int) : Segment
+  +turnLeft(angle:int)
+  +turnRight(angle:int)
+  +penUp()
+  +penDown()
+}
+
+class Segment {
+  -start : Point
+  -end : Point
+}
+
+class Point {
+  -x : int
+  -y : int
+}
+
+Segment *-- Point
+Cursor --> Point
+
+}
+
+@enduml
