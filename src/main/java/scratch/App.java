@@ -7,6 +7,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import scratch.model.Action;
+import scratch.model.Cursor;
+import scratch.model.Point;
 import scratch.view.MainView;
 import scratch.viewmodel.MainViewModel;
 
@@ -14,11 +17,11 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
-        MainViewModel vm = new MainViewModel();
+        Action action = new Action();
+        MainViewModel vm = new MainViewModel(action);
         MainView view = new MainView(vm);
 
-        Scene scene = new Scene(view, 1000, 650);
+        Scene scene = new Scene(view, 1300, 700);
         primaryStage.setTitle("Scratch");
         primaryStage.setScene(scene);
         primaryStage.show();
