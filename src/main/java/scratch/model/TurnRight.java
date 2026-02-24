@@ -1,14 +1,20 @@
 package scratch.model;
 
-public class TurnRight implements Command{
+public class TurnRight extends Action {
 
-    @Override
-    public String toString(){
-        return "Tourner à droite de";
+    private int angle;
+
+    public TurnRight(int angle) {
+        this.angle = angle;
     }
 
     @Override
-    public void execute() {
+    public void execute(Cursor cursor) {
+        cursor.turnRight(angle);
+    }
 
+    @Override
+    public String toString() {
+        return "Tourner à droite de " + angle;
     }
 }

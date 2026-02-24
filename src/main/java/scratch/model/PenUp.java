@@ -1,14 +1,14 @@
 package scratch.model;
 
-public class PenUp implements Command{
+public class PenUp extends Action {
 
     @Override
-    public String toString(){
-        return "Lever stylo";
+    public void execute(Cursor cursor) {
+        cursor.penUp();
     }
 
     @Override
-    public void execute() {
-
+    public String toString() {
+        return "Lever le stylo";
     }
 }

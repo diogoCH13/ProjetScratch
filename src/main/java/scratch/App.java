@@ -17,8 +17,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Action action = new Action();
-        MainViewModel vm = new MainViewModel(action);
+        Cursor cursor = new Cursor(new Point(0, 0));
+        MainViewModel vm = new MainViewModel(cursor);
         MainView view = new MainView(vm);
 
         Scene scene = new Scene(view, 1300, 700);

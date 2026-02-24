@@ -1,18 +1,17 @@
 package scratch.viewmodel;
 
 import javafx.collections.ObservableList;
-import scratch.model.Action;
-import scratch.model.Command;
-import scratch.model.Cursor;
+import scratch.model.*;
 
 public class MainViewModel {
-    private final Action action;
+    private final Cursor cursor;
 
-    public MainViewModel(Action action){
-        this.action = action;
+    public MainViewModel(Cursor cursor){
+        this.cursor = cursor;
+
     }
 
-    public ObservableList<Command> getPalettAction(){
-        return action.getPalettActions();
+    public ObservableList<ActionType> getPalettAction(){
+        return ActionsCatalog.getPalettActions();
     }
 }

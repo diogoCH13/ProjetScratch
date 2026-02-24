@@ -1,15 +1,14 @@
 package scratch.model;
 
-public class PenDown implements Command{
-
+public class PenDown extends Action {
 
     @Override
-    public String toString(){
-        return "Abaisser le stylo";
+    public void execute(Cursor cursor) {
+        cursor.penDown();
     }
 
     @Override
-    public void execute() {
-
+    public String toString() {
+        return "Abaisser le stylo";
     }
 }
