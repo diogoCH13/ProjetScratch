@@ -5,7 +5,7 @@ import javafx.collections.ObservableList;
 
 public class Action implements Command{
 
-    private final Cursor cursor = new Cursor(new Point(0,0));
+    private final Cursor cursor = new Cursor(new Point());
     private final ObservableList<Command> palettActions = FXCollections.observableArrayList(
             new MoveForward(),
             new TurnLeft(),

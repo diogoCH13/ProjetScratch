@@ -1,29 +1,28 @@
 package scratch.model;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 public class Point {
 
+    private IntegerProperty x = new SimpleIntegerProperty(250);
+    private IntegerProperty y = new SimpleIntegerProperty(250);
+
     public void setX(int x) {
-        this.x = x;
+        this.x.setValue(x);
     }
 
     public void setY(int y) {
-        this.y = y;
+        this.y.setValue(y);
     }
 
-    private int x;
-    private int y;
-
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public int getX() {
-        return x;
+    public int getX(){
+        return x.getValue();
     }
 
     public int getY() {
-        return y;
+        return y.getValue();
     }
 
 
