@@ -14,6 +14,8 @@ import javafx.scene.shape.Polygon;
 import scratch.model.*;
 import scratch.viewmodel.MainViewModel;
 
+import java.util.Set;
+
 
 public class MainView extends BorderPane /*VBox*/ {
     private final double TURTLE_HEAD_SIZE = 2;
@@ -80,7 +82,7 @@ public class MainView extends BorderPane /*VBox*/ {
     }
 
     public void configRight(){
-        drawTurtle(vm.getPoint().getX(),vm.getPoint().getY(),0);
+        drawTurtle(vm.getPoint().getX(),vm.getPoint().getY(),-90);
         paneTurtle.getChildren().addAll(configureSceneGrid(), turtle, headTurtle);
         sceneBox.getChildren().addAll(sceneLabel, paneTurtle, configureSceneButton());
     }
@@ -166,6 +168,36 @@ public class MainView extends BorderPane /*VBox*/ {
 //        sceneListView.setPrefSize(500,500);
 //        palletListView.setStyle("-fx-control-inner-background: lightblue;");
         palletListView.setItems(vm.getPalettAction());
+        palletListView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(ActionType action, boolean empty) {
+                super.updateItem(action, empty);
+                Circle circle = new Circle(5);
+
+                if (empty) {
+                    setText(null);
+                }
+                else {
+                    setGraphic(circle);
+                    setText(action.toString());
+                    switch (action) {
+                        case TURN_LEFT, TURN_RIGHT :
+                            setTextFill(Color.RED);
+                            circle.setFill(Color.RED);
+                            break;
+
+                        case MOVE_FORWARD:
+                            setTextFill(Color.BLUE);
+                            circle.setFill(Color.BLUE);
+                            break;
+
+                        default:
+                            setTextFill(Color.GREEN);
+                            circle.setFill(Color.GREEN);
+                    }
+                }
+            }
+        });
     }
 
     private void drawTurtle(double x, double y, double angle) {
