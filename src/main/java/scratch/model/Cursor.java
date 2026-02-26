@@ -28,10 +28,9 @@ public class Cursor {
 
         double dx = distance * Math.cos(radians);
         double dy = distance * Math.sin(radians);
+
         double oldX = position.getX();
         double oldY = position.getY();
-
-
 
         double newX = oldX + dx;
         double newY = oldY + dy;
@@ -49,17 +48,10 @@ public class Cursor {
         return penDown;
     }
 
-    public void pen(){
-
+    public void setPen(boolean write){
+        penDown = write;
     }
 
-    public void penUp() {
-        penDown = false;
-    }
-
-    public void penDown() {
-        penDown = true;
-    }
 
     public void turnLeft(double angle) {
     }
