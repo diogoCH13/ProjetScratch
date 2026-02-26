@@ -26,11 +26,6 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Label palettLabel = new Label("Palette d'actions");
     private final Label programLabel = new Label("Programme");
     private final Label sceneLabel = new Label("Scene");
-    private final Label moveForwardLabel = new Label(" Avancer de ");
-    private final Label turnLeft = new Label(" Tourner à gauche de ");
-    private final Label turnRight = new Label(" Tourner à droite de ");
-    private final Label penUp = new Label(" Lever stylo ");
-    private final Label penDown = new Label(" Abaisser stylo ");
 
     private final Button add = new Button("Ajouter au programme");
     private final Button upBtn = new Button("Monter");
@@ -42,16 +37,8 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Button executeBtn = new Button("Exécuter");
 
 
-//    private final ListView<ActionType> palletListView = new ListView<>();
-    private final ListView<Action> actionListView = new ListView<>();
-    private final ListView<Label> labelListView = new ListView<>();
-    private final ObservableList<Label> tabLabel = FXCollections.observableArrayList(
-            moveForwardLabel,
-            turnLeft,
-            turnRight,
-            penUp,
-            penDown
-    );
+    private final ListView<ActionType> palletListView = new ListView<>();
+    private final ListView<ActionType> actionListView = new ListView<>();
 
     private final MenuBar menuBar = new MenuBar(new Menu("File"));
     private final Pane paneTurtle = new Pane();
@@ -85,8 +72,7 @@ public class MainView extends BorderPane /*VBox*/ {
     }
 
     public void configLeft(){
-        labelListView.setItems(tabLabel);
-        palletBox.getChildren().addAll(palettLabel, labelListView, add);
+        palletBox.getChildren().addAll(palettLabel, palletListView, add);
     }
 
     public void configCenter(){
@@ -173,39 +159,13 @@ public class MainView extends BorderPane /*VBox*/ {
         return root;
     }
 
-    public void beautify(){
+    public void beautify() {
         palletBox.setPadding(new Insets(16, 16, 12, 16));
         programBox.setPadding(new Insets(16, 16, 12, 16));
         sceneBox.setPadding(new Insets(16, 16, 12, 16));
 //        sceneListView.setPrefSize(500,500);
 //        palletListView.setStyle("-fx-control-inner-background: lightblue;");
-//        palletListView.setItems(vm.getPalettAction());
-
-        Circle circleLabel = new Circle(5);
-        circleLabel.setFill(Color.BLUE);
-        moveForwardLabel.setStyle("-fx-text-fill: blue;");
-        moveForwardLabel.setGraphic(circleLabel);
-
-        Circle circleLabel2 = new Circle(5);
-        circleLabel2.setFill(Color.RED);
-        turnLeft.setStyle("-fx-text-fill: red;");
-        turnLeft.setGraphic(circleLabel2);
-
-        Circle circleLabel3 = new Circle(5);
-        circleLabel3.setFill(Color.RED);
-        turnRight.setStyle("-fx-text-fill: red;");
-        turnRight.setGraphic(circleLabel3);
-
-        Circle circleLabel4 = new Circle(5);
-        circleLabel4.setFill(Color.GREEN);
-        penUp.setStyle("-fx-text-fill: green;");
-        penUp.setGraphic(circleLabel4);
-
-        Circle circleLabel5 = new Circle(5);
-        circleLabel5.setFill(Color.GREEN);
-        penDown.setStyle("-fx-text-fill: green;");
-        penDown.setGraphic(circleLabel5);
-
+        palletListView.setItems(vm.getPalettAction());
     }
 
     private void drawTurtle(double x, double y, double angle) {
