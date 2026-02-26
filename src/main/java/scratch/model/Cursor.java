@@ -2,9 +2,11 @@ package scratch.model;
 
 public class Cursor {
 
-    private Point position;
+    private final Point position;
     private boolean penDown;
-    private int angle;
+    private final double angle;
+
+
 
     public Cursor(Point startPosition){
         this.position = startPosition;
@@ -16,12 +18,20 @@ public class Cursor {
         return position;
     }
 
-    public int getAngle() {
+    public double getAngle() {
         return angle;
+    }
+
+    public void move(double distance, double angle){
+        double radians = Math.toRadians(angle);
+
     }
 
     public boolean isPenDown() {
         return penDown;
+    }
+
+    public void pen(){
     }
 
     public void penUp() {
@@ -32,10 +42,10 @@ public class Cursor {
         penDown = true;
     }
 
-    public void turnLeft(int angle) {
+    public void turnLeft(double angle) {
     }
 
-    public void turnRight(int angle) {
+    public void turnRight(double angle) {
     }
 
 

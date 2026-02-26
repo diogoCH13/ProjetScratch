@@ -1,9 +1,9 @@
 package scratch.model;
 
 public class Turn extends Action {
-    private final int angle;
+    private final double angle;
 
-    public Turn(int angle){
+    public Turn(double angle){
         this.angle = angle;
     }
 
@@ -14,6 +14,9 @@ public class Turn extends Action {
     }
 
     public String toString(){
-        return angle > 0 ? :
+        if(angle > 0){
+            return "Tourner à droite de " + Math.abs(angle);
+        }
+        return "Tourner à gauche de " + Math.abs(angle);
     }
 }

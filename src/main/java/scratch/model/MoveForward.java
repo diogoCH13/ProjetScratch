@@ -2,15 +2,15 @@ package scratch.model;
 
 public class MoveForward extends Action {
 
-    private int distance;
+    private double distance;
 
-    public MoveForward(int distance) {
+    public MoveForward(double distance) {
         this.distance = distance;
     }
 
     @Override
     public void execute(Cursor cursor) {
-        // logique plus tard
+
     }
 
     @Override
