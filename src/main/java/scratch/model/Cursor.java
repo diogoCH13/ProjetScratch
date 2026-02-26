@@ -44,6 +44,20 @@ public class Cursor {
         position.setY(newY);
     }
 
+    public void turnLeft(double angle) {
+        if (angle < 1 || angle > 180){
+            throw new RuntimeException("angle invalide");
+        }
+        this.angle = (this.angle + angle) % 360;
+    }
+
+    public void turnRight(double angle) {
+        if (angle > -1 || angle < -180){
+            throw new RuntimeException("angle invalide");
+        }
+        this.angle = (this.angle + angle) % 360;
+    }
+
     public boolean isPenDown() {
         return penDown;
     }
@@ -51,14 +65,4 @@ public class Cursor {
     public void setPen(boolean write){
         penDown = write;
     }
-
-
-    public void turnLeft(double angle) {
-    }
-
-    public void turnRight(double angle) {
-    }
-
-
-
 }
