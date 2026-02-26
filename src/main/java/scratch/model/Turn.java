@@ -8,9 +8,19 @@ public class Turn extends Action {
     }
 
 
+//    @Override
+//    public void execute(Cursor cursor) {
+//        if (cursor.getAngle() > 0) {
+//            cursor.turnLeft(angle);
+//        }
+//        else {
+//            cursor.turnRight(angle);
+//        }
+//    }
+
     @Override
     public void execute(Cursor cursor) {
-        if (cursor.getAngle() > 0) {
+        if (angle > 0) {
             cursor.turnLeft(angle);
         }
         else {
@@ -20,8 +30,8 @@ public class Turn extends Action {
 
     public String toString(){
         if(angle > 0){
-            return "Tourner à gauche de " + Math.abs(angle);
+            return "Tourner à gauche de " + String.format("%.0f", Math.abs(angle));
         }
-        return "Tourner à droite de " + Math.abs(angle);
+        return "Tourner à droite de " + String.format("%.0f", Math.abs(angle));
     }
 }

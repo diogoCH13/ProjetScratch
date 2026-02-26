@@ -1,7 +1,5 @@
 package scratch.view;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -13,8 +11,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import scratch.model.*;
 import scratch.viewmodel.MainViewModel;
-
-import java.util.Set;
 
 
 public class MainView extends BorderPane /*VBox*/ {
@@ -29,7 +25,7 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Label programLabel = new Label("Programme");
     private final Label sceneLabel = new Label("Scene");
 
-    private final Button add = new Button("Ajouter au programme");
+    private final Button addBtn = new Button("Ajouter au programme");
     private final Button upBtn = new Button("Monter");
     private final Button downBtn = new Button("Descendre");
     private final Button duplicateBtn = new Button("Dupliquer");
@@ -40,7 +36,7 @@ public class MainView extends BorderPane /*VBox*/ {
 
 
     private final ListView<ActionType> palletListView = new ListView<>();
-    private final ListView<ActionType> actionListView = new ListView<>();
+    private final ListView<Action> actionListView = new ListView<>();
 
     private final MenuBar menuBar = new MenuBar(new Menu("File"));
     private final Pane paneTurtle = new Pane();
@@ -63,6 +59,10 @@ public class MainView extends BorderPane /*VBox*/ {
         this.setCenter(programBox);
         this.setRight(sceneBox);
 
+        loadData();
+        configActions();
+        configSelectionModels();
+
 //        this.getChildren().add(layoutControls());
 
         beautify();
@@ -74,7 +74,7 @@ public class MainView extends BorderPane /*VBox*/ {
     }
 
     public void configLeft(){
-        palletBox.getChildren().addAll(palettLabel, palletListView, add);
+        palletBox.getChildren().addAll(palettLabel, palletListView, addBtn);
     }
 
     public void configCenter(){
@@ -82,7 +82,7 @@ public class MainView extends BorderPane /*VBox*/ {
     }
 
     public void configRight(){
-        drawTurtle(vm.getPoint().getX(),vm.getPoint().getY(),-90);
+        drawTurtle(vm.getPoint().getX(),vm.getPoint().getY(),0);
         paneTurtle.getChildren().addAll(configureSceneGrid(), turtle, headTurtle);
         sceneBox.getChildren().addAll(sceneLabel, paneTurtle, configureSceneButton());
     }
@@ -167,7 +167,7 @@ public class MainView extends BorderPane /*VBox*/ {
         sceneBox.setPadding(new Insets(16, 16, 12, 16));
 //        sceneListView.setPrefSize(500,500);
 //        palletListView.setStyle("-fx-control-inner-background: lightblue;");
-        palletListView.setItems(vm.getPalettAction());
+
         palletListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(ActionType action, boolean empty) {
@@ -215,5 +215,44 @@ public class MainView extends BorderPane /*VBox*/ {
         this.headTurtle.setTranslateX(xP1); // move the head of the turtle (circle)
         this.headTurtle.setTranslateY(yP1);
     }
+
+
+    private void loadData() {
+        palletListView.setItems(vm.getPalettAction());
+        actionListView.setItems(vm.getProgramActions());
+    }
+
+    private void configActions() {
+        addBtn.setOnAction(e->{
+            vm.addAction();
+        });
+
+        palletListView.setOnMouseClicked(e->{
+            if (e.getClickCount() >= 2){
+                vm.addAction();
+            }
+        });
+
+//        removeButton.setOnAction(e->{
+//            mainViewModel.deleteAction();
+//        });
+    }
+
+    private void configButtonsDisabling() {
+
+    }
+
+    private void configSelectionModels() {
+
+      palletListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
+            vm.catalogIndexProperty().set(t1.intValue());
+        });
+
+        actionListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
+            vm.actionIndexProperty().set(t1.intValue());
+        });
+    }
+
+
 
 }

@@ -1,5 +1,7 @@
 package scratch.viewmodel;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
 import scratch.model.Cursor;
 import scratch.model.Point;
@@ -7,17 +9,38 @@ import scratch.model.*;
 
 public class MainViewModel {
     private final Cursor cursor;
+    private final Program program;
+
+    private final IntegerProperty catalogIndex = new SimpleIntegerProperty(-1);
+    private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
 
     public MainViewModel(Cursor cursor){
         this.cursor = cursor;
+        this.program = new Program();
+    }
 
+    public IntegerProperty catalogIndexProperty() {
+        return catalogIndex;
+    }
+
+    public IntegerProperty actionIndexProperty() {
+        return actionIndex;
     }
 
     public ObservableList<ActionType> getPalettAction(){
         return ActionsCatalog.getPalettActions();
     }
 
+    public ObservableList<Action>getProgramActions(){
+        return program.getActions();
+    }
+
     public Point getPoint(){
         return cursor.getPosition();
+    }
+
+    public void addAction(){
+        int i = catalogIndex.get();
+        program.addAction(i);
     }
 }

@@ -15,6 +15,6 @@ public class MoveForward extends Action {
 
     @Override
     public String toString() {
-        return "Avancer de " + distance;
+        return "Avancer de " + String.format("%.0f", distance);
     }
 }

@@ -11,5 +11,12 @@ public class ActionsCatalog {
     public static ObservableList<ActionType> getPalettActions() {
         return FXCollections.unmodifiableObservableList(palettActions);
     }
+
+    public static ActionType getAction(int index){
+        if (index <= -1 || index > palettActions.size() - 1){
+            return null;
+        }
+        return palettActions.get(index);
+    }
 }
 
