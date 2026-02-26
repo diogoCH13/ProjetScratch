@@ -42,7 +42,7 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Button executeBtn = new Button("Exécuter");
 
 
-    private final ListView<ActionType> palletListView = new ListView<>();
+//    private final ListView<ActionType> palletListView = new ListView<>();
     private final ListView<Action> actionListView = new ListView<>();
     private final ListView<Label> labelListView = new ListView<>();
     private final ObservableList<Label> tabLabel = FXCollections.observableArrayList(
@@ -99,7 +99,7 @@ public class MainView extends BorderPane /*VBox*/ {
         sceneBox.getChildren().addAll(sceneLabel, paneTurtle, configureSceneButton());
     }
 
-    private void ButtonsBox(){
+    private void configureButtonSizes(){
         upBtn.setPrefWidth(80);
         downBtn.setPrefWidth(80);
         duplicateBtn.setPrefWidth(80);
@@ -110,7 +110,7 @@ public class MainView extends BorderPane /*VBox*/ {
     private HBox configureButtonBox(){
         buttonBox.setSpacing(10);
         buttonBox.setAlignment(Pos.CENTER);
-        ButtonsBox();
+        configureButtonSizes();
         buttonBox.getChildren().addAll(upBtn, downBtn, duplicateBtn, deleteBtn, clearBtn);
         return buttonBox;
     }
@@ -163,7 +163,7 @@ public class MainView extends BorderPane /*VBox*/ {
             gc.strokeLine(0, yStart, width, yStart);
         }
 
-        return gc.getCanvas();
+        return canvas;
     }
 
     public HBox configureSceneButton(){
@@ -178,8 +178,8 @@ public class MainView extends BorderPane /*VBox*/ {
         programBox.setPadding(new Insets(16, 16, 12, 16));
         sceneBox.setPadding(new Insets(16, 16, 12, 16));
 //        sceneListView.setPrefSize(500,500);
-        palletListView.setStyle("-fx-control-inner-background: lightblue;");
-        palletListView.setItems(vm.getPalettAction());
+//        palletListView.setStyle("-fx-control-inner-background: lightblue;");
+//        palletListView.setItems(vm.getPalettAction());
 
         Circle circleLabel = new Circle(5);
         circleLabel.setFill(Color.BLUE);
