@@ -1,14 +1,20 @@
 package scratch.model;
 
-public class MoveForward implements Command{
+public class MoveForward extends Action {
 
-    @Override
-    public String toString(){
-        return "Avancer de";
+    private double distance;
+
+    public MoveForward(double distance) {
+        this.distance = distance;
     }
 
     @Override
-    public void execute() {
+    public void execute(Cursor cursor) {
 
+    }
+
+    @Override
+    public String toString() {
+        return "Avancer de " + distance;
     }
 }

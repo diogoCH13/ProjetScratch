@@ -3,26 +3,18 @@ package scratch.model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class Action implements Command{
+public abstract class Action {
 
-    private final Cursor cursor = new Cursor(new Point());
-    private final ObservableList<Command> palettActions = FXCollections.observableArrayList(
-            new MoveForward(),
-            new TurnLeft(),
-            new TurnRight(),
-            new PenUp(),
-            new PenDown()
+
+    private final Cursor cursor = new Cursor(new Point(250,250));
+    private final ObservableList<ActionType> palettActions = FXCollections.observableArrayList(
+            ActionType.MOVE_FORWARD,
+            ActionType.TURN_LEFT,
+            ActionType.TURN_RIGHT,
+            ActionType.PEN_UP,
+            ActionType.PEN_DOWN
     );
 
-    public Cursor getCursor(){
-        return cursor;
-    }
-    public ObservableList<Command> getPalettActions(){
-        return FXCollections.unmodifiableObservableList(palettActions);
-    }
+    public abstract void execute(Cursor cursor);
 
-    @Override
-    public void execute() {
-
-    }
 }

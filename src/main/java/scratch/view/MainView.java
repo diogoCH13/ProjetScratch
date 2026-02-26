@@ -41,8 +41,9 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Button loadBtn = new Button("Charger");
     private final Button executeBtn = new Button("Exécuter");
 
-    private final ListView<Command> palletListView = new ListView<>();
-    private final ListView<Command> actionListView = new ListView<>();
+
+    private final ListView<ActionType> palletListView = new ListView<>();
+    private final ListView<Action> actionListView = new ListView<>();
     private final ListView<Label> labelListView = new ListView<>();
     private final ObservableList<Label> tabLabel = FXCollections.observableArrayList(
             moveForwardLabel,

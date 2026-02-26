@@ -1,13 +1,16 @@
 package scratch.model;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 
 public class Point {
 
-    private IntegerProperty x = new SimpleIntegerProperty(250);
-    private IntegerProperty y = new SimpleIntegerProperty(250);
+    private DoubleProperty x = new SimpleDoubleProperty();
+    private DoubleProperty y = new SimpleDoubleProperty();
+
+    public Point(double x, double y) {
+        this.x.setValue(x);
+        this.y.setValue(y);
+    }
 
     public void setX(int x) {
         this.x.setValue(x);
@@ -17,13 +20,11 @@ public class Point {
         this.y.setValue(y);
     }
 
-    public int getX(){
+    public double getX(){
         return x.getValue();
     }
 
-    public int getY() {
+    public double getY() {
         return y.getValue();
     }
-
-
 }
