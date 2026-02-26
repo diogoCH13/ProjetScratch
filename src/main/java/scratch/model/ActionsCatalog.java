@@ -12,3 +12,4 @@ public class ActionsCatalog {
         return FXCollections.unmodifiableObservableList(palettActions);
     }
 }
+

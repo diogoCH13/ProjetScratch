@@ -1,6 +1,8 @@
 package scratch.viewmodel;
 
 import javafx.collections.ObservableList;
+import scratch.model.Cursor;
+import scratch.model.Point;
 import scratch.model.*;
 
 public class MainViewModel {
@@ -13,5 +15,9 @@ public class MainViewModel {
 
     public ObservableList<ActionType> getPalettAction(){
         return ActionsCatalog.getPalettActions();
+    }
+
+    public Point getPoint(){
+        return cursor.getPosition();
     }
 }
