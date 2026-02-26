@@ -1,14 +1,14 @@
 package scratch.model;
 
 public class Cursor {
-
+    private final CursorWorld world;
     private final Point position;
     private boolean penDown;
-    private final double angle;
+    private double angle;
 
 
-
-    public Cursor(Point startPosition){
+    public Cursor(CursorWorld world, Point startPosition){
+        this.world = world;
         this.position = startPosition;
         this.penDown = true;
         this.angle = 0;
@@ -22,25 +22,36 @@ public class Cursor {
         return angle;
     }
 
-    public void move(double distance, double angle){
-        double radians = Math.toRadians(angle);
+    public void moveForward(double distance){
 
+        double radians = Math.toRadians(angle) + Math.PI / 2;
+
+        double dx = distance * Math.cos(radians);
+        double dy = distance * Math.sin(radians);
+
+        double oldX = position.getX();
+        double oldY = position.getY();
+
+        double newX = oldX + dx;
+        double newY = oldY + dy;
+
+        if (penDown){
+            Segment segment = new Segment(new Point(oldX, oldY), new Point(newX,newY));
+            world.addSegment(segment);
+        }
+
+        position.setX(newX);
+        position.setY(newY);
     }
 
     public boolean isPenDown() {
         return penDown;
     }
 
-    public void pen(){
+    public void setPen(boolean write){
+        penDown = write;
     }
 
-    public void penUp() {
-        penDown = false;
-    }
-
-    public void penDown() {
-        penDown = true;
-    }
 
     public void turnLeft(double angle) {
     }

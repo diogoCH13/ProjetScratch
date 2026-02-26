@@ -8,10 +8,9 @@ public class Pen extends Action {
         this.write = write;
     }
 
-
     @Override
     public void execute(Cursor cursor) {
-
+        cursor.setPen(write);
     }
 
     public String toString(){
