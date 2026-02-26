@@ -10,7 +10,7 @@ public class MoveForward extends Action {
 
     @Override
     public void execute(Cursor cursor) {
-
+        cursor.moveForward(distance);
     }
 
     @Override
