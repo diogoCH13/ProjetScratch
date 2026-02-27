@@ -16,6 +16,8 @@ public class MainViewModel {
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
 
     private final BooleanBinding canUp = actionIndex.greaterThan(0);
+    private final BooleanBinding canAdd = catalogIndex.greaterThanOrEqualTo(0);
+    private final BooleanBinding canRemove = actionIndex.greaterThanOrEqualTo(0);
 
     public MainViewModel(Cursor cursor){
         this.cursor = cursor;
@@ -62,5 +64,13 @@ public class MainViewModel {
 
     public BooleanBinding canUp() {
         return canUp;
+    }
+
+    public BooleanBinding canAdd(){
+        return canAdd;
+    }
+
+    public BooleanBinding canRemove(){
+        return canRemove;
     }
 }

@@ -273,7 +273,8 @@ public class MainView extends BorderPane /*VBox*/ {
 
     private void configButtonsDisabling() {
         upBtn.disableProperty().bind(vm.canUp().not());
-
+        addBtn.disableProperty().bind(vm.canAdd().not());
+        deleteBtn.disableProperty().bind(vm.canRemove().not());
     }
 
     private void configSelectionModels() {
