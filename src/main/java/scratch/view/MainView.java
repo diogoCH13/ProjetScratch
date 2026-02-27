@@ -199,6 +199,34 @@ public class MainView extends BorderPane /*VBox*/ {
                 }
             }
         });
+
+
+        actionListView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Action action, boolean empty) {
+                super.updateItem(action, empty);
+                Circle circle = new Circle(5);
+
+                if (empty || action == null) {
+                    setText(null);
+                    setGraphic(null);
+                }
+                else {
+                    setGraphic(circle);
+                    setText(action.toString());
+                    if(action instanceof Turn){
+                        setTextFill(Color.RED);
+                        circle.setFill(Color.RED);
+                    } else if (action instanceof MoveForward) {
+                        setTextFill(Color.BLUE);
+                        circle.setFill(Color.BLUE);
+                    }else {
+                        setTextFill(Color.GREEN);
+                        circle.setFill(Color.GREEN);
+                    }
+                }
+            }
+        });
     }
 
     private void drawTurtle(double x, double y, double angle) {
