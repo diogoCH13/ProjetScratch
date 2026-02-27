@@ -62,6 +62,7 @@ public class MainView extends BorderPane /*VBox*/ {
         loadData();
         configActions();
         configSelectionModels();
+        configButtonsDisabling();
 
 //        this.getChildren().add(layoutControls());
 
@@ -233,12 +234,17 @@ public class MainView extends BorderPane /*VBox*/ {
             }
         });
 
-//        removeButton.setOnAction(e->{
-//            mainViewModel.deleteAction();
-//        });
+        deleteBtn.setOnAction(e->{
+            vm.deleteAction();
+        });
+
+        upBtn.setOnAction(e->{
+            vm.upAction();
+        });
     }
 
     private void configButtonsDisabling() {
+        upBtn.disableProperty().bind(vm.canUp().not());
 
     }
 
@@ -250,6 +256,10 @@ public class MainView extends BorderPane /*VBox*/ {
 
         actionListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
             vm.actionIndexProperty().set(t1.intValue());
+        });
+
+        vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
+            actionListView.getSelectionModel().select(t1.intValue());
         });
     }
 

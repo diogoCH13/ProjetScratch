@@ -1,5 +1,6 @@
 package scratch.viewmodel;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
@@ -13,6 +14,8 @@ public class MainViewModel {
 
     private final IntegerProperty catalogIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
+
+    private final BooleanBinding canUp = actionIndex.greaterThan(0);
 
     public MainViewModel(Cursor cursor){
         this.cursor = cursor;
@@ -42,5 +45,22 @@ public class MainViewModel {
     public void addAction(){
         int i = catalogIndex.get();
         program.addAction(i);
+    }
+
+    public void deleteAction(){
+        int i = actionIndex.get();
+        program.deleteAction(i);
+    }
+
+    public void upAction(){
+        int i = actionIndex.get();
+        program.up(i);
+        if (i  > 0){
+            actionIndex.set(i - 1);
+        }
+    }
+
+    public BooleanBinding canUp() {
+        return canUp;
     }
 }
