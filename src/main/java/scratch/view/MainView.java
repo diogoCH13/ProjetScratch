@@ -21,8 +21,12 @@ public class MainView extends BorderPane /*VBox*/ {
     private Polygon turtle;
     private final Circle headTurtle = new Circle(TURTLE_HEAD_SIZE);
 
+    private final TextField valueField = new TextField();
+
     private final Label palettLabel = new Label("Palette d'actions");
     private final Label programLabel = new Label("Programme");
+    private final Label detailLabel = new Label("(aucune action sélectionnée)");
+    private final Label detailLabel2 = new Label();
     private final Label sceneLabel = new Label("Scene");
 
     private final Button addBtn = new Button("Ajouter au programme");
@@ -33,7 +37,6 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Button clearBtn = new Button("Vider tout");
     private final Button loadBtn = new Button("Charger");
     private final Button executeBtn = new Button("Exécuter");
-
 
     private final ListView<ActionType> palletListView = new ListView<>();
     private final ListView<Action> actionListView = new ListView<>();
@@ -63,6 +66,7 @@ public class MainView extends BorderPane /*VBox*/ {
         configActions();
         configSelectionModels();
         configButtonsDisabling();
+        configureBindingsAndListeners();
 
 //        this.getChildren().add(layoutControls());
 
@@ -108,20 +112,18 @@ public class MainView extends BorderPane /*VBox*/ {
         VBox TitledPaneBox = new VBox();
         TitledPaneBox.setPadding(new Insets(10));
         TitledPaneBox.setFillWidth(false);
-        Label infoLabel = new Label("(aucune action sélectionnée)");
         TitledPane detailPane = new TitledPane();
 
         detailPane.setPrefWidth(460);
         detailPane.setText("Détail de l'action");
 
-        TextField valueField = new TextField();
         valueField.setPrefWidth(40);
         valueField.setMaxWidth(40);
 
         HBox detailContent = new HBox(10);
         detailContent.setAlignment(Pos.CENTER_LEFT);
         detailContent.setPadding(new Insets(10));
-        detailContent.getChildren().addAll(infoLabel, valueField);
+        detailContent.getChildren().addAll(detailLabel, valueField, detailLabel2);
 
         detailPane.setContent(detailContent);
         detailPane.setExpanded(true);
@@ -241,21 +243,36 @@ public class MainView extends BorderPane /*VBox*/ {
         upBtn.setOnAction(e->{
             vm.upAction();
         });
+
+        downBtn.setOnAction(e -> {
+            vm.downAction();
+        });
+
+        duplicateBtn.setOnAction(e -> {
+            vm.duplicateAction(actionListView.getSelectionModel().getSelectedItem());
+        });
+
+        clearBtn.setOnAction(e -> {
+            vm.clearAction();
+        });
+
     }
 
     private void configButtonsDisabling() {
         upBtn.disableProperty().bind(vm.canUp().not());
-
+        downBtn.disableProperty().bind(vm.canDown().not());
+        duplicateBtn.disableProperty().bind(vm.canDuplicate().not());
     }
 
     private void configSelectionModels() {
-
-      palletListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
+        palletListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
             vm.catalogIndexProperty().set(t1.intValue());
         });
 
         actionListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
-            vm.actionIndexProperty().set(t1.intValue());
+          vm.actionIndexProperty().set(t1.intValue());
+
+          vm.updateActionDetails();
         });
 
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
@@ -263,6 +280,8 @@ public class MainView extends BorderPane /*VBox*/ {
         });
     }
 
-
+    private void configureBindingsAndListeners(){
+        detailLabel.textProperty().bind(vm.actionDetailsProperty());
+    }
 
 }

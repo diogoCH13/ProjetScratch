@@ -14,6 +14,21 @@ public class MoveForward extends Action {
     }
 
     @Override
+    public ActionType actionType() {
+        return ActionType.MOVE_FORWARD;
+    }
+
+    @Override
+    public double getValue() {
+        return distance;
+    }
+
+    @Override
+    public void setValue(double value) {
+
+    }
+
+    @Override
     public String toString() {
         return "Avancer de " + String.format("%.0f", distance);
     }

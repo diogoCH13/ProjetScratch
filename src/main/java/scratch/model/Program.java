@@ -39,4 +39,17 @@ public class Program {
             Collections.swap(actions, index, index - 1);
         }
     }
+
+    public void down(int index){
+        if (index >= 0 && index < actions.size() - 1){
+            Action action = actions.set(index, actions.get(index + 1));
+            actions.set(index + 1, action);
+        }
+    }
+
+    public void duplicate(Action action){
+        if (action != null){
+            actions.add(action);
+        }
+    }
 }
