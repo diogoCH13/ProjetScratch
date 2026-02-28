@@ -21,9 +21,15 @@ public class CursorWorld {
         return segments;
     }
 
-
-
     public void addSegment(Segment segment){
         segments.add(segment);
     }
+
+    public void reset(){
+        segments.clear();
+        cursor.reset();
+    }
+
+
+
 }

@@ -5,11 +5,14 @@ public class Cursor {
     private final Point position;
     private boolean penDown;
     private double angle;
+    private final Point startPosition;
+
 
 
     public Cursor(CursorWorld world, Point startPosition){
         this.world = world;
-        this.position = startPosition;
+        this.startPosition = new Point(startPosition.getX(), startPosition.getY());
+        this.position = new Point(startPosition.getX(), startPosition.getY());
         this.penDown = true;
         this.angle = 0;
     }
@@ -64,5 +67,17 @@ public class Cursor {
 
     public void setPen(boolean write){
         penDown = write;
+    }
+
+
+    public void reset(){
+        position.setX(startPosition.getX());
+        position.setY(startPosition.getY());
+        angle = 0;
+        penDown = true;
+    }
+
+    public CursorWorld getWorld(){
+        return world;
     }
 }
