@@ -275,11 +275,13 @@ public class MainView extends BorderPane /*VBox*/ {
         upBtn.disableProperty().bind(vm.canUp().not());
         addBtn.disableProperty().bind(vm.canAdd().not());
         deleteBtn.disableProperty().bind(vm.canRemove().not());
+        loadBtn.disableProperty().bind(vm.canLoad().not());
+        executeBtn.disableProperty().bind(vm.canExecute().not());
     }
 
     private void configSelectionModels() {
 
-      palletListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
+        palletListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
             vm.catalogIndexProperty().set(t1.intValue());
         });
 

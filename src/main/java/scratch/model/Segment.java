@@ -2,6 +2,9 @@ package scratch.model;
 
 public class Segment {
 
+    private Point start;
+    private Point end;
+
     public Segment(Point start, Point end) {
         this.start = start;
         this.end = end;
@@ -23,7 +26,8 @@ public class Segment {
         this.end = end;
     }
 
-    private Point start;
-    private Point end;
+
+
+
 
 }
