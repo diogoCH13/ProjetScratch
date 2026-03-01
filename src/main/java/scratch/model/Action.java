@@ -1,13 +1,14 @@
 package scratch.model;
 
+
 public abstract class Action {
 
-    private final Cursor cursor;
+    public abstract void execute(Cursor cursor);
 
+    public abstract ActionType actionType();
 
-    public Action(Cursor cursor) {
-        this.cursor = cursor;
-    }
+    public abstract double getValue();
 
-    public abstract void execute();
+    public abstract void setValue(double value);
+
 }
