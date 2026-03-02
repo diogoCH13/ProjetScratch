@@ -1,5 +1,6 @@
 package scratch.model;
 
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class Program {
 
-    private final ObservableList<Action> actions = FXCollections.observableArrayList();
+    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.valueProperty() });
 
     public ObservableList<Action> getActions() {
         return FXCollections.unmodifiableObservableList(actions);

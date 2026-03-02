@@ -1,5 +1,6 @@
 package scratch.view;
 
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -9,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.util.converter.NumberStringConverter;
 import scratch.model.*;
 import scratch.viewmodel.MainViewModel;
 
@@ -168,8 +170,6 @@ public class MainView extends BorderPane /*VBox*/ {
         palletBox.setPadding(new Insets(16, 16, 12, 16));
         programBox.setPadding(new Insets(16, 16, 12, 16));
         sceneBox.setPadding(new Insets(16, 16, 12, 16));
-//        sceneListView.setPrefSize(500,500);
-//        palletListView.setStyle("-fx-control-inner-background: lightblue;");
 
         palletListView.setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -283,7 +283,6 @@ public class MainView extends BorderPane /*VBox*/ {
         clearBtn.setOnAction(e -> {
             vm.clearAction();
         });
-
     }
 
     private void configButtonsDisabling() {
@@ -303,8 +302,6 @@ public class MainView extends BorderPane /*VBox*/ {
 
         actionListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
           vm.actionIndexProperty().set(t1.intValue());
-
-          vm.updateActionDetails();
         });
 
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
@@ -313,7 +310,9 @@ public class MainView extends BorderPane /*VBox*/ {
     }
 
     private void configureBindingsAndListeners(){
-        detailLabel.textProperty().bind(vm.actionDetailsProperty());
+        detailLabel.textProperty().bind(vm.actionDetailsBinding());
+        valueField.textProperty().bindBidirectional(vm.actionValueProperty());
+        detailLabel2.textProperty().bind(vm.actionDetailValueBindings());
     }
 
 }
