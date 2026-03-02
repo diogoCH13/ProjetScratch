@@ -20,6 +20,7 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         CursorWorld world = new CursorWorld();
         Cursor cursor = new Cursor(world, new Point(250, 250));
+//        world.setCursor(cursor);
         MainViewModel vm = new MainViewModel(cursor);
         MainView view = new MainView(vm);
 

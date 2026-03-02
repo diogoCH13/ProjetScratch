@@ -18,14 +18,19 @@ public class Turn extends Action {
 //        }
 //    }
 
+//    @Override
+//    public void execute(Cursor cursor) {
+//        if (angle > 0) {
+//            cursor.turnLeft(angle);
+//        }
+//        else {
+//            cursor.turnRight(angle);
+//        }
+//    }
+
     @Override
     public void execute(Cursor cursor) {
-        if (angle > 0) {
-            cursor.turnLeft(angle);
-        }
-        else {
-            cursor.turnRight(angle);
-        }
+        cursor.rotate(angle);
     }
 
     @Override

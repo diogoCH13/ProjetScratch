@@ -15,7 +15,7 @@ import scratch.model.*;
 public class MainViewModel {
     private final Cursor cursor;
     private final Program program;
-    private final   CursorWorld world;
+    private final CursorWorld world;
 
     private final IntegerProperty catalogIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
@@ -28,7 +28,10 @@ public class MainViewModel {
     private final BooleanBinding canAdd = catalogIndex.greaterThanOrEqualTo(0);
     private final BooleanBinding canRemove = actionIndex.greaterThanOrEqualTo(0);
 
-    private BooleanProperty programLoaded = new SimpleBooleanProperty(false);
+
+    private final BooleanProperty programLoaded = new SimpleBooleanProperty(false);
+    private final BooleanProperty running = new SimpleBooleanProperty(false);
+
 
     public MainViewModel(Cursor cursor) {
         this.cursor = cursor;
@@ -42,6 +45,14 @@ public class MainViewModel {
 
     public IntegerProperty actionIndexProperty() {
         return actionIndex;
+    }
+
+    public IntegerProperty executionIndexProperty(){
+        return executionIndex;
+    }
+
+    public BooleanProperty runningProperty(){
+        return running;
     }
 
     public StringProperty actionDetailsProperty() {
@@ -67,6 +78,9 @@ public class MainViewModel {
     public void addAction() {
         int i = catalogIndex.get();
         program.addAction(i);
+        programLoaded.set(false);
+        running.set(false);
+        executionIndex.set(-1);
     }
 
     public void deleteAction() {
@@ -116,6 +130,9 @@ public class MainViewModel {
     public void clearAction() {
         program.removeAll();
         actionIndex.set(-1);
+        programLoaded.set(false);
+        running.set(false);
+        executionIndex.set(-1);
     }
 
     public void updateActionDetails() {
@@ -165,25 +182,71 @@ public class MainViewModel {
         return programLoaded.get();
     }
 
+    public boolean isRunning(){
+        return running.get();
+    }
+
     public BooleanProperty programLoadedProperty() {
         return programLoaded;
     }
 
     public BooleanBinding canLoad() {
-        return Bindings.isNotEmpty(program.getActions()).and(programLoaded.not());
+//        return Bindings.isNotEmpty(program.getActions()).and(programLoaded.not());
+        return Bindings.isNotEmpty(program.getActions());
     }
 
     public BooleanProperty canExecute() {
         return programLoaded;
     }
 
-    public void loadProgram(){
-        world.reset();
+    public void reset(){
+        world.clearSegments();
+        cursor.reset();
         executionIndex.set(0);
-        programLoaded.set(true);
-        if (!program.getActions().isEmpty()){
-            actionIndex.set(0);
-        }
+//        if (!program.getActions().isEmpty()){
+//            actionIndex.set(0);
+//        }
     }
+
+    public void loadProgram(){
+        reset();
+        programLoaded.set(true);
+    }
+
+    public void execute(){
+        running.set(true);
+        actionIndex.set(0); //selection 1er élément
+        executionIndex.set(0);
+
+    }
+
+    public void next(){
+        int i = executionIndex.get();
+        int size = program.getActions().size();
+        if (i < size){
+            Action action = program.getActions().get(i);
+            action.execute(cursor);
+            i++;
+            executionIndex.set(i);
+            if (i < size){
+                actionIndex.set(i);
+            }else{
+                running.set(false);
+            }
+        }
+//        System.out.println(
+//                "X : " + cursor.getPosition().getX() +
+//                        " Y : " + cursor.getPosition().getY()
+//        );
+    }
+
+    public BooleanBinding isExecutionFinished(){
+        return Bindings.createBooleanBinding(() ->
+                executionIndex.get() >= program.getActions().size(),
+                executionIndex, program.getActions()
+        );
+    }
+
+
 
 }

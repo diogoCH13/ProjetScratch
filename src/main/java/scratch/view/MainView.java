@@ -1,5 +1,6 @@
 package scratch.view;
 
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -37,6 +38,7 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Button clearBtn = new Button("Vider tout");
     private final Button loadBtn = new Button("Charger");
     private final Button executeBtn = new Button("Exécuter");
+
 
     private final ListView<ActionType> palletListView = new ListView<>();
     private final ListView<Action> actionListView = new ListView<>();
@@ -284,6 +286,24 @@ public class MainView extends BorderPane /*VBox*/ {
             vm.clearAction();
         });
 
+        loadBtn.setOnAction(e->{
+            if (!vm.isProgramLoaded()) {
+                vm.loadProgram();
+            } else {
+                vm.reset();
+            }
+        });
+
+        executeBtn.setOnAction(e->{
+            if (!vm.isRunning()){
+                vm.execute();
+            }else {
+                vm.next();
+            }
+        });
+
+
+
     }
 
     private void configButtonsDisabling() {
@@ -291,9 +311,11 @@ public class MainView extends BorderPane /*VBox*/ {
         addBtn.disableProperty().bind(vm.canAdd().not());
         deleteBtn.disableProperty().bind(vm.canRemove().not());
         loadBtn.disableProperty().bind(vm.canLoad().not());
-        executeBtn.disableProperty().bind(vm.canExecute().not());
+        executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
         downBtn.disableProperty().bind(vm.canDown().not());
         duplicateBtn.disableProperty().bind(vm.canDuplicate().not());
+
+
     }
 
     private void configSelectionModels() {
@@ -314,6 +336,21 @@ public class MainView extends BorderPane /*VBox*/ {
 
     private void configureBindingsAndListeners(){
         detailLabel.textProperty().bind(vm.actionDetailsProperty());
+
+
+        loadBtn.textProperty().bind(
+                Bindings.when(vm.programLoadedProperty())
+                        .then("Ré-initialiser")
+                        .otherwise("Charger")
+        );
+
+        executeBtn.textProperty().bind(
+                Bindings.when(vm.runningProperty())
+                        .then("Suivant")
+                        .otherwise("Exécuter")
+        );
+
+
     }
 
 }
