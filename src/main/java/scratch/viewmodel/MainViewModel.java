@@ -247,6 +247,18 @@ public class MainViewModel {
         );
     }
 
+    public DoubleProperty cursorXProperty(){
+        return cursor.getPosition().xProperty();
+    }
+
+    public DoubleProperty cursorYProperty(){
+        return cursor.getPosition().yProperty();
+    }
+
+    public DoubleProperty cursorAngelProperty(){
+        return cursor.angleProperty();
+    }
+
 
 
 }

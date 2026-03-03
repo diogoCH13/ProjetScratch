@@ -249,7 +249,6 @@ public class MainView extends BorderPane /*VBox*/ {
         this.headTurtle.setTranslateY(yP1);
     }
 
-
     private void loadData() {
         palletListView.setItems(vm.getPalettAction());
         actionListView.setItems(vm.getProgramActions());
@@ -350,6 +349,31 @@ public class MainView extends BorderPane /*VBox*/ {
                         .otherwise("Exécuter")
         );
 
+        vm.cursorXProperty().addListener((observableValue, number, t1) -> {
+            redrawTurtle();
+//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
+        });
+
+        vm.cursorYProperty().addListener((observableValue, number, t1) -> {
+            redrawTurtle();
+//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
+        });
+
+        vm.cursorAngelProperty().addListener((observableValue, number, t1) -> {
+//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
+            redrawTurtle();
+        });
+
+
+    }
+
+    private void redrawTurtle(){
+        paneTurtle.getChildren().remove(turtle);
+        drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
+        paneTurtle.getChildren().add(turtle);
+    }
+
+    private void render() {
 
     }
 
