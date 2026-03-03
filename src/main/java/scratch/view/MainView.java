@@ -1,6 +1,9 @@
 package scratch.view;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -10,9 +13,12 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.util.converter.IntegerStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import scratch.model.*;
 import scratch.viewmodel.MainViewModel;
+
+import java.util.function.UnaryOperator;
 
 
 public class MainView extends BorderPane /*VBox*/ {
@@ -289,6 +295,8 @@ public class MainView extends BorderPane /*VBox*/ {
         upBtn.disableProperty().bind(vm.canUp().not());
         addBtn.disableProperty().bind(vm.canAdd().not());
         deleteBtn.disableProperty().bind(vm.canRemove().not());
+        clearBtn.disableProperty().bind(vm.canClearAll().not());
+        valueField.disableProperty().bind(vm.disabledTextField().not());
         loadBtn.disableProperty().bind(vm.canLoad().not());
         executeBtn.disableProperty().bind(vm.canExecute().not());
         downBtn.disableProperty().bind(vm.canDown().not());
@@ -307,11 +315,32 @@ public class MainView extends BorderPane /*VBox*/ {
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
             actionListView.getSelectionModel().select(t1.intValue());
         });
+
+        actionListView.getItems().addListener((Observable obs) -> {
+            if (vm.isValidIndex()){
+                String value = String.valueOf(vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue());
+                vm.actionValueProperty().set(value);
+            }
+        });
     }
 
     private void configureBindingsAndListeners(){
         detailLabel.textProperty().bind(vm.actionDetailsBinding());
-        valueField.textProperty().bindBidirectional(vm.actionValueProperty());
+        try{
+            valueField.textProperty().bindBidirectional(vm.actionValueProperty());
+        }
+        catch(NumberFormatException numb){
+            System.out.println("yes");
+        }
+//        // Source - https://stackoverflow.com/a/30796829
+//        valueField.textProperty().addListener(new ChangeListener<String>() {
+//            @Override
+//            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+//                if (!newValue.matches("\\d*")) {
+//                    valueField.setText(newValue.replaceAll("\\D", ""));
+//                }
+//            }
+//        });
         detailLabel2.textProperty().bind(vm.actionDetailValueBindings());
     }
 

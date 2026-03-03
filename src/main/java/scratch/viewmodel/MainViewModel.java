@@ -1,7 +1,9 @@
 package scratch.viewmodel;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.*;
 import javafx.beans.property.*;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import scratch.model.Cursor;
 import scratch.model.Point;
@@ -10,7 +12,7 @@ import scratch.model.*;
 public class MainViewModel {
     private final Cursor cursor;
     private final Program program;
-    private final   CursorWorld world;
+    private final CursorWorld world;
 
     private final IntegerProperty catalogIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
@@ -39,7 +41,7 @@ public class MainViewModel {
         return actionIndex;
     }
 
-    public StringProperty actionValueProperty(){
+    public StringProperty actionValueProperty() {
         return actionValue;
     }
 
@@ -63,6 +65,8 @@ public class MainViewModel {
     public void deleteAction() {
         int i = actionIndex.get();
         if (i >= 0) {
+            long value = (long) getProgramActions().get(i).getValue();
+            actionValue.set(String.valueOf(value));
             program.deleteAction(i);
         }
     }
@@ -99,7 +103,7 @@ public class MainViewModel {
         program.duplicate(action);
     }
 
-    public BooleanBinding canDuplicate(){
+    public BooleanBinding canDuplicate() {
         return Bindings.createBooleanBinding(() -> !getProgramActions().isEmpty(), getProgramActions());
     }
 
@@ -108,11 +112,11 @@ public class MainViewModel {
         actionIndex.set(-1);
     }
 
-    public BooleanBinding canAdd(){
+    public BooleanBinding canAdd() {
         return canAdd;
     }
 
-    public BooleanBinding canRemove(){
+    public BooleanBinding canRemove() {
         return canRemove;
     }
 
@@ -132,17 +136,21 @@ public class MainViewModel {
         return programLoaded;
     }
 
-    public void loadProgram(){
+    public void loadProgram() {
         world.reset();
         executionIndex.set(0);
         programLoaded.set(true);
-        if (!program.getActions().isEmpty()){
+        if (!program.getActions().isEmpty()) {
             actionIndex.set(0);
         }
     }
 
-    public boolean isValidIndex(){
+    public boolean isValidIndex() {
         return actionIndex.get() >= 0 && actionIndex.get() < getProgramActions().size();
+    }
+
+    public BooleanBinding canClearAll(){
+        return Bindings.createBooleanBinding(() -> !getProgramActions().isEmpty(), getProgramActions());
     }
 
     public StringBinding actionDetailsBinding() {
@@ -161,15 +169,15 @@ public class MainViewModel {
                     default -> "Lever stylo";
                 };
             }
-            return  detail;
+            return detail;
         }, getProgramActions(), actionIndex);
     }
 
-    public StringBinding actionDetailValueBindings(){
+    public StringBinding actionDetailValueBindings() {
         return Bindings.createStringBinding(() -> {
             String detailValue = "";
 
-            if(!getProgramActions().isEmpty() && isValidIndex()){
+            if (!getProgramActions().isEmpty() && isValidIndex()) {
                 Action action = getProgramActions().get(actionIndex.get());
 
                 detailValue = switch (action.actionType()) {
@@ -182,33 +190,45 @@ public class MainViewModel {
         }, getProgramActions(), actionIndex);
     }
 
-    public void configureBindingsAndListeners(){
-        actionValue.addListener((obs, oldVal, newVal) -> {
-            if (isValidIndex() && newVal != null && !newVal.isEmpty()){
+    public BooleanBinding disabledTextField(){
+        return Bindings.createBooleanBinding(() -> {
+            boolean textField = false;
+            if (isValidIndex()){
                 Action action = getProgramActions().get(actionIndex.get());
-                double value = Double.valueOf(newVal);
+                textField = switch (action.actionType()) {
+                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD -> true;
+                    default -> false;
+                };
+            }
+            return textField;
+        }, actionIndex, getProgramActions());
+    }
 
-                switch (action.actionType()){
+    public void configureBindingsAndListeners() {
+        actionValue.addListener((obs, oldVal, newVal) -> {
+            if (isValidIndex() && newVal != null) {
+                Action action = getProgramActions().get(actionIndex.get());
+                int value = Integer.valueOf(newVal);
+
+                switch (action.actionType()) {
                     case MOVE_FORWARD:
-                        if (value > 0 && value <= 100){
+                        if (value > 0 && value <= 100) {
                             getProgramActions().get(actionIndex.get()).setValue(value);
                         }
                         break;
                     case TURN_LEFT, TURN_RIGHT:
-                        if (value > 0 && value <= 180){
+                        if (value > 0 && value <= 180) {
                             getProgramActions().get(actionIndex.get()).setValue(value);
                         }
                 }
             }
         });
-
         actionIndex.addListener((obs, oldVal, newVal) -> {
-            if (isValidIndex()){
+            if (isValidIndex()) {
                 long value = (long) getProgramActions().get(actionIndex.get()).getValue();
-                String val = String.valueOf(value);
-
-                actionValue.set(val);
+                actionValue.set(String.valueOf(value));
             }
         });
+
     }
 }
