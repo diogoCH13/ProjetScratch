@@ -48,9 +48,17 @@ public class Program {
         }
     }
 
-    public void duplicate(Action action){
-        if (action != null){
-            actions.add(action);
-        }
+    public void duplicate(Action action) {
+
+        switch (action.actionType()) {
+
+            case PEN_UP -> actions.add(new Pen(false));
+
+            case PEN_DOWN -> actions.add(new Pen(true));
+
+            case TURN_LEFT, TURN_RIGHT -> actions.add(new Turn(action.getValue()));
+
+            default -> actions.add(new MoveForward(action.getValue()));
+        };
     }
 }

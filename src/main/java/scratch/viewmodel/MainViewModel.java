@@ -1,9 +1,7 @@
 package scratch.viewmodel;
 
-import javafx.beans.Observable;
 import javafx.beans.binding.*;
 import javafx.beans.property.*;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import scratch.model.Cursor;
 import scratch.model.Point;
@@ -18,6 +16,7 @@ public class MainViewModel {
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty executionIndex = new SimpleIntegerProperty(-1);
     private final StringProperty actionValue = new SimpleStringProperty();
+    private final BooleanProperty errorValue = new SimpleBooleanProperty(false);
 
     private final BooleanBinding canUp = actionIndex.greaterThan(0);
     private final BooleanBinding canAdd = catalogIndex.greaterThanOrEqualTo(0);
@@ -43,6 +42,10 @@ public class MainViewModel {
 
     public StringProperty actionValueProperty() {
         return actionValue;
+    }
+
+    public BooleanProperty errorValueProperty(){
+        return errorValue;
     }
 
     public ObservableList<ActionType> getPalettAction() {
@@ -190,7 +193,7 @@ public class MainViewModel {
         }, getProgramActions(), actionIndex);
     }
 
-    public BooleanBinding disabledTextField(){
+    public BooleanBinding disableTextFieldByActionType(){
         return Bindings.createBooleanBinding(() -> {
             boolean textField = false;
             if (isValidIndex()){
@@ -208,25 +211,37 @@ public class MainViewModel {
         actionValue.addListener((obs, oldVal, newVal) -> {
             if (isValidIndex() && newVal != null) {
                 Action action = getProgramActions().get(actionIndex.get());
-                int value = Integer.valueOf(newVal);
+                try{
+                    int value = Integer.valueOf(newVal);
 
-                switch (action.actionType()) {
-                    case MOVE_FORWARD:
-                        if (value > 0 && value <= 100) {
-                            getProgramActions().get(actionIndex.get()).setValue(value);
-                        }
-                        break;
-                    case TURN_LEFT, TURN_RIGHT:
-                        if (value > 0 && value <= 180) {
-                            getProgramActions().get(actionIndex.get()).setValue(value);
-                        }
+                    switch (action.actionType()) {
+                        case MOVE_FORWARD:
+                            if (value > 0 && value <= 100) {
+                                getProgramActions().get(actionIndex.get()).setValue(value);
+                                errorValue.set(false);
+                            }
+                            else{
+                                errorValue.set(true);
+                            }
+                            break;
+                        case TURN_LEFT, TURN_RIGHT:
+                            if (value > 0 && value <= 180) {
+                                getProgramActions().get(actionIndex.get()).setValue(value);
+                                errorValue.set(false);
+                            }
+                            else{
+                                errorValue.set(true);
+                            }
+                    }
+                }
+                catch(NumberFormatException exc){
+                    errorValue.set(true);
                 }
             }
         });
         actionIndex.addListener((obs, oldVal, newVal) -> {
             if (isValidIndex()) {
-                long value = (long) getProgramActions().get(actionIndex.get()).getValue();
-                actionValue.set(String.valueOf(value));
+                actionValue.set(String.valueOf((long) getProgramActions().get(actionIndex.get()).getValue()));
             }
         });
 
