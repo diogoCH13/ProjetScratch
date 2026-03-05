@@ -1,19 +1,24 @@
 package scratch.model;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+
 public class Turn extends Action {
 
+//    private double angle;
+//    private DoubleProperty angle = new SimpleDoubleProperty();
+//
+//    private DoubleProperty angleProperty(){
+//        return angle;
+//    }
+
     public Turn(double angle){
-        super.value.setValue(angle);
+        super.value.set(angle);
     }
 
     @Override
     public void execute(Cursor cursor) {
-        if (super.value.get() > 0) {
-            cursor.turnLeft(super.value.get());
-        }
-        else {
-            cursor.turnRight(super.value.get());
-        }
+        cursor.rotate(super.value.get());
     }
 
     @Override
@@ -23,11 +28,23 @@ public class Turn extends Action {
 
     @Override
     public double getValue() {
-        return super.value.getValue();
+        return super.value.get();
     }
 
-    public void setValue(double value) {
-        super.value.setValue(value);
+    @Override
+    public void setValue(double newVal) {
+        if (actionType() == ActionType.TURN_LEFT){
+            if (newVal > 0 && newVal <= 180){
+//                angle = newVal;
+                super.value.set(newVal);
+            }
+        }
+        else{
+            if (newVal <= -1 && newVal >= -180){
+//                angle = newVal;
+                super.value.set(newVal);
+            }
+        }
     }
 
 

@@ -7,6 +7,15 @@ public class Point {
     private DoubleProperty x = new SimpleDoubleProperty();
     private DoubleProperty y = new SimpleDoubleProperty();
 
+
+    public DoubleProperty xProperty() {
+        return x;
+    }
+
+    public DoubleProperty yProperty(){
+        return y;
+    }
+
     public Point(double x, double y) {
         this.x.setValue(x);
         this.y.setValue(y);

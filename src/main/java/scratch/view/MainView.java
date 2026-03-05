@@ -1,6 +1,7 @@
 package scratch.view;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -39,6 +40,7 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Button clearBtn = new Button("Vider tout");
     private final Button loadBtn = new Button("Charger");
     private final Button executeBtn = new Button("Exécuter");
+
 
     private final ListView<ActionType> palletListView = new ListView<>();
     private final ListView<Action> actionListView = new ListView<>();
@@ -253,7 +255,6 @@ public class MainView extends BorderPane /*VBox*/ {
         this.headTurtle.setTranslateY(yP1);
     }
 
-
     private void loadData() {
         palletListView.setItems(vm.getPalettAction());
         actionListView.setItems(vm.getProgramActions());
@@ -289,6 +290,22 @@ public class MainView extends BorderPane /*VBox*/ {
         clearBtn.setOnAction(e -> {
             vm.clearAction();
         });
+
+        loadBtn.setOnAction(e->{
+            if (!vm.isProgramLoaded()) {
+                vm.loadProgram();
+            } else {
+                vm.reset();
+            }
+        });
+
+        executeBtn.setOnAction(e->{
+            if (!vm.isRunning()){
+                vm.execute();
+            }else {
+                vm.next();
+            }
+        });
     }
 
     private void configButtonsDisabling() {
@@ -300,9 +317,11 @@ public class MainView extends BorderPane /*VBox*/ {
         errorLabel.visibleProperty().bind(vm.errorValueProperty());
         errorLabel.managedProperty().bind(vm.errorValueProperty());
         loadBtn.disableProperty().bind(vm.canLoad().not());
-        executeBtn.disableProperty().bind(vm.canExecute().not());
+        executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
         downBtn.disableProperty().bind(vm.canDown().not());
         duplicateBtn.disableProperty().bind(vm.canDuplicate().not());
+
+
     }
 
     private void configSelectionModels() {
@@ -320,8 +339,8 @@ public class MainView extends BorderPane /*VBox*/ {
 
         actionListView.getItems().addListener((Observable obs) -> {
             if (vm.isValidIndex()){
-                vm.actionValueProperty().set(
-                        String.valueOf((int)vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue()));
+                int value = (int)vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue();
+                vm.actionValueProperty().setValue(String.valueOf(Math.abs(value)));
             }
             else{
                 vm.actionValueProperty().set("");
@@ -333,17 +352,46 @@ public class MainView extends BorderPane /*VBox*/ {
     private void configureBindingsAndListeners(){
         detailLabel.textProperty().bind(vm.actionDetailsBinding());
         valueField.textProperty().bindBidirectional(vm.actionValueProperty());
-
-//        // Source - https://stackoverflow.com/a/30796829
-//        valueField.textProperty().addListener(new ChangeListener<String>() {
-//            @Override
-//            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-//                if (!newValue.matches("\\d*")) {
-//                    valueField.setText(newValue.replaceAll("\\D", ""));
-//                }
-//            }
-//        });
         detailLabel2.textProperty().bind(vm.actionDetailValueBindings());
+
+        loadBtn.textProperty().bind(
+                Bindings.when(vm.programLoadedProperty())
+                        .then("Ré-initialiser")
+                        .otherwise("Charger")
+        );
+
+        executeBtn.textProperty().bind(
+                Bindings.when(vm.runningProperty())
+                        .then("Suivant")
+                        .otherwise("Exécuter")
+        );
+
+        vm.cursorXProperty().addListener((observableValue, number, t1) -> {
+            redrawTurtle();
+//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
+        });
+
+        vm.cursorYProperty().addListener((observableValue, number, t1) -> {
+            redrawTurtle();
+//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
+        });
+
+        vm.cursorAngelProperty().addListener((observableValue, number, t1) -> {
+//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
+            redrawTurtle();
+        });
+
+
+    }
+
+    private void redrawTurtle(){
+        paneTurtle.getChildren().remove(turtle);
+        drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
+        paneTurtle.getChildren().add(turtle);
+    }
+
+    private void render() {
+
     }
 
 }

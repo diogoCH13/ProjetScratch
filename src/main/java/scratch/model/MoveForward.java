@@ -27,6 +27,6 @@ public class MoveForward extends Action {
 
     @Override
     public String toString() {
-        return "Avancer de " + String.format("%.0f", super.value.get());
+        return "Avancer de " + String.format("%.0f", Math.abs(super.value.get()));
     }
 }
