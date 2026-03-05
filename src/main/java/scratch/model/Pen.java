@@ -19,13 +19,13 @@ public class Pen extends Action {
     }
 
     @Override
-    public double getValue() {
-        return 0 ;
+    public void setValue(double value) {
+
     }
 
     @Override
-    public void setValue(double value) {
-
+    public double getValue() {
+        return super.value.getValue();
     }
 
     public String toString(){
