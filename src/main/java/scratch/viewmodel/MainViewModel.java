@@ -252,6 +252,9 @@ public class MainViewModel {
                             else{
                                 errorValue.set(true);
                             }
+                            break;
+                        default:
+                            errorValue.set(false);
                     }
                 }
                 catch(NumberFormatException exc){
