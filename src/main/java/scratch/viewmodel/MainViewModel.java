@@ -1,12 +1,7 @@
 package scratch.viewmodel;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.*;
 import javafx.beans.property.*;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
 import scratch.model.Cursor;
 import scratch.model.Point;
@@ -20,23 +15,22 @@ public class MainViewModel {
     private final IntegerProperty catalogIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty executionIndex = new SimpleIntegerProperty(-1);
-    private final IntegerProperty actionValue = new SimpleIntegerProperty();
-
-    private final StringProperty actionDetails = new SimpleStringProperty("(aucune action sélectionnée)");
+    private final StringProperty actionValue = new SimpleStringProperty();
+    private final BooleanProperty errorValue = new SimpleBooleanProperty(false);
 
     private final BooleanBinding canUp = actionIndex.greaterThan(0);
     private final BooleanBinding canAdd = catalogIndex.greaterThanOrEqualTo(0);
     private final BooleanBinding canRemove = actionIndex.greaterThanOrEqualTo(0);
 
-
     private final BooleanProperty programLoaded = new SimpleBooleanProperty(false);
     private final BooleanProperty running = new SimpleBooleanProperty(false);
-
 
     public MainViewModel(Cursor cursor) {
         this.cursor = cursor;
         this.program = new Program();
         this.world = this.cursor.getWorld();
+
+        configureBindingsAndListeners();
     }
 
     public IntegerProperty catalogIndexProperty() {
@@ -47,6 +41,10 @@ public class MainViewModel {
         return actionIndex;
     }
 
+    public StringProperty actionValueProperty() {
+        return actionValue;
+    }
+
     public IntegerProperty executionIndexProperty(){
         return executionIndex;
     }
@@ -55,12 +53,8 @@ public class MainViewModel {
         return running;
     }
 
-    public StringProperty actionDetailsProperty() {
-        return actionDetails;
-    }
-
-    public IntegerProperty actionValueProperty(){
-        return actionValue;
+    public BooleanProperty errorValueProperty(){
+        return errorValue;
     }
 
     public ObservableList<ActionType> getPalettAction() {
@@ -86,8 +80,9 @@ public class MainViewModel {
     public void deleteAction() {
         int i = actionIndex.get();
         if (i >= 0) {
+            long value = (long) getProgramActions().get(i).getValue();
+            actionValue.set(String.valueOf(value));
             program.deleteAction(i);
-            updateActionDetails();
         }
     }
 
@@ -123,7 +118,7 @@ public class MainViewModel {
         program.duplicate(action);
     }
 
-    public BooleanBinding canDuplicate(){
+    public BooleanBinding canDuplicate() {
         return Bindings.createBooleanBinding(() -> !getProgramActions().isEmpty(), getProgramActions());
     }
 
@@ -135,46 +130,11 @@ public class MainViewModel {
         executionIndex.set(-1);
     }
 
-    public void updateActionDetails() {
-        int idx = actionIndex.get();
-
-        if (!getProgramActions().isEmpty() && idx >= 0 && idx < getProgramActions().size()) {
-            Action action = getProgramActions().get(idx);
-
-            switch (action.actionType()) {
-                case MOVE_FORWARD:
-                    actionDetails.set("Avancer de");
-                    actionValue.setValue(action.getValue());
-                    break;
-                case TURN_LEFT:
-                    actionDetails.set("Angle vers la gauche");
-                    actionValue.setValue(action.getValue());
-                    break;
-                case TURN_RIGHT:
-                    actionDetails.set("Angle vers la droite");
-                    actionValue.setValue(action.getValue());
-                    break;
-                case PEN_DOWN:
-                    actionDetails.set("Abaisser stylo");
-                    actionValue.setValue(0);
-                    break;
-                case PEN_UP:
-                    actionDetails.set("Lever stylo");
-                    actionValue.setValue(0);
-            }
-
-        }
-        else {
-            actionDetails.set("(aucune action sélectionnée)");
-            actionValue.setValue(0);
-        }
-    }
-
-    public BooleanBinding canAdd(){
+    public BooleanBinding canAdd() {
         return canAdd;
     }
 
-    public BooleanBinding canRemove(){
+    public BooleanBinding canRemove() {
         return canRemove;
     }
 
@@ -197,6 +157,115 @@ public class MainViewModel {
 
     public BooleanProperty canExecute() {
         return programLoaded;
+    }
+
+    public boolean isValidIndex() {
+        return actionIndex.get() >= 0 && actionIndex.get() < getProgramActions().size();
+    }
+
+    public BooleanBinding canClearAll(){
+        return Bindings.createBooleanBinding(() -> !getProgramActions().isEmpty(), getProgramActions());
+    }
+
+    public StringBinding actionDetailsBinding() {
+        return Bindings.createStringBinding(() -> {
+            String detail = "aucune action sélectionnées";
+
+            if (!getProgramActions().isEmpty() && isValidIndex()) {
+                Action action = getProgramActions().get(actionIndex.get());
+                long value = (long) getProgramActions().get(actionIndex.get()).getValue();
+
+                detail = switch (action.actionType()) {
+                    case MOVE_FORWARD -> "Avancer de";
+                    case TURN_LEFT -> "Angle vers la gauche";
+                    case TURN_RIGHT -> "Angle vers la droite";
+                    case PEN_DOWN -> "Abaisser stylo";
+                    default -> "Lever stylo";
+                };
+            }
+            return detail;
+        }, getProgramActions(), actionIndex);
+    }
+
+    public StringBinding actionDetailValueBindings() {
+        return Bindings.createStringBinding(() -> {
+            String detailValue = "";
+
+            if (!getProgramActions().isEmpty() && isValidIndex()) {
+                Action action = getProgramActions().get(actionIndex.get());
+
+                detailValue = switch (action.actionType()) {
+                    case MOVE_FORWARD -> "pixels";
+                    case TURN_LEFT, TURN_RIGHT -> "degrés";
+                    default -> "";
+                };
+            }
+            return detailValue;
+        }, getProgramActions(), actionIndex);
+    }
+
+    public BooleanBinding disableTextFieldByActionType(){
+        return Bindings.createBooleanBinding(() -> {
+            boolean textField = false;
+            if (isValidIndex()){
+                Action action = getProgramActions().get(actionIndex.get());
+                textField = switch (action.actionType()) {
+                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD -> true;
+                    default -> false;
+                };
+            }
+            return textField;
+        }, actionIndex, getProgramActions());
+    }
+
+    public void configureBindingsAndListeners() {
+        actionValue.addListener((obs, oldVal, newVal) -> {
+            if (isValidIndex() && newVal != null) {
+                Action action = getProgramActions().get(actionIndex.get());
+                try{
+                    int value = Integer.valueOf(newVal);
+
+                    switch (action.actionType()) {
+                        case MOVE_FORWARD:
+                            if (value > 0 && value <= 100) {
+                                getProgramActions().get(actionIndex.get()).setValue(-value);
+                                errorValue.set(false);
+                            }
+                            else{
+                                errorValue.set(true);
+                            }
+                            break;
+                        case TURN_LEFT:
+                            if (value > 0 && value <= 180) {
+                                getProgramActions().get(actionIndex.get()).setValue(value);
+                                errorValue.set(false);
+                            }
+                            else{
+                                errorValue.set(true);
+                            }
+                            break;
+                        case TURN_RIGHT:
+                            if (value > 0 && value <= 180) {
+                                getProgramActions().get(actionIndex.get()).setValue(-value);
+                                errorValue.set(false);
+                            }
+                            else{
+                                errorValue.set(true);
+                            }
+                    }
+                }
+                catch(NumberFormatException exc){
+                    errorValue.set(true);
+                }
+            }
+        });
+        actionIndex.addListener((obs, oldVal, newVal) -> {
+            if (isValidIndex()) {
+                String test = String.valueOf((long) Math.abs(getProgramActions().get(actionIndex.get()).getValue()));
+                actionValue.set(test);
+            }
+        });
+
     }
 
     public void reset(){
@@ -258,7 +327,4 @@ public class MainViewModel {
     public DoubleProperty cursorAngelProperty(){
         return cursor.angleProperty();
     }
-
-
-
 }

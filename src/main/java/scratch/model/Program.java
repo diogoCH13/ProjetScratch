@@ -1,5 +1,6 @@
 package scratch.model;
 
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class Program {
 
-    private final ObservableList<Action> actions = FXCollections.observableArrayList();
+    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.valueProperty() });
 
     public ObservableList<Action> getActions() {
         return FXCollections.unmodifiableObservableList(actions);
@@ -47,9 +48,17 @@ public class Program {
         }
     }
 
-    public void duplicate(Action action){
-        if (action != null){
-            actions.add(action);
-        }
+    public void duplicate(Action action) {
+
+        switch (action.actionType()) {
+
+            case PEN_UP -> actions.add(new Pen(false));
+
+            case PEN_DOWN -> actions.add(new Pen(true));
+
+            case TURN_LEFT, TURN_RIGHT -> actions.add(new Turn(action.getValue()));
+
+            default -> actions.add(new MoveForward(action.getValue()));
+        };
     }
 }

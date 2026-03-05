@@ -1,5 +1,6 @@
 package scratch.view;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,6 +29,7 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Label programLabel = new Label("Programme");
     private final Label detailLabel = new Label("(aucune action sélectionnée)");
     private final Label detailLabel2 = new Label();
+    private final Label errorLabel = new Label("Erreur valeur");
     private final Label sceneLabel = new Label("Scene");
 
     private final Button addBtn = new Button("Ajouter au programme");
@@ -53,6 +55,7 @@ public class MainView extends BorderPane /*VBox*/ {
 
     public MainView(MainViewModel vm) {
         this.vm = vm;
+        beautify();
 
         configureMenuBox();
         configLeft();
@@ -71,9 +74,6 @@ public class MainView extends BorderPane /*VBox*/ {
         configureBindingsAndListeners();
 
 //        this.getChildren().add(layoutControls());
-
-        beautify();
-
     }
 
     private void configureMenuBox(){
@@ -122,15 +122,20 @@ public class MainView extends BorderPane /*VBox*/ {
         valueField.setPrefWidth(40);
         valueField.setMaxWidth(40);
 
+        VBox detail = new VBox();
         HBox detailContent = new HBox(10);
+
         detailContent.setAlignment(Pos.CENTER_LEFT);
         detailContent.setPadding(new Insets(10));
         detailContent.getChildren().addAll(detailLabel, valueField, detailLabel2);
 
-        detailPane.setContent(detailContent);
+        errorLabel.setPadding(new Insets(0,0,0,10));
+        detail.getChildren().addAll(detailContent, errorLabel);
+
+        detailPane.setContent(detail);
         detailPane.setExpanded(true);
 
-        TitledPaneBox.getChildren().add(detailPane);
+        TitledPaneBox.getChildren().addAll(detailPane);
 
         return TitledPaneBox;
     }
@@ -170,8 +175,9 @@ public class MainView extends BorderPane /*VBox*/ {
         palletBox.setPadding(new Insets(16, 16, 12, 16));
         programBox.setPadding(new Insets(16, 16, 12, 16));
         sceneBox.setPadding(new Insets(16, 16, 12, 16));
-//        sceneListView.setPrefSize(500,500);
-//        palletListView.setStyle("-fx-control-inner-background: lightblue;");
+        errorLabel.setTextFill(Color.INDIANRED);
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
 
         palletListView.setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -278,7 +284,7 @@ public class MainView extends BorderPane /*VBox*/ {
         });
 
         duplicateBtn.setOnAction(e -> {
-            vm.duplicateAction(actionListView.getSelectionModel().getSelectedItem());
+            vm.duplicateAction(vm.getProgramActions().get(vm.actionIndexProperty().get()));
         });
 
         clearBtn.setOnAction(e -> {
@@ -300,15 +306,16 @@ public class MainView extends BorderPane /*VBox*/ {
                 vm.next();
             }
         });
-
-
-
     }
 
     private void configButtonsDisabling() {
         upBtn.disableProperty().bind(vm.canUp().not());
         addBtn.disableProperty().bind(vm.canAdd().not());
         deleteBtn.disableProperty().bind(vm.canRemove().not());
+        clearBtn.disableProperty().bind(vm.canClearAll().not());
+        valueField.disableProperty().bind(vm.disableTextFieldByActionType().not());
+        errorLabel.visibleProperty().bind(vm.errorValueProperty());
+        errorLabel.managedProperty().bind(vm.errorValueProperty());
         loadBtn.disableProperty().bind(vm.canLoad().not());
         executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
         downBtn.disableProperty().bind(vm.canDown().not());
@@ -324,18 +331,28 @@ public class MainView extends BorderPane /*VBox*/ {
 
         actionListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
           vm.actionIndexProperty().set(t1.intValue());
-
-          vm.updateActionDetails();
         });
 
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
             actionListView.getSelectionModel().select(t1.intValue());
         });
+
+        actionListView.getItems().addListener((Observable obs) -> {
+            if (vm.isValidIndex()){
+                int value = (int)vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue();
+                vm.actionValueProperty().setValue(String.valueOf(Math.abs(value)));
+            }
+            else{
+                vm.actionValueProperty().set("");
+                vm.errorValueProperty().set(false);
+            }
+        });
     }
 
     private void configureBindingsAndListeners(){
-        detailLabel.textProperty().bind(vm.actionDetailsProperty());
-
+        detailLabel.textProperty().bind(vm.actionDetailsBinding());
+        valueField.textProperty().bindBidirectional(vm.actionValueProperty());
+        detailLabel2.textProperty().bind(vm.actionDetailValueBindings());
 
         loadBtn.textProperty().bind(
                 Bindings.when(vm.programLoadedProperty())
