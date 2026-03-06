@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +67,39 @@ public class Program {
         if (index < actions.size()){
             Action action = actions.get(index);
             action.execute(cursor);
+        }
+    }
+
+    public void save(File file) {
+        try (PrintWriter writer = new PrintWriter(file)) {
+            for (Action action : actions) {
+                writer.println(action.actionType().name() + ";" + action.getValue());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void load(File file) {
+
+        actions.clear();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(";");
+
+                ActionType type = ActionType.valueOf(parts[0]);
+                double value = Double.parseDouble(parts[1]);
+
+                Action action = ActionFactory.createAction(type);
+                action.setValue(value);
+                actions.add(action);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
