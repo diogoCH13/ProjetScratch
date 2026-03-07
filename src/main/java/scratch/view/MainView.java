@@ -1,5 +1,6 @@
 package scratch.view;
 
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -11,8 +12,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.stage.FileChooser;
 import scratch.model.*;
 import scratch.viewmodel.MainViewModel;
+
+import java.io.File;
 
 
 public class MainView extends BorderPane /*VBox*/ {
@@ -41,11 +45,15 @@ public class MainView extends BorderPane /*VBox*/ {
     private final Button loadBtn = new Button("Charger");
     private final Button executeBtn = new Button("Exécuter");
 
+    private final MenuItem newItem  = new MenuItem("New...");
+    private final MenuItem openItem = new MenuItem("Open...");
+    private final MenuItem saveItem = new MenuItem("Save As...");
+    private final MenuItem exitItem = new MenuItem("Exit");
+
 
     private final ListView<ActionType> palletListView = new ListView<>();
     private final ListView<Action> actionListView = new ListView<>();
 
-    private final MenuBar menuBar = new MenuBar(new Menu("File"));
     private final Pane paneTurtle = new Pane();
     private final VBox menuBox = new VBox(10);
     private final VBox palletBox = new VBox(10);
@@ -80,7 +88,11 @@ public class MainView extends BorderPane /*VBox*/ {
     }
 
     private void configureMenuBox(){
-        menuBox.getChildren().addAll(menuBar);
+        Menu fileMenu = new Menu("File");
+        fileMenu.getItems().addAll(newItem, openItem, saveItem, exitItem);
+
+        MenuBar menuBar = new MenuBar(fileMenu);
+        menuBox.getChildren().add(menuBar);
     }
 
     public void configLeft(){
@@ -312,6 +324,22 @@ public class MainView extends BorderPane /*VBox*/ {
                 vm.next();
             }
         });
+
+        newItem.setOnAction(e->{
+            vm.newFile();
+        });
+
+        exitItem.setOnAction(e->{
+            Platform.exit();
+        });
+
+        openItem.setOnAction(e->{
+            openFile();
+        });
+
+        saveItem.setOnAction(e->{
+            saveFile();
+        });
     }
 
     private void configButtonsDisabling() {
@@ -341,6 +369,10 @@ public class MainView extends BorderPane /*VBox*/ {
 
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
             actionListView.getSelectionModel().select(t1.intValue());
+        });
+
+        vm.catalogIndexProperty().addListener((observableValue, number, t1) -> {
+            palletListView.getSelectionModel().select(t1.intValue());
         });
 
         actionListView.getItems().addListener((Observable obs) -> {
@@ -419,6 +451,39 @@ public class MainView extends BorderPane /*VBox*/ {
         }
         else {
             vm.clearSegment();
+        }
+    }
+
+    private void openFile(){
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Ouvrir");
+        fileChooser.setInitialDirectory(new File("scratch"));
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Scratch files (*.scr)", "*.scr")
+        );
+
+        File file = fileChooser.showOpenDialog(this.getScene().getWindow());
+
+        if (file != null){
+            vm.openFile(file);
+        }
+    }
+
+
+    private void saveFile(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer sous");
+        fileChooser.setInitialDirectory(new File("scratch"));
+
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Scratch files (*.scr)", "*.scr")
+        );
+
+        File file = fileChooser.showSaveDialog(this.getScene().getWindow());
+
+        if (file != null) {
+            vm.saveFile(file);
         }
     }
 

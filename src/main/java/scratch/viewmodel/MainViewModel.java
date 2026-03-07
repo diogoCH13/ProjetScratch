@@ -7,6 +7,8 @@ import scratch.model.Cursor;
 import scratch.model.Point;
 import scratch.model.*;
 
+import java.io.File;
+
 public class MainViewModel {
     private final Cursor cursor;
     private final Program program;
@@ -237,7 +239,9 @@ public class MainViewModel {
     public void reset(){
         world.clearSegments();
         cursor.reset();
+        actionIndex.set(-1);
         executionIndex.set(0);
+        catalogIndex.set(0);
 //        if (!program.getActions().isEmpty()){
 //            actionIndex.set(0);
 //        }
@@ -289,4 +293,26 @@ public class MainViewModel {
     public DoubleProperty cursorAngelProperty(){
         return cursor.angleProperty();
     }
+
+    public void newFile(){
+        clearAction();
+        world.clearSegments();
+        cursor.reset();
+        catalogIndex.set(-1);
+    }
+
+    public void saveFile(File file){
+        program.save(file);
+    }
+
+    public void openFile(File file){
+        program.load(file);
+        executionIndex.set(-1);
+        running.set(false);
+        programLoaded.set(false);
+    }
+
+
+
+
 }
