@@ -257,17 +257,13 @@ public class MainViewModel {
 
     public void next(){
         int i = executionIndex.get();
-        int size = program.getActions().size();
-        if (i < size){
-            Action action = program.getActions().get(i);
-            action.execute(cursor);
-            i++;
-            executionIndex.set(i);
-            if (i < size){
-                actionIndex.set(i);
-            }else{
-                running.set(false);
-            }
+        program.executeNext(i, cursor);
+        i++;
+        executionIndex.set(i);
+        if (i < program.getActions().size()){
+            actionIndex.set(i);
+        }else{
+            running.set(false);
         }
 //        System.out.println(
 //                "X : " + cursor.getPosition().getX() +

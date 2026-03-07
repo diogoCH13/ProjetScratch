@@ -61,4 +61,13 @@ public class Program {
             default -> actions.add(new MoveForward(action.getValue()));
         };
     }
+
+    public void executeNext(int index, Cursor cursor){
+        if (index < actions.size()){
+            Action action = actions.get(index);
+            action.execute(cursor);
+        }
+    }
+
+
 }
