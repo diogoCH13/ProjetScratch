@@ -33,6 +33,10 @@ public class MainViewModel {
         configureBindingsAndListeners();
     }
 
+    public Cursor getCursor(){
+        return cursor;
+    }
+
     public IntegerProperty catalogIndexProperty() {
         return catalogIndex;
     }
@@ -69,6 +73,18 @@ public class MainViewModel {
         return cursor.getPosition();
     }
 
+    public CursorWorld getWorld(){
+        return world;
+    }
+
+    public void addSegment(Point start, Point end){
+        world.addSegment(new Segment(start, end));
+    }
+
+    public void clearSegment(){
+        world.clearSegments();
+    }
+
     public void addAction() {
         int i = catalogIndex.get();
         program.addAction(i);
@@ -79,9 +95,7 @@ public class MainViewModel {
 
     public void deleteAction() {
         int i = actionIndex.get();
-        if (i >= 0) {
-            long value = (long) getProgramActions().get(i).getValue();
-            actionValue.set(String.valueOf(value));
+        if (isValidIndex()) {
             program.deleteAction(i);
         }
     }
@@ -109,8 +123,7 @@ public class MainViewModel {
 
     public BooleanBinding canDown() {
         return Bindings.createBooleanBinding(() -> {
-            int idx = actionIndex.get();
-            return idx >= 0 && idx < getProgramActions().size() - 1;
+            return actionIndex.get() >= 0 && actionIndex.get()< getProgramActions().size() - 1;
         }, getProgramActions(), actionIndex);
     }
 
@@ -173,15 +186,7 @@ public class MainViewModel {
 
             if (!getProgramActions().isEmpty() && isValidIndex()) {
                 Action action = getProgramActions().get(actionIndex.get());
-                long value = (long) getProgramActions().get(actionIndex.get()).getValue();
-
-                detail = switch (action.actionType()) {
-                    case MOVE_FORWARD -> "Avancer de";
-                    case TURN_LEFT -> "Angle vers la gauche";
-                    case TURN_RIGHT -> "Angle vers la droite";
-                    case PEN_DOWN -> "Abaisser stylo";
-                    default -> "Lever stylo";
-                };
+                detail = action.actionDetail(action.actionType());
             }
             return detail;
         }, getProgramActions(), actionIndex);
@@ -193,12 +198,7 @@ public class MainViewModel {
 
             if (!getProgramActions().isEmpty() && isValidIndex()) {
                 Action action = getProgramActions().get(actionIndex.get());
-
-                detailValue = switch (action.actionType()) {
-                    case MOVE_FORWARD -> "pixels";
-                    case TURN_LEFT, TURN_RIGHT -> "degrés";
-                    default -> "";
-                };
+                detailValue = action.actionDetailValue(action.actionType());
             }
             return detailValue;
         }, getProgramActions(), actionIndex);
@@ -222,44 +222,7 @@ public class MainViewModel {
         actionValue.addListener((obs, oldVal, newVal) -> {
             if (isValidIndex() && newVal != null) {
                 Action action = getProgramActions().get(actionIndex.get());
-                try{
-                    int value = Integer.valueOf(newVal);
-
-                    switch (action.actionType()) {
-                        case MOVE_FORWARD:
-                            if (value > 0 && value <= 100) {
-                                getProgramActions().get(actionIndex.get()).setValue(-value);
-                                errorValue.set(false);
-                            }
-                            else{
-                                errorValue.set(true);
-                            }
-                            break;
-                        case TURN_LEFT:
-                            if (value > 0 && value <= 180) {
-                                getProgramActions().get(actionIndex.get()).setValue(value);
-                                errorValue.set(false);
-                            }
-                            else{
-                                errorValue.set(true);
-                            }
-                            break;
-                        case TURN_RIGHT:
-                            if (value > 0 && value <= 180) {
-                                getProgramActions().get(actionIndex.get()).setValue(-value);
-                                errorValue.set(false);
-                            }
-                            else{
-                                errorValue.set(true);
-                            }
-                            break;
-                        default:
-                            errorValue.set(false);
-                    }
-                }
-                catch(NumberFormatException exc){
-                    errorValue.set(true);
-                }
+                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
             }
         });
         actionIndex.addListener((obs, oldVal, newVal) -> {

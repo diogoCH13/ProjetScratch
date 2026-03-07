@@ -53,6 +53,9 @@ public class MainView extends BorderPane /*VBox*/ {
     private final VBox sceneBox = new VBox(10);
     private final HBox buttonBox = new HBox(10);
 
+    private Canvas canvas = new Canvas(500, 500);
+    private GraphicsContext gc = canvas.getGraphicsContext2D();
+
     public MainView(MainViewModel vm) {
         this.vm = vm;
         beautify();
@@ -90,7 +93,7 @@ public class MainView extends BorderPane /*VBox*/ {
 
     public void configRight(){
         drawTurtle(vm.getPoint().getX(),vm.getPoint().getY(),0);
-        paneTurtle.getChildren().addAll(configureSceneGrid(), turtle, headTurtle);
+        paneTurtle.getChildren().addAll(configureSceneGrid(), turtle, headTurtle, canvas);
         sceneBox.getChildren().addAll(sceneLabel, paneTurtle, configureSceneButton());
     }
 
@@ -178,6 +181,7 @@ public class MainView extends BorderPane /*VBox*/ {
         errorLabel.setTextFill(Color.INDIANRED);
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
+        gc.setStroke(Color.RED);
 
         palletListView.setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -294,9 +298,11 @@ public class MainView extends BorderPane /*VBox*/ {
         loadBtn.setOnAction(e->{
             if (!vm.isProgramLoaded()) {
                 vm.loadProgram();
+
             } else {
                 vm.reset();
             }
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         });
 
         executeBtn.setOnAction(e->{
@@ -388,6 +394,32 @@ public class MainView extends BorderPane /*VBox*/ {
         paneTurtle.getChildren().remove(turtle);
         drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
         paneTurtle.getChildren().add(turtle);
+        if (vm.isRunning()){
+            if (vm.getCursor().isPenDown()){
+                double  xP2 = vm.cursorXProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
+                        yP2 = vm.cursorYProperty().get() + TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.sin(Math.toRadians(vm.cursorAngelProperty().get())),
+                        xP3 = vm.cursorXProperty().get() + TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
+                        yP3 = vm.cursorYProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.sin(Math.toRadians(vm.cursorAngelProperty().get()));
+
+                Point start = new Point((xP2 + xP3) / 2, (yP2 + yP3) / 2);
+                Point end = new Point(vm.cursorXProperty().get(), vm.cursorYProperty().get());
+
+                vm.addSegment(start, end);
+
+                for (int i = 0; i < vm.getWorld().getSegments().size(); ++i){
+                    gc.strokeLine(
+                            vm.getWorld().getSegments().get(i).getStart().getX(),
+                            vm.getWorld().getSegments().get(i).getStart().getY(),
+                            vm.getWorld().getSegments().get(i).getEnd().getX(),
+                            vm.getWorld().getSegments().get(i).getEnd().getY()
+                    );
+                }
+            }
+
+        }
+        else {
+            vm.clearSegment();
+        }
     }
 
     private void render() {
