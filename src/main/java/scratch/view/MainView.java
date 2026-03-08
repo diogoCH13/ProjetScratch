@@ -314,7 +314,7 @@ public class MainView extends BorderPane /*VBox*/ {
             } else {
                 vm.reset();
             }
-            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+//            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         });
 
         executeBtn.setOnAction(e->{
@@ -430,32 +430,46 @@ public class MainView extends BorderPane /*VBox*/ {
     }
 
     public void drawSegments(){
-        if (vm.isRunning()){
-            if (vm.getCursor().isPenDown()){
-                double  xP2 = vm.cursorXProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
-                        yP2 = vm.cursorYProperty().get() + TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.sin(Math.toRadians(vm.cursorAngelProperty().get())),
-                        xP3 = vm.cursorXProperty().get() + TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
-                        yP3 = vm.cursorYProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.sin(Math.toRadians(vm.cursorAngelProperty().get()));
 
-                Point start = new Point((xP2 + xP3) / 2, (yP2 + yP3) / 2);
-                Point end = new Point(vm.cursorXProperty().get(), vm.cursorYProperty().get());
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-                vm.addSegment(start, end);
-
-                for (int i = 0; i < vm.getWorld().getSegments().size(); ++i){
-                    gc.strokeLine(
-                            vm.getWorld().getSegments().get(i).getStart().getX(),
-                            vm.getWorld().getSegments().get(i).getStart().getY(),
-                            vm.getWorld().getSegments().get(i).getEnd().getX(),
-                            vm.getWorld().getSegments().get(i).getEnd().getY()
-                    );
-                }
-            }
-        }
-        else {
-            vm.clearSegment();
+        for (Segment segment : vm.getWorld().getSegments()) {
+            gc.strokeLine(
+                    segment.getStart().getX(),
+                    segment.getStart().getY(),
+                    segment.getEnd().getX(),
+                    segment.getEnd().getY()
+            );
         }
     }
+
+//    public void drawSegments(){
+//        if (vm.isRunning()){
+//            if (vm.getCursor().isPenDown()){
+//                double  xP2 = vm.cursorXProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
+//                        yP2 = vm.cursorYProperty().get() + TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.sin(Math.toRadians(vm.cursorAngelProperty().get())),
+//                        xP3 = vm.cursorXProperty().get() + TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
+//                        yP3 = vm.cursorYProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.sin(Math.toRadians(vm.cursorAngelProperty().get()));
+//
+//                Point start = new Point((xP2 + xP3) / 2, (yP2 + yP3) / 2);
+//                Point end = new Point(vm.cursorXProperty().get(), vm.cursorYProperty().get());
+//
+//                vm.addSegment(start, end);
+//
+//                for (int i = 0; i < vm.getWorld().getSegments().size(); ++i){
+//                    gc.strokeLine(
+//                            vm.getWorld().getSegments().get(i).getStart().getX(),
+//                            vm.getWorld().getSegments().get(i).getStart().getY(),
+//                            vm.getWorld().getSegments().get(i).getEnd().getX(),
+//                            vm.getWorld().getSegments().get(i).getEnd().getY()
+//                    );
+//                }
+//            }
+//        }
+//        else {
+//            vm.clearSegment();
+//        }
+//    }
 
     private void openFile(){
 
