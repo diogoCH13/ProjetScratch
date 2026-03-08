@@ -73,7 +73,7 @@ public class Program {
     public void save(File file) {
         try (PrintWriter writer = new PrintWriter(file)) {
             for (Action action : actions) {
-                writer.println(action.actionType().name() + ";" + action.getValue());
+                writer.println(action.actionType().name() + ";" + Math.abs(action.getValue()));
             }
 
         } catch (IOException e) {
@@ -92,7 +92,9 @@ public class Program {
 
                 ActionType type = ActionType.valueOf(parts[0]);
                 double value = Double.parseDouble(parts[1]);
-
+                if (type == ActionType.MOVE_FORWARD || type == ActionType.TURN_RIGHT){
+                    value = -value;
+                }
                 Action action = ActionFactory.createAction(type);
                 action.setValue(value);
                 actions.add(action);

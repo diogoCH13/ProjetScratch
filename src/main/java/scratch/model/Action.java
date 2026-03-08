@@ -40,7 +40,7 @@ public abstract class Action {
         };
     }
 
-    public void setSelectionnedValue(String newVal, BooleanProperty errorValue, int index, ObservableList<Action> list){
+    public void setSelectedValue(String newVal, BooleanProperty errorValue, int index, ObservableList<Action> list){
         try{
             int value = Integer.valueOf(newVal);
 

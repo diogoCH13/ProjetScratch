@@ -229,7 +229,7 @@ public class MainViewModel {
         actionValue.addListener((obs, oldVal, newVal) -> {
             if (isValidIndex() && newVal != null) {
                 Action action = getProgramActions().get(actionIndex.get());
-                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
+                action.setSelectedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
             }
         });
         actionIndex.addListener((obs, oldVal, newVal) -> {

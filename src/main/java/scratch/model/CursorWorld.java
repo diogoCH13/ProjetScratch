@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CursorWorld {
 
-    private final List<Segment>segments = new ArrayList<>();
+    private final List<Segment> segments = new ArrayList<>();
 
     public List<Segment> getSegments() {
         return segments;
