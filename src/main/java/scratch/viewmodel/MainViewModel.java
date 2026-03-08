@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 import scratch.model.Cursor;
 import scratch.model.Point;
 import scratch.model.*;
-
+import javafx.beans.Observable;
 import java.io.File;
 
 public class MainViewModel {
@@ -27,6 +27,7 @@ public class MainViewModel {
 
     private final BooleanProperty programLoaded = new SimpleBooleanProperty(false);
     private final BooleanProperty running = new SimpleBooleanProperty(false);
+    private boolean updatingActionValue = false;
 
 
     public MainViewModel(Cursor cursor) {
@@ -139,8 +140,13 @@ public class MainViewModel {
         program.duplicate(action);
     }
 
+//    public BooleanBinding canDuplicate() {
+//        return Bindings.createBooleanBinding(() -> !getProgramActions().isEmpty(), getProgramActions());
+//    }
+
     public BooleanBinding canDuplicate() {
-        return Bindings.createBooleanBinding(() -> !getProgramActions().isEmpty(), getProgramActions());
+        return Bindings.isNotEmpty(getProgramActions())
+                .and(actionIndex.greaterThanOrEqualTo(0));
     }
 
     public void clearAction() {
@@ -225,17 +231,47 @@ public class MainViewModel {
         }, actionIndex, getProgramActions());
     }
 
+//    public void configureBindingsAndListeners() {
+//        actionValue.addListener((obs, oldVal, newVal) -> {
+//            if (isValidIndex() && newVal != null) {
+//                Action action = getProgramActions().get(actionIndex.get());
+//                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
+//
+//            }
+//        });
+//        actionIndex.addListener((obs, oldVal, newVal) -> {
+//            if (isValidIndex()) {
+//                String test = String.valueOf((long) Math.abs(getProgramActions().get(actionIndex.get()).getValue()));
+//                actionValue.set(test);
+//            }
+//        });
+//
+//    }
+
     public void configureBindingsAndListeners() {
+
         actionValue.addListener((obs, oldVal, newVal) -> {
+            if (updatingActionValue) {
+                return;
+            }
             if (isValidIndex() && newVal != null) {
                 Action action = getProgramActions().get(actionIndex.get());
                 action.setSelectedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
+
+                if (running.get()) {
+                    running.set(false);
+                    programLoaded.set(false);
+                    executionIndex.set(-1);
+                }
             }
         });
+
         actionIndex.addListener((obs, oldVal, newVal) -> {
             if (isValidIndex()) {
+                updatingActionValue = true;
                 String test = String.valueOf((long) Math.abs(getProgramActions().get(actionIndex.get()).getValue()));
                 actionValue.set(test);
+                updatingActionValue = false;
             }
         });
 
