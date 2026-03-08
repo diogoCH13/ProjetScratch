@@ -33,17 +33,9 @@ public class Turn extends Action {
 
     @Override
     public void setValue(double newVal) {
-        if (actionType() == ActionType.TURN_LEFT){
-            if (newVal > 0 && newVal <= 180){
-//                angle = newVal;
-                super.value.set(newVal);
-            }
-        }
-        else{
-            if (newVal <= -1 && newVal >= -180){
-//                angle = newVal;
-                super.value.set(newVal);
-            }
+        boolean valid = actionType() == ActionType.TURN_LEFT ? (newVal > 0 && newVal <= 180) : (newVal >= -180 && newVal <= -1);
+        if (valid){
+            super.value.set(newVal);
         }
     }
 

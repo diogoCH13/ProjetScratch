@@ -426,6 +426,10 @@ public class MainView extends BorderPane /*VBox*/ {
         paneTurtle.getChildren().remove(turtle);
         drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
         paneTurtle.getChildren().add(turtle);
+        drawSegments();
+    }
+
+    public void drawSegments(){
         if (vm.isRunning()){
             if (vm.getCursor().isPenDown()){
                 double  xP2 = vm.cursorXProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
@@ -447,7 +451,6 @@ public class MainView extends BorderPane /*VBox*/ {
                     );
                 }
             }
-
         }
         else {
             vm.clearSegment();
