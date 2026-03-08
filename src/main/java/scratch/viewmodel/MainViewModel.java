@@ -23,14 +23,20 @@ public class MainViewModel {
     private final BooleanBinding canUp = actionIndex.greaterThan(0);
     private final BooleanBinding canAdd = catalogIndex.greaterThanOrEqualTo(0);
     private final BooleanBinding canRemove = actionIndex.greaterThanOrEqualTo(0);
+    private final BooleanBinding actionsValide;
 
     private final BooleanProperty programLoaded = new SimpleBooleanProperty(false);
     private final BooleanProperty running = new SimpleBooleanProperty(false);
+
 
     public MainViewModel(Cursor cursor) {
         this.cursor = cursor;
         this.program = new Program();
         this.world = this.cursor.getWorld();
+        this.actionsValide = Bindings.createBooleanBinding(
+                () -> program.isPenStateValid(),
+                program.getActions()
+        );
 
         configureBindingsAndListeners();
     }
@@ -166,8 +172,7 @@ public class MainViewModel {
     }
 
     public BooleanBinding canLoad() {
-//        return Bindings.isNotEmpty(program.getActions()).and(programLoaded.not());
-        return Bindings.isNotEmpty(program.getActions());
+        return Bindings.isNotEmpty(program.getActions()).and(actionsValide);
     }
 
     public BooleanProperty canExecute() {
@@ -242,9 +247,6 @@ public class MainViewModel {
         actionIndex.set(-1);
         executionIndex.set(0);
         catalogIndex.set(0);
-//        if (!program.getActions().isEmpty()){
-//            actionIndex.set(0);
-//        }
     }
 
     public void loadProgram(){
@@ -269,10 +271,6 @@ public class MainViewModel {
         }else{
             running.set(false);
         }
-//        System.out.println(
-//                "X : " + cursor.getPosition().getX() +
-//                        " Y : " + cursor.getPosition().getY()
-//        );
     }
 
     public BooleanBinding isExecutionFinished(){

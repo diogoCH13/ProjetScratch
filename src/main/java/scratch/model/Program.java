@@ -104,4 +104,22 @@ public class Program {
     }
 
 
+    public boolean isPenStateValid() {
+        boolean penDown = true;
+        for (Action action : actions) {
+            if (action.actionType() == ActionType.PEN_DOWN) {
+                if (penDown) {
+                    return false;
+                }
+                penDown = true;
+            }
+            else if (action.actionType() == ActionType.PEN_UP) {
+                if (!penDown) {
+                    return false;
+                }
+                penDown = false;
+            }
+        }
+        return true;
+    }
 }

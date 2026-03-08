@@ -7,7 +7,6 @@ public class Cursor {
     private final CursorWorld world;
     private final Point position;
     private boolean penDown;
-//    private double angle;
     private final Point startPosition;
 
     private DoubleProperty angle = new SimpleDoubleProperty();
@@ -55,7 +54,6 @@ public class Cursor {
     }
 
     public void rotate(double deltaAngle) {
-        //        this.angle.get() = (this.angle + deltaAngle) % 360;
         double angleValue = this.angle.get();
         angleValue = (angleValue + deltaAngle) % 360;
         this.angle.set(angleValue);
