@@ -1,0 +1,149 @@
+@startuml
+top to bottom direction
+
+' =========================
+' ENUM
+' =========================
+package "Types" {
+enum ActionType {
+    MOVE_FORWARD
+    TURN_LEFT
+    TURN_RIGHT
+    PEN_UP
+    PEN_DOWN
+    VAR_DECLARATION
+    VAR_ASSIGNMENT
+    INCREMENT_VARIABLE
+    REPEAT
+    END_REPEAT
+}
+}
+
+' =========================
+' ACTIONS
+' =========================
+package "Actions" {
+
+abstract class Action {
+    value : DoubleProperty
+    +execute(cursor : Cursor)
+    +actionType() : ActionType
+    +setValue(value : double)
+    +getValue() : double
+}
+
+class MoveForward
+class Turn
+class Pen {
+    write : boolean
+}
+
+class VarDeclaration
+class VarAssignment
+class IncrementVariable
+
+class Repeat {
+    actions : ObservableList<Action>
+}
+
+class EndRepeat
+
+Action <|-- MoveForward
+Action <|-- Turn
+Action <|-- Pen
+Action <|-- VarDeclaration
+Action <|-- VarAssignment
+Action <|-- IncrementVariable
+Action <|-- Repeat
+Action <|-- EndRepeat
+
+Action ..> ActionType
+Repeat "1" o-- "*" Action
+}
+
+' =========================
+' PROGRAM
+' =========================
+package "Program" {
+
+class Variable {
+    name : String
+    value : int
+}
+
+class Program {
+    actions : ObservableList<Action>
+    variables : ObservableList<Variable>
+    +addAction(index)
+    +deleteAction(index)
+    +removeAll()
+    +up(index)
+    +down(index)
+    +duplicate(action)
+    +executeNext(index, cursor)
+    +save(file)
+    +load(file)
+}
+
+Program "1" o-- "*" Action
+Program "1" o-- "*" Variable
+}
+
+' =========================
+' FACTORY & CATALOG
+' =========================
+package "Catalog" {
+
+class ActionFactory {
+    +createAction(type : ActionType) : Action
+}
+
+class ActionsCatalog {
+    palettActions : ObservableList<ActionType>
+    +getPalettActions()
+    +getAction(index)
+}
+
+ActionFactory ..> Action
+ActionFactory ..> ActionType
+ActionsCatalog ..> ActionType
+}
+
+' =========================
+' EXECUTION (TURTLE WORLD)
+' =========================
+package "Execution" {
+
+class Cursor {
+    position : Point
+    angle : DoubleProperty
+    penDown : boolean
+    +moveForward(distance)
+    +rotate(angle)
+    +setPen(write)
+    +reset()
+}
+
+class CursorWorld {
+    segments : List<Segment>
+    +addSegment(segment)
+    +clearSegments()
+}
+
+class Segment {
+    start : Point
+    end : Point
+}
+
+class Point {
+    x : DoubleProperty
+    y : DoubleProperty
+}
+
+Cursor --> CursorWorld
+Cursor --> Point
+CursorWorld "1" o-- "*" Segment
+Segment --> Point
+}
+
+@enduml

@@ -38,7 +38,6 @@ public class MainViewModel {
                 () -> program.isPenStateValid(),
                 program.getActions()
         );
-
         configureBindingsAndListeners();
     }
 

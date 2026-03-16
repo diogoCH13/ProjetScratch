@@ -217,6 +217,10 @@ public class MainView extends BorderPane /*VBox*/ {
                             setTextFill(Color.BLUE);
                             circle.setFill(Color.BLUE);
                             break;
+                        case REPEAT, END_REPEAT, VAR_DECLARATION, VAR_ASSIGNMENT, INCREMENT_VARIABLE:
+                            setTextFill(Color.DARKTURQUOISE);
+                            circle.setFill(Color.DARKTURQUOISE);
+                            break;
 
                         default:
                             setTextFill(Color.GREEN);
@@ -354,7 +358,6 @@ public class MainView extends BorderPane /*VBox*/ {
         executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
         downBtn.disableProperty().bind(vm.canDown().not());
         duplicateBtn.disableProperty().bind(vm.canDuplicate().not());
-
 
     }
 
