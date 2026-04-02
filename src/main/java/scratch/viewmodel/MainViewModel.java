@@ -27,6 +27,7 @@ public class MainViewModel {
 
     private final BooleanProperty programLoaded = new SimpleBooleanProperty(false);
     private final BooleanProperty running = new SimpleBooleanProperty(false);
+    private final BooleanProperty executionFinished = new SimpleBooleanProperty(false);
     private boolean updatingActionValue = false;
 
 
@@ -57,9 +58,9 @@ public class MainViewModel {
         return actionValue;
     }
 
-    public IntegerProperty executionIndexProperty(){
-        return executionIndex;
-    }
+//    public IntegerProperty executionIndexProperty(){
+//        return executionIndex;
+//    }
 
     public BooleanProperty runningProperty(){
         return running;
@@ -98,7 +99,7 @@ public class MainViewModel {
         program.addAction(i);
         programLoaded.set(false);
         running.set(false);
-        executionIndex.set(-1);
+//        executionIndex.set(-1);
     }
 
     public void deleteAction() {
@@ -153,7 +154,8 @@ public class MainViewModel {
         actionIndex.set(-1);
         programLoaded.set(false);
         running.set(false);
-        executionIndex.set(-1);
+        executionFinished.set(false);
+//        executionIndex.set(-1);
     }
 
     public BooleanBinding canAdd() {
@@ -260,7 +262,7 @@ public class MainViewModel {
                 if (running.get()) {
                     running.set(false);
                     programLoaded.set(false);
-                    executionIndex.set(-1);
+//                    executionIndex.set(-1);
                 }
             }
         });
@@ -275,44 +277,65 @@ public class MainViewModel {
         });
     }
 
+    public BooleanProperty executionFinishedProperty() {
+        return executionFinished;
+    }
+
     public void reset(){
         world.clearSegments();
         cursor.reset();
         actionIndex.set(-1);
-        executionIndex.set(0);
+//        executionIndex.set(0);
         catalogIndex.set(0);
+        executionFinished.set(false);
     }
 
     public void loadProgram(){
         reset();
         programLoaded.set(true);
+        executionFinished.set(false);
+
     }
 
     public void execute(){
         running.set(true);
-        actionIndex.set(0);
-        executionIndex.set(0);
+        executionFinished.set(false);
+        program.startExecution();
+        actionIndex.set(program.getCurrentIndex());
+
+//        actionIndex.set(0);
+//        executionIndex.set(0);
 
     }
 
     public void next(){
-        int i = executionIndex.get();
-        program.executeNext(i, cursor);
-        i++;
-        executionIndex.set(i);
-        if (i < program.getActions().size()){
-            actionIndex.set(i);
-        }else{
+//        int i = executionIndex.get();
+//        program.executeNext(cursor);
+//        i++;
+//        executionIndex.set(i);
+//        if (i < program.getActions().size()){
+//            actionIndex.set(i);
+//        }else{
+//            running.set(false);
+//        }
+        program.executeNext(cursor);
+        int index = program.getCurrentIndex();
+        if(index >= 0){
+            actionIndex.set(index);
+        }
+
+        if (program.isExecutionFinished()){
             running.set(false);
+            executionFinished.set(true);
         }
     }
 
-    public BooleanBinding isExecutionFinished(){
-        return Bindings.createBooleanBinding(() ->
-                executionIndex.get() >= program.getActions().size(),
-                executionIndex, program.getActions()
-        );
-    }
+//    public BooleanBinding isExecutionFinished(){
+//        return Bindings.createBooleanBinding(() ->
+//                executionIndex.get() >= program.getActions().size(),
+//                executionIndex, program.getActions()
+//        );
+//    }
 
     public DoubleProperty cursorXProperty(){
         return cursor.getPosition().xProperty();
@@ -331,6 +354,7 @@ public class MainViewModel {
         world.clearSegments();
         cursor.reset();
         catalogIndex.set(-1);
+        executionFinished.set(false);
     }
 
     public void saveFile(File file){
@@ -339,12 +363,11 @@ public class MainViewModel {
 
     public void openFile(File file){
         program.load(file);
-        executionIndex.set(-1);
+//        executionIndex.set(-1);
         running.set(false);
         programLoaded.set(false);
+        executionFinished.set(false);
     }
-
-
 
 
 }

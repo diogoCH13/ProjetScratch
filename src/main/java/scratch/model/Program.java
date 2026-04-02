@@ -1,19 +1,18 @@
 package scratch.model;
 
+import javafx.beans.DefaultProperty;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Program {
 
     private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.valueProperty() });
-
+    private final Deque<ExecutionContext> executionStack = new ArrayDeque<>();
     public ObservableList<Action> getActions() {
         return FXCollections.unmodifiableObservableList(actions);
     }
@@ -25,6 +24,101 @@ public class Program {
             actions.add(action);
         }
     }
+
+    public void startExecution(){
+        executionStack.clear();
+        ExecutionContext context = new ExecutionContext(actions, 0);
+        executionStack.push(context);
+    }
+
+    public void executeNext(Cursor cursor){
+        if (executionStack.isEmpty()){
+            return;
+        }
+        ExecutionContext context = executionStack.peek();
+        int index = context.getCurrentIndex();
+        ObservableList<Action>list = context.getCurrentActions();
+        if (index >= list.size()){
+            executionStack.pop();
+            return;
+        }
+        Action action = list.get(index);
+        if (action.actionType() != ActionType.REPEAT && action.actionType() != ActionType.END_REPEAT){
+            action.execute(cursor);
+            context.setCurrentIndex(index + 1);
+
+            if (context.getCurrentIndex() >= list.size()) {
+                executionStack.pop();
+            }
+            return;
+        }
+
+        if (action.actionType() == ActionType.REPEAT){
+            int cpt = (int)action.getValue();
+            if (cpt <= 0){
+                int endIndex = findMatchingEndRepeat(index);
+                context.setCurrentIndex(endIndex + 1);
+            }
+            else {
+                int endIndex = findMatchingEndRepeat(index);
+                executionStack.push(
+                        new ExecutionContext(
+                                list,
+                                index + 1,
+                                cpt,
+                                index,
+                                endIndex
+                        )
+                );
+                return;
+            }
+        } else if (action.actionType() == ActionType.END_REPEAT) {
+            ExecutionContext ctx = executionStack.peek();
+            int cpt = ctx.getRemainingIterations();
+            if (cpt > 1){
+                ctx.setRemainingIterations(cpt - 1);
+                ctx.setCurrentIndex(ctx.getRepeatStartIndex() + 1);
+            }else {
+                executionStack.pop();
+                if (!executionStack.isEmpty()) {
+                    ExecutionContext parent = executionStack.peek();
+                    parent.setCurrentIndex(ctx.getRepeatEndIndex() + 1);
+                }
+            }
+            return;
+        }
+
+
+    }
+
+    public int findMatchingEndRepeat(int index){
+        int cpt =  1;
+        for (int i = index + 1; i < actions.size(); ++i){
+            Action action = actions.get(i);
+            if (action.actionType() == ActionType.REPEAT){
+                ++cpt;
+            }
+            if (action.actionType() == ActionType.END_REPEAT){
+                --cpt;
+                if (cpt == 0){
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public int getCurrentIndex(){
+        if (!executionStack.isEmpty()){
+            return executionStack.peek().getCurrentIndex();
+        }
+        return -1;
+    }
+
+    public boolean isExecutionFinished(){
+        return executionStack.isEmpty();
+    }
+
 
     public void deleteAction(int index){
         actions.remove(index);
@@ -63,12 +157,12 @@ public class Program {
         };
     }
 
-    public void executeNext(int index, Cursor cursor){
-        if (index < actions.size()){
-            Action action = actions.get(index);
-            action.execute(cursor);
-        }
-    }
+//    public void executeNext(int index, Cursor cursor){
+//        if (index < actions.size()){
+//            Action action = actions.get(index);
+//            action.execute(cursor);
+//        }
+//    }
 
     public void save(File file) {
         try (PrintWriter writer = new PrintWriter(file)) {

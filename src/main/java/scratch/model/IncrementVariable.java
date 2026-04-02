@@ -8,7 +8,7 @@ public class IncrementVariable extends Action {
 
     @Override
     public ActionType actionType() {
-        return null;
+        return ActionType.INCREMENT_VARIABLE;
     }
 
     @Override

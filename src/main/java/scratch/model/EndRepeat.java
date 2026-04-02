@@ -8,7 +8,7 @@ public class EndRepeat extends Action{
 
     @Override
     public ActionType actionType() {
-        return null;
+        return ActionType.END_REPEAT;
     }
 
     @Override
@@ -19,5 +19,9 @@ public class EndRepeat extends Action{
     @Override
     public double getValue() {
         return 0;
+    }
+
+    public String toString(){
+        return "Fin répéter";
     }
 }

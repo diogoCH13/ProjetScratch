@@ -4,6 +4,7 @@ package scratch.model;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public abstract class Action {
@@ -81,4 +82,12 @@ public abstract class Action {
             errorValue.set(true);
         }
     }
+
+//    public boolean isComposite() {
+//        return false;
+//    }
+//
+//    public ObservableList<Action> getChildren() {
+//        return FXCollections.emptyObservableList();
+//    }
 }

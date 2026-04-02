@@ -8,12 +8,7 @@ import javafx.collections.ObservableList;
 
 public class Repeat extends Action {
 
-    private StringProperty parameter = new SimpleStringProperty("4");
-
-    private final ObservableList<Action> actions = FXCollections.observableArrayList(action -> new Observable[]{ action.valueProperty() });
-    public ObservableList<Action> getActions() {
-        return FXCollections.unmodifiableObservableList(actions);
-    }
+    private StringProperty parameter = new SimpleStringProperty("2");
 
     public StringProperty parameterProperty() {
         return parameter;
@@ -51,5 +46,15 @@ public class Repeat extends Action {
     public String toString(){
         return "Répéter " + parameter.get() + " fois";
     }
+
+//    @Override
+//    public boolean isComposite() {
+//        return true;
+//    }
+//
+//     @Override
+//    public ObservableList<Action> getChildren() {
+//        return actions;
+//    }
 
 }

@@ -230,30 +230,53 @@ public class MainView extends BorderPane /*VBox*/ {
             }
         });
 
+//        actionListView.setCellFactory(lv -> new ListCell<>() {
+//            @Override
+//            protected void updateItem(Action action, boolean empty) {
+//                super.updateItem(action, empty);
+//                Circle circle = new Circle(5);
+//
+//                if (empty || action == null) {
+//                    setText(null);
+//                    setGraphic(null);
+//                }
+//                else {
+//                    setGraphic(circle);
+//                    setText(action.toString());
+//                    if(action.actionType() == ActionType.TURN_LEFT || action.actionType() == ActionType.TURN_RIGHT){
+//                        setTextFill(Color.RED);
+//                        circle.setFill(Color.RED);
+//                    } else if (action.actionType() == ActionType.MOVE_FORWARD) {
+//                        setTextFill(Color.BLUE);
+//                        circle.setFill(Color.BLUE);
+//                    } else if (action.actionType() == ActionType.PEN_DOWN || action.actionType() == ActionType.PEN_UP) {
+//                        setTextFill(Color.GREEN);
+//                        circle.setFill(Color.GREEN);
+//                    } else {
+//                        setTextFill(Color.DARKTURQUOISE);
+//                        circle.setFill(Color.DARKTURQUOISE);
+//                    }
+//                }
+//            }
+//        });
 
         actionListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Action action, boolean empty) {
                 super.updateItem(action, empty);
-                Circle circle = new Circle(5);
 
                 if (empty || action == null) {
                     setText(null);
                     setGraphic(null);
-                }
-                else {
-                    setGraphic(circle);
+                } else {
+                    Circle circle = new Circle(5);
+                    Color color = action.actionType().getColor();
+
                     setText(action.toString());
-                    if(action instanceof Turn){
-                        setTextFill(Color.RED);
-                        circle.setFill(Color.RED);
-                    } else if (action instanceof MoveForward) {
-                        setTextFill(Color.BLUE);
-                        circle.setFill(Color.BLUE);
-                    }else {
-                        setTextFill(Color.GREEN);
-                        circle.setFill(Color.GREEN);
-                    }
+                    setTextFill(color);
+
+                    circle.setFill(color);
+                    setGraphic(circle);
                 }
             }
         });
@@ -318,7 +341,6 @@ public class MainView extends BorderPane /*VBox*/ {
             } else {
                 vm.reset();
             }
-//            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         });
 
         executeBtn.setOnAction(e->{
@@ -355,7 +377,12 @@ public class MainView extends BorderPane /*VBox*/ {
         errorLabel.visibleProperty().bind(vm.errorValueProperty());
         errorLabel.managedProperty().bind(vm.errorValueProperty());
         loadBtn.disableProperty().bind(vm.canLoad().not());
-        executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
+//        executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
+
+        executeBtn.disableProperty().bind(
+                vm.canExecute().not()
+                        .or(vm.executionFinishedProperty())
+        );
         downBtn.disableProperty().bind(vm.canDown().not());
         duplicateBtn.disableProperty().bind(vm.canDuplicate().not());
 
@@ -446,34 +473,6 @@ public class MainView extends BorderPane /*VBox*/ {
         }
     }
 
-//    public void drawSegments(){
-//        if (vm.isRunning()){
-//            if (vm.getCursor().isPenDown()){
-//                double  xP2 = vm.cursorXProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
-//                        yP2 = vm.cursorYProperty().get() + TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.sin(Math.toRadians(vm.cursorAngelProperty().get())),
-//                        xP3 = vm.cursorXProperty().get() + TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.cos(Math.toRadians(vm.cursorAngelProperty().get())),
-//                        yP3 = vm.cursorYProperty().get() - TURTLE_SIZE * Math.sin(Math.toRadians(30)) * Math.sin(Math.toRadians(vm.cursorAngelProperty().get()));
-//
-//                Point start = new Point((xP2 + xP3) / 2, (yP2 + yP3) / 2);
-//                Point end = new Point(vm.cursorXProperty().get(), vm.cursorYProperty().get());
-//
-//                vm.addSegment(start, end);
-//
-//                for (int i = 0; i < vm.getWorld().getSegments().size(); ++i){
-//                    gc.strokeLine(
-//                            vm.getWorld().getSegments().get(i).getStart().getX(),
-//                            vm.getWorld().getSegments().get(i).getStart().getY(),
-//                            vm.getWorld().getSegments().get(i).getEnd().getX(),
-//                            vm.getWorld().getSegments().get(i).getEnd().getY()
-//                    );
-//                }
-//            }
-//        }
-//        else {
-//            vm.clearSegment();
-//        }
-//    }
-
     private void openFile(){
 
         FileChooser fileChooser = new FileChooser();
@@ -505,10 +504,6 @@ public class MainView extends BorderPane /*VBox*/ {
         if (file != null) {
             vm.saveFile(file);
         }
-    }
-
-    private void render() {
-
     }
 
 }

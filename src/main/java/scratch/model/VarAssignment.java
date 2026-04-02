@@ -1,5 +1,7 @@
 package scratch.model;
 
+import javafx.beans.property.StringProperty;
+
 public class VarAssignment extends Action{
     @Override
     public void execute(Cursor cursor) {
@@ -8,7 +10,7 @@ public class VarAssignment extends Action{
 
     @Override
     public ActionType actionType() {
-        return null;
+        return ActionType.VAR_ASSIGNMENT;
     }
 
     @Override
@@ -19,5 +21,10 @@ public class VarAssignment extends Action{
     @Override
     public double getValue() {
         return 0;
+    }
+
+
+    public String toString(){
+        return "Assignation : ";
     }
 }

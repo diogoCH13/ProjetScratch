@@ -1,5 +1,7 @@
 package scratch.model;
 
+import javafx.scene.paint.Color;
+
 public enum ActionType {
     VAR_DECLARATION("Déclaration variable"),
     VAR_ASSIGNMENT("Assignation"),
@@ -11,6 +13,24 @@ public enum ActionType {
     END_REPEAT("Fin répéter"),
     PEN_UP("Lever stylo"),
     PEN_DOWN("Abaisser le stylo");
+
+    public Color getColor(){
+         switch(this){
+            case PEN_UP, PEN_DOWN -> {
+                return Color.GREEN;
+            }
+            case TURN_LEFT, TURN_RIGHT -> {
+                return Color.RED;
+            }
+            case MOVE_FORWARD -> {
+                return Color.BLUE;
+            }
+
+            default -> {
+                 return Color.DARKTURQUOISE;
+            }
+        }
+    }
 
 
     private final String label;
