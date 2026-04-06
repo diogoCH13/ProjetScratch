@@ -1,6 +1,7 @@
 package scratch.view;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -9,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import scratch.model.Action;
+import scratch.model.ActionType;
 import scratch.viewmodel.MainViewModel;
 
 public class ActionsListView extends VBox {
@@ -44,6 +46,7 @@ public class ActionsListView extends VBox {
     private void beautify(){
         getChildren().addAll(programLabel, actionListView, configureButtonBox(), configureDetailSection());
         setPadding(new Insets(16, 16, 12, 16));
+        beautifyValueField();
 
         upBtn.setPrefWidth(80);
         downBtn.setPrefWidth(80);
@@ -160,12 +163,15 @@ public class ActionsListView extends VBox {
 
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
             actionListView.getSelectionModel().select(t1.intValue());
+            beautifyValueField();
         });
 
         actionListView.getItems().addListener((Observable obs) -> {
             if (vm.isValidIndex()){
                 int value = (int)vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue();
-                vm.actionValueProperty().setValue(String.valueOf(Math.abs(value)));
+                Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
+                vm.actionValueProperty().setValue(action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf(Math.abs(value)));
+                beautifyValueField();
             }
             else{
                 vm.actionValueProperty().set("");
@@ -178,5 +184,19 @@ public class ActionsListView extends VBox {
         detailLabel.textProperty().bind(vm.actionDetailsBinding());
         valueField.textProperty().bindBidirectional(vm.actionValueProperty());
         detailLabel2.textProperty().bind(vm.actionDetailValueBindings());
+    }
+
+    private void beautifyValueField(){
+        if (vm.isValidIndex()){
+            Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
+            if (action.actionType() == ActionType.VAR_DECLARATION){
+                valueField.setPrefWidth(60);
+                valueField.setMaxWidth(60);
+            }
+            else{
+                valueField.setPrefWidth(40);
+                valueField.setMaxWidth(40);
+            }
+        }
     }
 }
