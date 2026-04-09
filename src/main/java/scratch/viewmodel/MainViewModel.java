@@ -274,7 +274,7 @@ public class MainViewModel {
                 String test = action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf((long) Math.abs(action.getValue()));
                 actionValue.set(test);
                 updatingActionValue = false;
-                System.out.println(errorValue.getValue());
+//                System.out.println(errorValue.getValue());
                 errorValue.set(false);
             }
         });
@@ -345,7 +345,7 @@ public class MainViewModel {
     }
 
     public DoubleProperty cursorYProperty(){
-        return cursor.getPosition().yProperty();
+        return  cursor.getPosition().yProperty();
     }
 
     public DoubleProperty cursorAngelProperty(){
