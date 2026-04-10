@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Program {
 
-    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.valueProperty() });
+    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.valueProperty(), action.varProperty() });
     private final Deque<ExecutionContext> executionStack = new ArrayDeque<>();
     public ObservableList<Action> getActions() {
         return FXCollections.unmodifiableObservableList(actions);
@@ -131,19 +131,17 @@ public class Program {
     public void removeAll(){
         actions.clear();
     }
-
     public void up(int index){
         if (index > 0 && index < actions.size()){
-//            Action action = actions.set(index, actions.get(index - 1));
-//            actions.set(index - 1, action);
-            Collections.swap(actions, index, index - 1);
+            Action action = actions.remove(index);
+            actions.add(index - 1, action);
         }
     }
 
     public void down(int index){
         if (index >= 0 && index < actions.size() - 1){
-            Action action = actions.set(index, actions.get(index + 1));
-            actions.set(index + 1, action);
+            Action action = actions.remove(index);
+            actions.add(index + 1, action);
         }
     }
 
@@ -156,6 +154,8 @@ public class Program {
             case PEN_DOWN -> actions.add(new Pen(true));
 
             case TURN_LEFT, TURN_RIGHT -> actions.add(new Turn(action.getValue()));
+
+            case VAR_DECLARATION -> actions.add(new VarDeclaration(action.getVar()));
 
             default -> actions.add(new MoveForward(action.getValue()));
         };

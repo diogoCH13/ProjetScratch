@@ -203,7 +203,7 @@ public class MainViewModel {
                 detail = action.actionDetail(action.actionType());
             }
             return detail;
-        }, getProgramActions(), actionIndex);
+        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
     }
 
     public StringBinding actionDetailValueBindings() {
@@ -215,7 +215,7 @@ public class MainViewModel {
                 detailValue = action.actionDetailValue(action.actionType());
             }
             return detailValue;
-        }, getProgramActions(), actionIndex);
+        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
     }
 
     public BooleanBinding disableTextFieldByActionType(){
@@ -224,12 +224,12 @@ public class MainViewModel {
             if (isValidIndex()){
                 Action action = getProgramActions().get(actionIndex.get());
                 textField = switch (action.actionType()) {
-                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD -> true;
+                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, VAR_DECLARATION -> true;
                     default -> false;
                 };
             }
             return textField;
-        }, actionIndex, getProgramActions());
+        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
     }
 
 //    public void configureBindingsAndListeners() {
@@ -270,9 +270,12 @@ public class MainViewModel {
         actionIndex.addListener((obs, oldVal, newVal) -> {
             if (isValidIndex()) {
                 updatingActionValue = true;
-                String test = String.valueOf((long) Math.abs(getProgramActions().get(actionIndex.get()).getValue()));
+                Action action = getProgramActions().get(actionIndex.get());
+                String test = action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf((long) Math.abs(action.getValue()));
                 actionValue.set(test);
                 updatingActionValue = false;
+//                System.out.println(errorValue.getValue());
+                errorValue.set(false);
             }
         });
     }
@@ -344,7 +347,7 @@ public class MainViewModel {
     }
 
     public DoubleProperty cursorYProperty(){
-        return cursor.getPosition().yProperty();
+        return  cursor.getPosition().yProperty();
     }
 
     public DoubleProperty cursorAngelProperty(){
@@ -372,4 +375,21 @@ public class MainViewModel {
     }
 
 
+    public BooleanBinding varDeclarationIsBefore(){
+        return Bindings.createBooleanBinding(() -> {
+            boolean isBefore = true;
+
+            for(Action action : getProgramActions()){
+                if (action.actionType() == ActionType.VAR_DECLARATION){
+                    int index = getProgramActions().indexOf(action);
+                    for (int i = 0; i < index; ++i){
+                        if (getProgramActions().get(i).actionType() != ActionType.VAR_DECLARATION){
+                            isBefore = false;
+                        }
+                    }
+                }
+            }
+            return isBefore;
+        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
+    }
 }

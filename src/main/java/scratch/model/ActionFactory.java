@@ -23,7 +23,7 @@ public class ActionFactory {
                 return new Repeat();
             }
             case VAR_DECLARATION -> {
-                return new VarDeclaration();
+                return new VarDeclaration("");
             }
             case VAR_ASSIGNMENT -> {
                 return new VarAssignment();

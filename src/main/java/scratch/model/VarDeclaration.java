@@ -5,14 +5,8 @@ import javafx.beans.property.StringProperty;
 
 public class VarDeclaration extends Action{
 
-    private StringProperty name = new SimpleStringProperty();
-
-    public String getName() {
-        return name.get();
-    }
-
-    public void setName(String name){
-        this.name.set(name);
+    public VarDeclaration(String var){
+        super.setVar(var);
     }
 
     @Override
@@ -35,10 +29,10 @@ public class VarDeclaration extends Action{
     }
 
     public String toString(){
-        if (name.get() == null || name.get().isEmpty()){
+        if (super.getVar() == null || super.getVar().isEmpty()){
             return "Déclaration variable";
         }
-        return "Déclaration variable " + name.get();
+        return "Déclaration variable " + super.getVar();
     }
 
 }
