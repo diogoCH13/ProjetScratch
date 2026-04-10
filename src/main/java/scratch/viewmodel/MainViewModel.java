@@ -288,6 +288,8 @@ public class MainViewModel {
 //        executionIndex.set(0);
         catalogIndex.set(0);
         executionFinished.set(false);
+        running.set(false);
+        program.resetStack();
     }
 
     public void loadProgram(){
