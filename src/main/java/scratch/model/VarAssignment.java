@@ -1,11 +1,18 @@
 package scratch.model;
 
-import javafx.beans.property.StringProperty;
-
 public class VarAssignment extends Action{
-    @Override
-    public void execute(Cursor cursor) {
 
+    private String variableTarget;
+
+    public VarAssignment(Expression expression, String variableTarget) {
+        super(expression);
+        this.variableTarget = variableTarget;
+    }
+
+    @Override
+    public void execute(Cursor cursor, Program program) {
+        int value = super.getExpression().expressionValue(program);
+        program.setVariableValueByName(variableTarget, value);
     }
 
     @Override
@@ -14,19 +21,23 @@ public class VarAssignment extends Action{
     }
 
     @Override
-    public void setValue(double value) {
-        if (value > 0){
-            super.valueProperty().setValue(value);
-        }
+    public String getVariableTargetName() {
+        return variableTarget;
     }
 
-    @Override
-    public double getValue() {
-        return super.valueProperty().getValue();
-    }
-
-
-//    public String toString(){
-//        return "Assignation : " + super.getVar() + " = " + (int)getValue();
+    //    @Override
+//    public void setExpression(double value) {
+//        if (value > 0){
+//            super.valueProperty().setValue(value);
+//        }
 //    }
+//
+//    @Override
+//    public double getValue() {
+//        return super.valueProperty().getValue();
+//    }
+    @Override
+    public String toString() {
+        return "Assignation : " + variableTarget + " = " + super.getExpression().expressionName();
+    }
 }

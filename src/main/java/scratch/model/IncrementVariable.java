@@ -1,8 +1,13 @@
 package scratch.model;
 
 public class IncrementVariable extends Action {
+
+    public IncrementVariable(Expression expression) {
+        super(expression);
+    }
+
     @Override
-    public void execute(Cursor cursor) {
+    public void execute(Cursor cursor, Program program) {
 
     }
 
@@ -11,13 +16,13 @@ public class IncrementVariable extends Action {
         return ActionType.INCREMENT_VARIABLE;
     }
 
-    @Override
-    public void setValue(double value) {
-
-    }
-
-    @Override
-    public double getValue() {
-        return 0;
-    }
+//    @Override
+//    public void setExpression(double value) {
+//
+//    }
+//
+//    @Override
+//    public double getValue() {
+//        return 0;
+//    }
 }

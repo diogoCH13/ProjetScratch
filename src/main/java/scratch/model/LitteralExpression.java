@@ -1,0 +1,26 @@
+package scratch.model;
+
+import javafx.beans.InvalidationListener;
+
+public class LitteralExpression implements Expression{
+
+    private final int value;
+
+    public LitteralExpression(int value) {
+        this.value = value;
+    }
+
+    public int getValue(){
+        return value;
+    }
+
+    @Override
+    public int expressionValue(Program program) {
+        return value;
+    }
+
+    @Override
+    public String expressionName() {
+        return value < 0 ? String.valueOf(-value) : String.valueOf(value);
+    }
+}

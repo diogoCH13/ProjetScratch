@@ -188,14 +188,15 @@ public class ActionsListView extends VBox {
 
         actionListView.getItems().addListener((Observable obs) -> {
             if (vm.isValidIndex()){
-                int value = (int)vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue();
                 Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-                if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT){
-                    vm.actionValueProperty().set(action.getVar());
-                }
-                else{
-                    vm.actionValueProperty().set(String.valueOf(Math.abs(value)));
-                }
+                vm.actionValueProperty().set(action.getExpression().expressionName());
+//                int value = (int)vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue();
+//                if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT){
+//                    vm.actionValueProperty().set(action.getVar());
+//                }
+//                else{
+//                    vm.actionValueProperty().set(String.valueOf(Math.abs(value)));
+//                }
                 beautifyValueField();
             }
             else{

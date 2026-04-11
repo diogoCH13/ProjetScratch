@@ -1,9 +1,13 @@
 package scratch.model;
 
 public class EndRepeat extends Action{
-    @Override
-    public void execute(Cursor cursor) {
 
+    public EndRepeat(Expression expression) {
+        super(expression);
+    }
+
+    @Override
+    public void execute(Cursor cursor, Program program) {
     }
 
     @Override
@@ -11,15 +15,6 @@ public class EndRepeat extends Action{
         return ActionType.END_REPEAT;
     }
 
-    @Override
-    public void setValue(double value) {
-
-    }
-
-    @Override
-    public double getValue() {
-        return 0;
-    }
 
     public String toString(){
         return "Fin répéter";

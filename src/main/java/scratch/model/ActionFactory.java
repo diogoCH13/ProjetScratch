@@ -11,28 +11,28 @@ public class ActionFactory {
                 return new Pen(true);
             }
             case TURN_LEFT -> {
-                return new Turn(+90);
+                return new Turn(ActionType.TURN_LEFT, new LitteralExpression(90));
             }
             case TURN_RIGHT -> {
-                return new Turn(-90);
+                return new Turn(ActionType.TURN_RIGHT, new LitteralExpression(-90));
             }
             case MOVE_FORWARD -> {
-                return new MoveForward(-30);
+                return new MoveForward(new LitteralExpression(-30));
             }
             case REPEAT -> {
-                return new Repeat();
+                return new Repeat(new LitteralExpression(0));
             }
             case VAR_DECLARATION -> {
-                return new VarDeclaration("");
+                return new VarDeclaration(new LitteralExpression(0));
             }
             case VAR_ASSIGNMENT -> {
-                return new VarAssignment();
+                return new VarAssignment(new LitteralExpression(0), "");
             }
             case INCREMENT_VARIABLE -> {
-                return new IncrementVariable();
+                return new IncrementVariable(new LitteralExpression(0));
             }
             case END_REPEAT -> {
-                return new EndRepeat();
+                return new EndRepeat(new LitteralExpression(0));
             }
 
         }

@@ -1,6 +1,7 @@
 package scratch.model;
 
-public abstract class Expression {
+public interface Expression {
 
-
+    int expressionValue(Program program);
+    String expressionName();
 }

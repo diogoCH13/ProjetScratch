@@ -239,9 +239,10 @@ public class MainViewModel {
             if (updatingActionValue) {
                 return;
             }
-            if (isValidIndex() && newVal != null) {
+            if (isValidIndex() && newVal != null && !newVal.isEmpty()) {
                 Action action = getProgramActions().get(actionIndex.get());
-                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
+                setValue(action, newVal);
+//                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
 
                 if (running.get()) {
                     running.set(false);
@@ -255,8 +256,8 @@ public class MainViewModel {
             if (isValidIndex()) {
                 updatingActionValue = true;
                 Action action = getProgramActions().get(actionIndex.get());
-                String test = action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf((long) Math.abs(action.getValue()));
-                actionValue.set(test);
+//                String test = action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf((long) Math.abs(action.getValue()));
+                actionValue.set(action.getExpression().expressionName());
                 updatingActionValue = false;
                 errorValue.set(false);
             }
@@ -383,5 +384,61 @@ public class MainViewModel {
             }
             return isValid;
         }, getProgramActions(), actionIndexProperty());
+    }
+
+    public void setValue(Action action, String value){
+        if (program.isInteger(value)){
+            int val = Integer.parseInt(value);
+            verificationValueRules(action, val);
+        }
+        else{
+            verificationNameRules(action, value);
+            action.setExpression(new VariableExpression(value));
+        }
+    }
+
+    public void verificationValueRules(Action action, int value){
+        errorValue.set(true);
+        switch (action.actionType()){
+            case MOVE_FORWARD, TURN_RIGHT:
+                if (action.valueIsCorrect(value)){
+                    action.setExpression(new LitteralExpression(-value));
+                    errorValue.set(false);
+                }
+                break;
+            case TURN_LEFT, VAR_ASSIGNMENT:
+                if (action.valueIsCorrect(value)){
+                    action.setExpression(new LitteralExpression(value));
+                    errorValue.set(false);
+                }
+                break;
+        }
+    }
+
+    public void verificationNameRules(Action action, String name){
+        errorValue.set(true);
+        if (isLetterOrUnderscore(name.charAt(0))){
+            errorValue.set(false);
+            if (nameIsCorrect(name)){
+                action.setExpression(new VariableExpression(name));
+            }
+            else{
+                errorValue.set(true);
+            }
+        }
+    }
+
+    public boolean isLetterOrUnderscore(Character name){
+        return name == '_' || (name >= 'A' && name <= 'z');
+    }
+
+    public boolean nameIsCorrect(String name){
+        boolean isCorrect = true;
+        for (int i = 1; i < name.length() && isCorrect; ++i){
+            if (!(isLetterOrUnderscore(name.charAt(i)) || (name.charAt(i) >= '0' && name.charAt(i) <= '9'))){
+                isCorrect = false;
+            }
+        }
+        return isCorrect;
     }
 }

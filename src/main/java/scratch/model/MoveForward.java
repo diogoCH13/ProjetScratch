@@ -2,13 +2,13 @@ package scratch.model;
 
 public class MoveForward extends Action {
 
-    public MoveForward(double distance) {
-        super.valueProperty().setValue(distance);
+    public MoveForward(Expression distance) {
+        super(distance);
     }
 
     @Override
-    public void execute(Cursor cursor) {
-        cursor.moveForward(super.valueProperty().get());
+    public void execute(Cursor cursor, Program program) {
+        cursor.moveForward(super.getExpression().expressionValue(program));
     }
 
     @Override
@@ -17,16 +17,22 @@ public class MoveForward extends Action {
     }
 
     @Override
-    public double getValue() {
-        return super.valueProperty().getValue();
+    public boolean valueIsCorrect(int value){
+        return value >= 1 && value <= 180;
     }
 
-    public void setValue(double value) {
-        super.valueProperty().setValue(value);
-    }
+//    @Override
+//    public double getValue() {
+//        return super.valueProperty().getValue();
+//    }
+//
+//    public void setExpression(double value) {
+//        super.valueProperty().setValue(value);
+//    }
 
     @Override
     public String toString() {
-        return "Avancer de " + String.format("%.0f", Math.abs(super.valueProperty().get()));
+        return "Avancer de " + super.getExpression().expressionName() ;
     }
+
 }

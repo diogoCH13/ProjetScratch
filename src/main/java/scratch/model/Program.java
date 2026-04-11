@@ -1,17 +1,16 @@
 package scratch.model;
 
-import javafx.beans.DefaultProperty;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ListView;
 
 import java.io.*;
 import java.util.*;
 
 public class Program {
 
-    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.valueProperty(), action.varProperty() });
+    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.expressionProperty() });
+    private final Map<String, Integer> declarationList = new HashMap<>();
     private final Deque<ExecutionContext> executionStack = new ArrayDeque<>();
     public ObservableList<Action> getActions() {
         return FXCollections.unmodifiableObservableList(actions);
@@ -44,7 +43,7 @@ public class Program {
         }
         Action action = list.get(index);
         if (action.actionType() != ActionType.REPEAT && action.actionType() != ActionType.END_REPEAT){
-            action.execute(cursor);
+            action.execute(cursor, this);
             context.setCurrentIndex(index + 1);
 
             if (context.getCurrentIndex() >= list.size()) {
@@ -54,7 +53,8 @@ public class Program {
         }
 
         if (action.actionType() == ActionType.REPEAT){
-            int cpt = (int)action.getValue();
+            Expression value = action.getExpression();
+            int cpt = value.expressionValue(this);
             if (cpt <= 0){
                 int endIndex = findMatchingEndRepeat(index);
                 context.setCurrentIndex(endIndex + 1);
@@ -142,6 +142,7 @@ public class Program {
     }
 
     public void duplicate(Action action) {
+        Expression value = action.getExpression();
 
         switch (action.actionType()) {
 
@@ -149,11 +150,13 @@ public class Program {
 
             case PEN_DOWN -> actions.add(new Pen(true));
 
-            case TURN_LEFT, TURN_RIGHT -> actions.add(new Turn(action.getValue()));
+            case TURN_LEFT -> actions.add(new Turn(ActionType.TURN_LEFT, value));
 
-            case VAR_DECLARATION -> actions.add(new VarDeclaration(action.getVar()));
+            case TURN_RIGHT -> actions.add(new Turn(ActionType.TURN_RIGHT, value));
 
-            default -> actions.add(new MoveForward(action.getValue()));
+            case VAR_DECLARATION -> actions.add(new VarDeclaration(value));
+
+            default -> actions.add(new MoveForward(value));
         };
     }
 
@@ -167,7 +170,7 @@ public class Program {
     public void save(File file) {
         try (PrintWriter writer = new PrintWriter(file)) {
             for (Action action : actions) {
-                writer.println(action.actionType().name() + ";" + action.getValue());
+                writer.println(action.actionType().name() + ";" + action.getExpression().expressionName());
             }
 
         } catch (IOException e) {
@@ -185,10 +188,10 @@ public class Program {
                 String[] parts = line.split(";");
 
                 ActionType type = ActionType.valueOf(parts[0]);
-                double value = Double.parseDouble(parts[1]);
+                Expression value = parseExpression(parts[1]);
 
                 Action action = ActionFactory.createAction(type);
-                action.setValue(value);
+                action.setExpression(value);
                 actions.add(action);
             }
 
@@ -215,5 +218,40 @@ public class Program {
             }
         }
         return true;
+    }
+
+    public Expression parseExpression(String name){
+        return isInteger(name) ? new LitteralExpression(Integer.valueOf(name)) : new VariableExpression(name);
+    }
+
+    public boolean isInteger(String name){
+        boolean isInteger = false;
+        if (!(name == null || name.isBlank())) {
+            try {
+                Integer.valueOf(name.trim());
+                isInteger = true;
+            } catch (NumberFormatException e) {
+
+            }
+        }
+        return isInteger;
+    }
+
+    public int getVariableValueByName(String name){
+        int val = -1;
+        for (String key : declarationList.keySet()){
+            if (key.equals(name)){
+                val = declarationList.get(key);
+            }
+        }
+        return val;
+    }
+
+    public void setVariableValueByName(String name, int value) {
+        declarationList.put(name, value);
+    }
+
+    public void declareVariable(String name){
+        declarationList.put(name, 0);
     }
 }

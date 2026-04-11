@@ -1,14 +1,15 @@
 package scratch.model;
 
-import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 public class Repeat extends Action {
 
     private StringProperty parameter = new SimpleStringProperty("2");
+
+    public Repeat(Expression expression) {
+        super(expression);
+    }
 
     public StringProperty parameterProperty() {
         return parameter;
@@ -23,23 +24,23 @@ public class Repeat extends Action {
         return ActionType.REPEAT;
     }
 
-    @Override
-    public void setValue(double value) {
-        this.parameter.set(String.valueOf((int)value));
-    }
+//    @Override
+//    public void setExpression(double value) {
+//        this.parameter.set(String.valueOf((int)value));
+//    }
+//
+//    @Override
+//    public double getValue() {
+//        try {
+//            return Double.parseDouble(parameter.get());
+//        }
+//        catch (NumberFormatException e) {
+//            return 0;
+//        }
+//    }
 
     @Override
-    public double getValue() {
-        try {
-            return Double.parseDouble(parameter.get());
-        }
-        catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    @Override
-    public void execute(Cursor cursor) {
+    public void execute(Cursor cursor, Program program) {
 
     }
 

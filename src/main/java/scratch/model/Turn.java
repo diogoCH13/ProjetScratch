@@ -12,38 +12,57 @@ public class Turn extends Action {
 //        return angle;
 //    }
 
-    public Turn(double angle){
-        super.valueProperty().setValue(angle);
+//    public Turn(double angle){
+//        super.valueProperty().setValue(angle);
+//    }
+
+    private final ActionType direction;
+
+    public Turn(ActionType direction, Expression expression){
+        super(expression);
+        this.direction = direction;
     }
 
     @Override
-    public void execute(Cursor cursor) {
-        cursor.rotate(super.valueProperty().get());
+    public void execute(Cursor cursor, Program program) {
+        cursor.rotate(super.getExpression().expressionValue(program));
     }
 
     @Override
     public ActionType actionType() {
-        return super.valueProperty().get() > 0 ? ActionType.TURN_LEFT : ActionType.TURN_RIGHT;
+        return direction;
     }
 
     @Override
-    public double getValue() {
-        return super.valueProperty().get();
-    }
-
-    @Override
-    public void setValue(double newVal) {
-        boolean valid = actionType() == ActionType.TURN_LEFT ? (newVal > 0 && newVal <= 180) : (newVal >= -180 && newVal <= -1);
-        if (valid){
-            super.valueProperty().setValue(newVal);
+    public boolean valueIsCorrect(int value){
+        if (value < 0){
+            value = -value;
         }
+        return value > 0 && value <= 180;
     }
 
+//    @Override
+//    public double getValue() {
+//        return super.valueProperty().get();
+//    }
+//
+//    @Override
+//    public void setExpression(double newVal) {
+//        boolean valid = actionType() == ActionType.TURN_LEFT ? (newVal > 0 && newVal <= 180) : (newVal >= -180 && newVal <= -1);
+//        if (valid){
+//            super.valueProperty().setValue(newVal);
+//        }
+//    }
 
     public String toString(){
-        if(super.valueProperty().get() > 0){
-            return "Tourner à gauche de " + String.format("%.0f", Math.abs(super.valueProperty().get()));
+        String val = "Tourner à droite de " + super.getExpression().expressionName();
+        if (direction == ActionType.TURN_LEFT){
+            val = "Tourner à gauche de " + super.getExpression().expressionName();
         }
-        return "Tourner à droite de " + String.format("%.0f", Math.abs(super.valueProperty().get()));
+        return val;
+//        if(super.valueProperty().get() > 0){
+//            return "Tourner à gauche de " + String.format("%.0f", Math.abs(super.valueProperty().get()));
+//        }
+//        return "Tourner à droite de " + String.format("%.0f", Math.abs(super.valueProperty().get()));
     }
 }
