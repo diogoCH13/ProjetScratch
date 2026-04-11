@@ -25,7 +25,7 @@ public class Pen extends Action {
 
     @Override
     public double getValue() {
-        return super.value.getValue();
+        return super.valueProperty().getValue();
     }
 
     public String toString(){

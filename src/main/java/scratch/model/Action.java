@@ -2,13 +2,12 @@ package scratch.model;
 
 
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public abstract class Action {
 
-    public DoubleProperty value = new SimpleDoubleProperty();
-    public StringProperty var = new SimpleStringProperty();
+    private final DoubleProperty value = new SimpleDoubleProperty();
+    private final StringProperty var = new SimpleStringProperty();
 
     public DoubleProperty valueProperty(){
         return value;
@@ -34,21 +33,23 @@ public abstract class Action {
         return var.get();
     }
 
-    public String actionDetail(ActionType actionType){
-        return switch (actionType) {
+    public String actionDetail(){
+        return switch (actionType()) {
             case MOVE_FORWARD -> "Avancer de";
             case TURN_LEFT -> "Angle vers la gauche";
             case TURN_RIGHT -> "Angle vers la droite";
             case PEN_DOWN -> "Abaisser stylo";
             case VAR_DECLARATION -> "Déclaration de la variable";
+            case VAR_ASSIGNMENT -> "Assignation de la variable";
             default -> "Lever stylo";
         };
     }
 
-    public String actionDetailValue(ActionType actionType){
+    public String actionDetailValue(){
         return switch (actionType()) {
             case MOVE_FORWARD -> "pixels";
             case TURN_LEFT, TURN_RIGHT -> "degrés";
+            case VAR_ASSIGNMENT -> "valeur:";
             default -> "";
         };
     }
@@ -58,7 +59,7 @@ public abstract class Action {
         if (!newVal.isEmpty()){
             if (Character.isDigit(newVal.charAt(0))){
                 try{
-                    int value = Integer.valueOf(newVal);
+                    int value = Integer.parseInt(newVal);
 
                     switch (actionType()) {
                         case MOVE_FORWARD:
@@ -88,7 +89,7 @@ public abstract class Action {
                                 errorValue.set(true);
                             }
                             break;
-                        case VAR_DECLARATION:
+                        case VAR_DECLARATION, VAR_ASSIGNMENT:
                             errorValue.set(true);
                             break;
 
@@ -101,7 +102,6 @@ public abstract class Action {
                 }
             }
             else if (Character.isLetter(newVal.charAt(0)) || newVal.charAt(0) == '_'){
-
                 errorValue.set(false);
                 for (int i = 0; i < newVal.length() && !errorValue.getValue(); ++i){
                     if (!(Character.isLetterOrDigit(newVal.charAt(i)) || newVal.charAt(i) == '_')){
@@ -121,7 +121,6 @@ public abstract class Action {
             errorValue.set(true);
         }
     }
-
 //    public boolean isComposite() {
 //        return false;
 //    }

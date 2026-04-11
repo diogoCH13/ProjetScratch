@@ -16,11 +16,12 @@ public class VarDeclaration extends Action{
 
     @Override
     public void setValue(double value) {
+        super.valueProperty().setValue(value);
     }
 
     @Override
     public double getValue() {
-        return 0;
+        return super.valueProperty().get();
     }
 
     @Override

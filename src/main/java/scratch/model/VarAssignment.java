@@ -15,16 +15,18 @@ public class VarAssignment extends Action{
 
     @Override
     public void setValue(double value) {
-
+        if (value > 0){
+            super.valueProperty().setValue(value);
+        }
     }
 
     @Override
     public double getValue() {
-        return 0;
+        return super.valueProperty().getValue();
     }
 
 
-    public String toString(){
-        return "Assignation : ";
-    }
+//    public String toString(){
+//        return "Assignation : " + super.getVar() + " = " + (int)getValue();
+//    }
 }

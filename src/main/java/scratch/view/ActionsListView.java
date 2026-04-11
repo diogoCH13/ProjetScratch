@@ -17,9 +17,10 @@ public class ActionsListView extends VBox {
     private final MainViewModel vm;
 
     private final TextField valueField = new TextField();
+    private final TextField varField = new TextField();
 
     private final Label programLabel = new Label("Programme");
-    private final Label detailLabel = new Label("(aucune action sélectionnée)");
+    private final Label detailLabel = new Label("aucune action sélectionnées");
     private final Label detailLabel2 = new Label();
     private final Label errorLabel = new Label("Erreur valeur");
 
@@ -28,6 +29,8 @@ public class ActionsListView extends VBox {
     private final Button duplicateBtn = new Button("Dupliquer");
     private final Button deleteBtn = new Button("Supprimer");
     private final Button clearBtn = new Button("Vider tout");
+    private final Button increment = new Button("+");
+    private final Button decrement = new Button("-");
 
     private final ListView<Action> actionListView = new ListView<>();
     private final HBox buttonBox = new HBox(10);
@@ -100,12 +103,24 @@ public class ActionsListView extends VBox {
         valueField.setPrefWidth(40);
         valueField.setMaxWidth(40);
 
+        varField.setPrefWidth(50);
+        varField.setMaxWidth(50);
+
+        varField.setVisible(false);
+        varField.setManaged(false);
+
+        increment.setVisible(false);
+        increment.setManaged(false);
+
+        decrement.setVisible(false);
+        decrement.setManaged(false);
+
         VBox detail = new VBox();
         HBox detailContent = new HBox(10);
 
         detailContent.setAlignment(Pos.CENTER_LEFT);
         detailContent.setPadding(new Insets(10));
-        detailContent.getChildren().addAll(detailLabel, valueField, detailLabel2);
+        detailContent.getChildren().addAll(detailLabel, valueField, detailLabel2, varField, increment, decrement);
 
         errorLabel.setPadding(new Insets(0,0,0,10));
         detail.getChildren().addAll(detailContent, errorLabel);
@@ -153,7 +168,12 @@ public class ActionsListView extends VBox {
         errorLabel.managedProperty().bind(vm.errorValueProperty());
         downBtn.disableProperty().bind(vm.canDown().not());
         duplicateBtn.disableProperty().bind(vm.canDuplicate().not());
-
+        varField.visibleProperty().bind(vm.disableVarField());
+        varField.managedProperty().bind(vm.disableVarField());
+        increment.visibleProperty().bind(vm.disableVarField());
+        increment.managedProperty().bind(vm.disableVarField());
+        decrement.visibleProperty().bind(vm.disableVarField());
+        decrement.managedProperty().bind(vm.disableVarField());
     }
 
     private void configSelectionModels() {
@@ -170,7 +190,12 @@ public class ActionsListView extends VBox {
             if (vm.isValidIndex()){
                 int value = (int)vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue();
                 Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-                vm.actionValueProperty().setValue(action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf(Math.abs(value)));
+                if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT){
+                    vm.actionValueProperty().set(action.getVar());
+                }
+                else{
+                    vm.actionValueProperty().set(String.valueOf(Math.abs(value)));
+                }
                 beautifyValueField();
             }
             else{
@@ -189,10 +214,11 @@ public class ActionsListView extends VBox {
     private void beautifyValueField(){
         if (vm.isValidIndex()){
             Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-            if (action.actionType() == ActionType.VAR_DECLARATION){
+            if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT){
                 valueField.setPrefWidth(60);
                 valueField.setMaxWidth(60);
             }
+
             else{
                 valueField.setPrefWidth(40);
                 valueField.setMaxWidth(40);

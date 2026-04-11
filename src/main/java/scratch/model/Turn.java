@@ -13,37 +13,37 @@ public class Turn extends Action {
 //    }
 
     public Turn(double angle){
-        super.value.set(angle);
+        super.valueProperty().setValue(angle);
     }
 
     @Override
     public void execute(Cursor cursor) {
-        cursor.rotate(super.value.get());
+        cursor.rotate(super.valueProperty().get());
     }
 
     @Override
     public ActionType actionType() {
-        return super.value.get() > 0 ? ActionType.TURN_LEFT : ActionType.TURN_RIGHT;
+        return super.valueProperty().get() > 0 ? ActionType.TURN_LEFT : ActionType.TURN_RIGHT;
     }
 
     @Override
     public double getValue() {
-        return super.value.get();
+        return super.valueProperty().get();
     }
 
     @Override
     public void setValue(double newVal) {
         boolean valid = actionType() == ActionType.TURN_LEFT ? (newVal > 0 && newVal <= 180) : (newVal >= -180 && newVal <= -1);
         if (valid){
-            super.value.set(newVal);
+            super.valueProperty().setValue(newVal);
         }
     }
 
 
     public String toString(){
-        if(super.value.get() > 0){
-            return "Tourner à gauche de " + String.format("%.0f", Math.abs(super.value.get()));
+        if(super.valueProperty().get() > 0){
+            return "Tourner à gauche de " + String.format("%.0f", Math.abs(super.valueProperty().get()));
         }
-        return "Tourner à droite de " + String.format("%.0f", Math.abs(super.value.get()));
+        return "Tourner à droite de " + String.format("%.0f", Math.abs(super.valueProperty().get()));
     }
 }

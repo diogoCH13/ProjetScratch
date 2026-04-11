@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 import scratch.model.Cursor;
 import scratch.model.Point;
 import scratch.model.*;
-import javafx.beans.Observable;
+
 import java.io.File;
 
 public class MainViewModel {
@@ -18,6 +18,7 @@ public class MainViewModel {
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty executionIndex = new SimpleIntegerProperty(-1);
     private final StringProperty actionValue = new SimpleStringProperty();
+    private final StringProperty actionVar = new SimpleStringProperty();
     private final BooleanProperty errorValue = new SimpleBooleanProperty(false);
 
     private final BooleanBinding canUp = actionIndex.greaterThan(0);
@@ -200,7 +201,7 @@ public class MainViewModel {
 
             if (!getProgramActions().isEmpty() && isValidIndex()) {
                 Action action = getProgramActions().get(actionIndex.get());
-                detail = action.actionDetail(action.actionType());
+                detail = action.actionDetail();
             }
             return detail;
         }, actionIndexProperty(), getProgramActions(), actionValueProperty());
@@ -212,7 +213,7 @@ public class MainViewModel {
 
             if (!getProgramActions().isEmpty() && isValidIndex()) {
                 Action action = getProgramActions().get(actionIndex.get());
-                detailValue = action.actionDetailValue(action.actionType());
+                detailValue = action.actionDetailValue();
             }
             return detailValue;
         }, actionIndexProperty(), getProgramActions(), actionValueProperty());
@@ -224,30 +225,13 @@ public class MainViewModel {
             if (isValidIndex()){
                 Action action = getProgramActions().get(actionIndex.get());
                 textField = switch (action.actionType()) {
-                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, VAR_DECLARATION -> true;
+                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, VAR_DECLARATION, VAR_ASSIGNMENT -> true;
                     default -> false;
                 };
             }
             return textField;
         }, actionIndexProperty(), getProgramActions(), actionValueProperty());
     }
-
-//    public void configureBindingsAndListeners() {
-//        actionValue.addListener((obs, oldVal, newVal) -> {
-//            if (isValidIndex() && newVal != null) {
-//                Action action = getProgramActions().get(actionIndex.get());
-//                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
-//
-//            }
-//        });
-//        actionIndex.addListener((obs, oldVal, newVal) -> {
-//            if (isValidIndex()) {
-//                String test = String.valueOf((long) Math.abs(getProgramActions().get(actionIndex.get()).getValue()));
-//                actionValue.set(test);
-//            }
-//        });
-//
-//    }
 
     public void configureBindingsAndListeners() {
 
@@ -274,7 +258,6 @@ public class MainViewModel {
                 String test = action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf((long) Math.abs(action.getValue()));
                 actionValue.set(test);
                 updatingActionValue = false;
-                System.out.println(errorValue.getValue());
                 errorValue.set(false);
             }
         });
@@ -378,9 +361,9 @@ public class MainViewModel {
             boolean isBefore = true;
 
             for(Action action : getProgramActions()){
-                if (action.actionType() == ActionType.VAR_DECLARATION){
+                if (action.actionType() == ActionType.VAR_DECLARATION && isBefore){
                     int index = getProgramActions().indexOf(action);
-                    for (int i = 0; i < index; ++i){
+                    for (int i = 0; i < index && isBefore; ++i){
                         if (getProgramActions().get(i).actionType() != ActionType.VAR_DECLARATION){
                             isBefore = false;
                         }
@@ -389,5 +372,16 @@ public class MainViewModel {
             }
             return isBefore;
         }, actionIndexProperty(), getProgramActions(), actionValueProperty());
+    }
+
+    public BooleanBinding disableVarField(){
+        return Bindings.createBooleanBinding(() -> {
+            boolean isValid = false;
+            if (isValidIndex()){
+                Action action = getProgramActions().get(actionIndex.get());
+                isValid = action.actionType() == ActionType.VAR_ASSIGNMENT;
+            }
+            return isValid;
+        }, getProgramActions(), actionIndexProperty());
     }
 }
