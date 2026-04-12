@@ -25,7 +25,12 @@ public class Turn extends Action {
 
     @Override
     public void execute(Cursor cursor, Program program) {
-        cursor.rotate(super.getExpression().expressionValue(program));
+        int val = super.getExpression().expressionValue(program);
+        val = val < 0 ? -val : val;
+        if (!valueIsCorrect(val)){
+            throw new RuntimeException("RUNTIME ERROR !");
+        }
+        cursor.rotate(val);
     }
 
     @Override

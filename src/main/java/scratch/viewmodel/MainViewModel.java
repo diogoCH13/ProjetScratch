@@ -1,22 +1,28 @@
 package scratch.viewmodel;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.binding.*;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
+import javafx.util.Duration;
 import scratch.model.Cursor;
 import scratch.model.Point;
 import scratch.model.*;
-
+import javafx.beans.Observable;
 import java.io.File;
 
 public class MainViewModel {
+
+    private Timeline timeline;
     private final Cursor cursor;
     private final Program program;
     private final CursorWorld world;
 
     private final IntegerProperty catalogIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
-    private final IntegerProperty executionIndex = new SimpleIntegerProperty(-1);
+//    private final IntegerProperty executionIndex = new SimpleIntegerProperty(-1);
     private final StringProperty actionValue = new SimpleStringProperty();
     private final StringProperty actionVar = new SimpleStringProperty();
     private final BooleanProperty errorValue = new SimpleBooleanProperty(false);
@@ -30,6 +36,7 @@ public class MainViewModel {
     private final BooleanProperty running = new SimpleBooleanProperty(false);
     private final BooleanProperty executionFinished = new SimpleBooleanProperty(false);
     private boolean updatingActionValue = false;
+    private final BooleanProperty autoMode = new SimpleBooleanProperty(false);
 
 
     public MainViewModel(Cursor cursor) {
@@ -69,6 +76,10 @@ public class MainViewModel {
 
     public BooleanProperty runningProperty(){
         return running;
+    }
+
+    public BooleanProperty autoModeProperty(){
+        return autoMode;
     }
 
     public BooleanProperty errorValueProperty(){
@@ -112,6 +123,8 @@ public class MainViewModel {
         if (isValidIndex()) {
             program.deleteAction(i);
         }
+        programLoaded.set(false);
+        running.set(false);
     }
 
     public void upAction() {
@@ -179,6 +192,10 @@ public class MainViewModel {
         return running.get();
     }
 
+    public boolean isAutoMode(){
+        return autoMode.get();
+    }
+
     public BooleanProperty programLoadedProperty() {
         return programLoaded;
     }
@@ -229,13 +246,53 @@ public class MainViewModel {
             if (isValidIndex()){
                 Action action = getProgramActions().get(actionIndex.get());
                 textField = switch (action.actionType()) {
-                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, VAR_DECLARATION, VAR_ASSIGNMENT -> true;
+                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, VAR_DECLARATION, VAR_ASSIGNMENT, REPEAT -> true;
                     default -> false;
                 };
             }
             return textField;
         }, actionIndexProperty(), getProgramActions(), actionValueProperty());
     }
+
+    public BooleanBinding verificationVarInList(){
+        return Bindings.createBooleanBinding(() -> {
+            boolean textField = false;
+            if (isValidIndex()){
+                Action action = getProgramActions().get(actionIndex.get());
+                int pos = actionIndex.get();
+                if (action.getExpression().expressionName() != null){
+                    for (int i = 0; i < pos && !textField; ++i){
+                        Action varDeclaration = getProgramActions().get(i);
+                        if (varDeclaration.actionType() == ActionType.VAR_DECLARATION){
+                            String nameAction = action.getExpression().expressionName();
+                            String nameVar = varDeclaration.getExpression().expressionName();
+                            if (nameAction.equals(nameVar)){
+                                textField = true;
+                            }
+                        }
+                    }
+                }
+            }
+            return textField;
+        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
+    }
+
+//    public void configureBindingsAndListeners() {
+//        actionValue.addListener((obs, oldVal, newVal) -> {
+//            if (isValidIndex() && newVal != null) {
+//                Action action = getProgramActions().get(actionIndex.get());
+//                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
+//
+//            }
+//        });
+//        actionIndex.addListener((obs, oldVal, newVal) -> {
+//            if (isValidIndex()) {
+//                String test = String.valueOf((long) Math.abs(getProgramActions().get(actionIndex.get()).getValue()));
+//                actionValue.set(test);
+//            }
+//        });
+//
+//    }
 
     public void configureBindingsAndListeners() {
 
@@ -282,6 +339,7 @@ public class MainViewModel {
                     actionValue.set(action.getExpression().expressionName());
                 }
                 updatingActionValue = false;
+//                System.out.println(errorValue.getValue());
                 errorValue.set(false);
             }
         });
@@ -298,6 +356,11 @@ public class MainViewModel {
 //        executionIndex.set(0);
         catalogIndex.set(0);
         executionFinished.set(false);
+        running.set(false);
+        program.resetStack();
+        if (timeline != null){
+            timeline.stop();
+        }
     }
 
     public void loadProgram(){
@@ -308,6 +371,8 @@ public class MainViewModel {
     }
 
     public void execute(){
+        world.clearSegments();
+        cursor.reset();
         running.set(true);
         executionFinished.set(false);
         program.startExecution();
@@ -428,7 +493,7 @@ public class MainViewModel {
                     errorValue.set(false);
                 }
                 break;
-            case TURN_LEFT, VAR_ASSIGNMENT:
+            case TURN_LEFT, VAR_ASSIGNMENT, REPEAT:
                 if (action.valueIsCorrect(value)){
                     action.setExpression(new LitteralExpression(value));
                     System.out.println(action.getExpression().expressionName());
@@ -477,6 +542,42 @@ public class MainViewModel {
             else{
                 errorValue.set(true);
             }
+        }
+    }
+
+    public void autoNext(){
+
+        if (timeline != null){
+            timeline.stop();
+        }
+
+        timeline = new Timeline(new KeyFrame(Duration.millis(500), e->{
+            next();
+            if (program.isExecutionFinished()){
+                timeline.stop();
+                running.set(false);
+                executionFinished.set(true);
+            }
+        }));
+
+        timeline.setCycleCount(Animation.INDEFINITE);  //boucle qui s'arrête pas
+        running.set(true);
+        executionFinished.set(false);
+        timeline.play();
+
+    }
+
+    public void stopAutoMode(){
+        timeline.stop();
+        running.set(false);
+//        executionFinished.set(true);
+
+    }
+
+
+    public void setTime(double val){
+        if (timeline != null){
+            timeline.setRate(val);
         }
     }
 }

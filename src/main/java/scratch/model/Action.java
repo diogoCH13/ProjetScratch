@@ -63,6 +63,7 @@ public abstract class Action {
             case PEN_DOWN -> "Abaisser stylo";
             case VAR_DECLARATION -> "Déclaration de la variable";
             case VAR_ASSIGNMENT -> "Assignation de la variable";
+            case REPEAT -> "Répéter";
             default -> "Lever stylo";
         };
     }
@@ -72,6 +73,7 @@ public abstract class Action {
             case MOVE_FORWARD -> "pixels";
             case TURN_LEFT, TURN_RIGHT -> "degrés";
             case VAR_ASSIGNMENT -> "valeur:";
+            case REPEAT -> "fois";
             default -> "";
         };
     }

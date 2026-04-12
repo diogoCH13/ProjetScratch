@@ -8,7 +8,12 @@ public class MoveForward extends Action {
 
     @Override
     public void execute(Cursor cursor, Program program) {
-        cursor.moveForward(super.getExpression().expressionValue(program));
+        int val = super.getExpression().expressionValue(program);
+        val = val < 0 ? -val : val;
+        if (!valueIsCorrect(val)){
+            throw new RuntimeException("RUNTIME ERROR !");
+        }
+        cursor.moveForward(-val);
     }
 
     @Override
@@ -18,7 +23,7 @@ public class MoveForward extends Action {
 
     @Override
     public boolean valueIsCorrect(int value){
-        return value >= 1 && value <= 180;
+        return value >= 1 && value <= 100;
     }
 
 //    @Override

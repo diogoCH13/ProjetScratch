@@ -119,6 +119,10 @@ public class Program {
         return executionStack.isEmpty();
     }
 
+    public void resetStack(){
+        executionStack.clear();
+    }
+
 
     public void deleteAction(int index){
         actions.remove(index);

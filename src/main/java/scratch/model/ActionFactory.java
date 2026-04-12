@@ -20,7 +20,7 @@ public class ActionFactory {
                 return new MoveForward(new LitteralExpression(-30));
             }
             case REPEAT -> {
-                return new Repeat(new LitteralExpression(0));
+                return new Repeat(new LitteralExpression(2));
             }
             case VAR_DECLARATION -> {
                 return new VarDeclaration(new LitteralExpression(0));

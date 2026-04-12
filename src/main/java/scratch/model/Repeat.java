@@ -5,19 +5,19 @@ import javafx.beans.property.StringProperty;
 
 public class Repeat extends Action {
 
-    private StringProperty parameter = new SimpleStringProperty("2");
+//    private StringProperty parameter = new SimpleStringProperty("2");
 
     public Repeat(Expression expression) {
         super(expression);
     }
 
-    public StringProperty parameterProperty() {
-        return parameter;
-    }
+//    public StringProperty parameterProperty() {
+//        return parameter;
+//    }
 
-    public void setParameter(String parameter) {
-        this.parameter.set(parameter);
-    }
+//    public void setParameter(String parameter) {
+//        this.parameter.set(parameter);
+//    }
 
     @Override
     public ActionType actionType() {
@@ -45,7 +45,7 @@ public class Repeat extends Action {
     }
 
     public String toString(){
-        return "Répéter " + parameter.get() + " fois";
+        return "Répéter " + super.getExpression().expressionName() + " fois";
     }
 
 //    @Override
