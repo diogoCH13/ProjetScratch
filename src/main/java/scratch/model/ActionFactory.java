@@ -26,7 +26,7 @@ public class ActionFactory {
                 return new VarDeclaration(new LitteralExpression(0));
             }
             case VAR_ASSIGNMENT -> {
-                return new VarAssignment(new LitteralExpression(0), "");
+                return new VarAssignment(new VariableExpression(""), "");
             }
             case INCREMENT_VARIABLE -> {
                 return new IncrementVariable(new LitteralExpression(0));

@@ -2,17 +2,15 @@ package scratch.model;
 
 public class VarAssignment extends Action{
 
-    private String variableTarget;
-
-    public VarAssignment(Expression expression, String variableTarget) {
+    public VarAssignment(Expression expression, String variableTargetName) {
         super(expression);
-        this.variableTarget = variableTarget;
+        super.setVariableTargetName(variableTargetName);
     }
 
     @Override
     public void execute(Cursor cursor, Program program) {
         int value = super.getExpression().expressionValue(program);
-        program.setVariableValueByName(variableTarget, value);
+        program.setVariableValueByName(super.getVariableTargetName(), value);
     }
 
     @Override
@@ -21,23 +19,7 @@ public class VarAssignment extends Action{
     }
 
     @Override
-    public String getVariableTargetName() {
-        return variableTarget;
-    }
-
-    //    @Override
-//    public void setExpression(double value) {
-//        if (value > 0){
-//            super.valueProperty().setValue(value);
-//        }
-//    }
-//
-//    @Override
-//    public double getValue() {
-//        return super.valueProperty().getValue();
-//    }
-    @Override
     public String toString() {
-        return "Assignation : " + variableTarget + " = " + super.getExpression().expressionName();
+        return "Assignation : " + super.getVariableTargetName() + " = " + super.getExpression().expressionName();
     }
 }

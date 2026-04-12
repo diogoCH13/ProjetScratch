@@ -189,14 +189,12 @@ public class ActionsListView extends VBox {
         actionListView.getItems().addListener((Observable obs) -> {
             if (vm.isValidIndex()){
                 Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-                vm.actionValueProperty().set(action.getExpression().expressionName());
-//                int value = (int)vm.getProgramActions().get(vm.actionIndexProperty().get()).getValue();
-//                if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT){
-//                    vm.actionValueProperty().set(action.getVar());
-//                }
-//                else{
-//                    vm.actionValueProperty().set(String.valueOf(Math.abs(value)));
-//                }
+                if (action.actionType() == ActionType.VAR_ASSIGNMENT) {
+                    vm.actionValueProperty().set(action.getVariableTargetName());
+                }
+                else{
+                    vm.actionValueProperty().set(action.getExpression().expressionName());
+                }
                 beautifyValueField();
             }
             else{
@@ -210,6 +208,7 @@ public class ActionsListView extends VBox {
         detailLabel.textProperty().bind(vm.actionDetailsBinding());
         valueField.textProperty().bindBidirectional(vm.actionValueProperty());
         detailLabel2.textProperty().bind(vm.actionDetailValueBindings());
+        varField.textProperty().bindBidirectional(vm.actionVarProperty());
     }
 
     private void beautifyValueField(){

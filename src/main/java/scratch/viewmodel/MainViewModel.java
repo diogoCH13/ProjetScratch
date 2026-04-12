@@ -59,6 +59,10 @@ public class MainViewModel {
         return actionValue;
     }
 
+    public StringProperty actionVarProperty() {
+        return actionVar;
+    }
+
 //    public IntegerProperty executionIndexProperty(){
 //        return executionIndex;
 //    }
@@ -241,8 +245,12 @@ public class MainViewModel {
             }
             if (isValidIndex() && newVal != null && !newVal.isEmpty()) {
                 Action action = getProgramActions().get(actionIndex.get());
-                setValue(action, newVal);
-//                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
+                if (action.actionType() == ActionType.VAR_ASSIGNMENT) {
+                    setTargetName(action, newVal);
+                }
+                else {
+                    setValue(action, newVal);
+                }
 
                 if (running.get()) {
                     running.set(false);
@@ -252,12 +260,27 @@ public class MainViewModel {
             }
         });
 
+        actionVar.addListener((obs, oldVal, newVal) -> {
+            if (updatingActionValue) {
+                return;
+            }
+            if (isValidIndex() && newVal != null && !newVal.isEmpty()) {
+                Action action = getProgramActions().get(actionIndex.get());
+                setValue(action, newVal);
+            }
+        });
+
         actionIndex.addListener((obs, oldVal, newVal) -> {
             if (isValidIndex()) {
                 updatingActionValue = true;
                 Action action = getProgramActions().get(actionIndex.get());
 //                String test = action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf((long) Math.abs(action.getValue()));
-                actionValue.set(action.getExpression().expressionName());
+                if (action.actionType() == ActionType.VAR_ASSIGNMENT) {
+                    actionValue.set(action.getVariableTargetName());
+                }
+                else{
+                    actionValue.set(action.getExpression().expressionName());
+                }
                 updatingActionValue = false;
                 errorValue.set(false);
             }
@@ -393,7 +416,6 @@ public class MainViewModel {
         }
         else{
             verificationNameRules(action, value);
-            action.setExpression(new VariableExpression(value));
         }
     }
 
@@ -409,6 +431,7 @@ public class MainViewModel {
             case TURN_LEFT, VAR_ASSIGNMENT:
                 if (action.valueIsCorrect(value)){
                     action.setExpression(new LitteralExpression(value));
+                    System.out.println(action.getExpression().expressionName());
                     errorValue.set(false);
                 }
                 break;
@@ -421,6 +444,7 @@ public class MainViewModel {
             errorValue.set(false);
             if (nameIsCorrect(name)){
                 action.setExpression(new VariableExpression(name));
+                System.out.println(action.getExpression().expressionName());
             }
             else{
                 errorValue.set(true);
@@ -440,5 +464,19 @@ public class MainViewModel {
             }
         }
         return isCorrect;
+    }
+
+    public void setTargetName(Action action, String name){
+        errorValue.set(true);
+        if (isLetterOrUnderscore(name.charAt(0))){
+            errorValue.set(false);
+            if (nameIsCorrect(name)){
+                action.setVariableTargetName(name);
+                System.out.println(action.getVariableTargetName());
+            }
+            else{
+                errorValue.set(true);
+            }
+        }
     }
 }

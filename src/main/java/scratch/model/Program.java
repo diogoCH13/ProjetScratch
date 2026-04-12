@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Program {
 
-    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.expressionProperty() });
+    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.expressionProperty(), action.VariableTargetNameProperty() });
     private final Map<String, Integer> declarationList = new HashMap<>();
     private final Deque<ExecutionContext> executionStack = new ArrayDeque<>();
     public ObservableList<Action> getActions() {
@@ -248,7 +248,9 @@ public class Program {
     }
 
     public void setVariableValueByName(String name, int value) {
-        declarationList.put(name, value);
+        if (declarationList.containsKey(name)){
+            declarationList.put(name, value);
+        }
     }
 
     public void declareVariable(String name){
