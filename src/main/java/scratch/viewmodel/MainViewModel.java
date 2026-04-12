@@ -11,6 +11,7 @@ import scratch.model.Cursor;
 import scratch.model.Point;
 import scratch.model.*;
 import java.io.File;
+import java.util.List;
 
 public class MainViewModel {
 
@@ -198,7 +199,6 @@ public class MainViewModel {
     }
 
     public BooleanBinding canLoad() {
-
         return Bindings.isNotEmpty(program.getActions()).and(actionsValide);
     }
 
@@ -540,7 +540,7 @@ public class MainViewModel {
             timeline.stop();
         }
 
-        timeline = new Timeline(new KeyFrame(Duration.millis(500), e->{
+        timeline = new Timeline(new KeyFrame(Duration.millis(200), e->{
             next();
             if (program.isExecutionFinished()){
                 timeline.stop();
@@ -579,5 +579,27 @@ public class MainViewModel {
         else{
             actionValue.set("");
         }
+    }
+
+    public int getIndentationLevel(int index){
+        int level = 0;
+        List<Action> actionList = program.getActions();
+        for (int i = 0; i < index; ++i){
+            Action action = actionList.get(i);
+            if (action.actionType() == ActionType.REPEAT){
+                ++level;
+            }else if (action.actionType() == ActionType.END_REPEAT){
+                if (level > 0){
+                    --level;
+                }
+            }
+        }
+        Action currentAction = actionList.get(index);
+        if (currentAction.actionType() == ActionType.END_REPEAT){
+            if (level > 0){
+                --level;
+            }
+        }
+        return level;
     }
 }
