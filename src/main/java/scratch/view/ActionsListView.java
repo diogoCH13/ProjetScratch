@@ -61,6 +61,38 @@ public class ActionsListView extends VBox {
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
 
+//        actionListView.setCellFactory(lv -> new ListCell<>() {
+//            @Override
+//            protected void updateItem(Action action, boolean empty) {
+//                super.updateItem(action, empty);
+//
+//                if (empty || action == null) {
+//                    setText(null);
+//                    setGraphic(null);
+//                } else {
+//                    Circle circle = new Circle(5);
+//                    Color color = action.actionType().getColor();
+//                    int index = getIndex();
+//                    int level = vm.getIndentationLevel(index);
+//                    if (level == 0){
+//                        setText(action.toString());
+//                        setTextFill(color);
+//                    }else if (level > 0){
+//                        String res = "";
+//                        for(int i = 0; i < level; ++i){
+//
+//                            res += "\t";
+//                        }
+//                        setText(res + action.toString());
+//                        setTextFill(color);
+//                    }
+//                    circle.setFill(color);
+//                    setGraphic(circle);
+//                }
+//            }
+//        });
+
+
         actionListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Action action, boolean empty) {
@@ -73,11 +105,23 @@ public class ActionsListView extends VBox {
                     Circle circle = new Circle(5);
                     Color color = action.actionType().getColor();
 
-                    setText(action.toString());
-                    setTextFill(color);
+                    int index = getIndex();
+                    int level = vm.getIndentationLevel(index);
+
+                    Label label = new Label(action.toString());
+                    label.setTextFill(color);
+
+                    HBox box = new HBox(5);
+                    box.getChildren().addAll(circle, label);
+
+                    // Décalage à gauche selon level
+                    box.setPadding(new Insets(0, 0, 0, level * 20));
+                    box.setAlignment(Pos.CENTER_LEFT);
 
                     circle.setFill(color);
-                    setGraphic(circle);
+
+                    setText(null);
+                    setGraphic(box);
                 }
             }
         });
