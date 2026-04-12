@@ -23,7 +23,9 @@ public class Turn extends Action {
     @Override
     public void execute(Cursor cursor, Program program) {
         int val = super.getExpression().valueOfVariableOrLitteral(program);
-        val = val < 0 ? -val : val;
+        if (direction == ActionType.TURN_RIGHT){
+            val = -val;
+        }
         if (!valueIsCorrect(val)){
             throw new RuntimeException("RUNTIME ERROR !");
         }

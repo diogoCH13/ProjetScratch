@@ -4,23 +4,21 @@ package scratch.model;
 import javafx.beans.property.*;
 
 public abstract class Action {
-
-//    private final DoubleProperty value = new SimpleDoubleProperty();
-//    private final StringProperty var = new SimpleStringProperty();
-//
-//    public DoubleProperty valueProperty(){
-//        return value;
-//    }
-//
-//    public StringProperty varProperty(){
-//        return var;
-//    }
+    private boolean isValid = true;
 
     private ObjectProperty<Expression> expressionProperty = new SimpleObjectProperty<>();
     private StringProperty variableTarget = new SimpleStringProperty();
 
     public Action(Expression expression){
         expressionProperty.set(expression);
+    }
+
+    public void setIsValid(boolean isValid){
+        this.isValid = isValid;
+    }
+
+    public boolean getIsValid(){
+        return isValid;
     }
 
     public abstract void execute(Cursor cursor, Program program);

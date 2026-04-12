@@ -121,6 +121,7 @@ public class MainViewModel {
         int i = actionIndex.get();
         if (isValidIndex()) {
             program.deleteAction(i);
+            refreshValue();
         }
         programLoaded.set(false);
         running.set(false);
@@ -165,6 +166,7 @@ public class MainViewModel {
     public void clearAction() {
         program.removeAll();
         actionIndex.set(-1);
+        refreshValue();
         programLoaded.set(false);
         running.set(false);
         executionFinished.set(false);
@@ -196,6 +198,7 @@ public class MainViewModel {
     }
 
     public BooleanBinding canLoad() {
+
         return Bindings.isNotEmpty(program.getActions()).and(actionsValide);
     }
 
@@ -254,10 +257,7 @@ public class MainViewModel {
             boolean textField = true;
             if (isValidIndex()){
                 int pos = actionIndex.get();
-                Action action = getProgramActions().get(pos);
-                if (action.actionType() == ActionType.VAR_ASSIGNMENT){
-                    textField = verificationVarBeforeExecution();
-                }
+                textField = verificationVarBeforeExecution();
             }
             return textField;
         }, actionValueProperty(), getProgramActions(), actionIndexProperty());
@@ -268,11 +268,11 @@ public class MainViewModel {
             boolean isBefore = true;
 
             for(Action action : getProgramActions()){
-                if ((action.actionType() == ActionType.VAR_DECLARATION ||  action.actionType() == ActionType.VAR_ASSIGNMENT) && isBefore){
+                if (action.actionType() == ActionType.VAR_DECLARATION && isBefore){
                     int index = getProgramActions().indexOf(action);
                     for (int i = 0; i < index && isBefore; ++i){
                         ActionType type = getProgramActions().get(i).actionType();
-                        if (type != ActionType.VAR_DECLARATION && type != ActionType.VAR_ASSIGNMENT){
+                        if (type != ActionType.VAR_DECLARATION){
                             isBefore = false;
                         }
                     }
@@ -331,8 +331,9 @@ public class MainViewModel {
                 updatingActionValue = true;
                 Action action = getProgramActions().get(actionIndex.get());
 //                String test = action.actionType() == ActionType.VAR_DECLARATION ? action.getVar() : String.valueOf((long) Math.abs(action.getValue()));
-                if (action.actionType() == ActionType.VAR_ASSIGNMENT) {
+                if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
                     actionValue.set(action.getVariableTargetName());
+                    actionVar.set(action.getExpression().toString());
                 }
                 else{
                     actionValue.set(action.getExpression().toString());
@@ -485,15 +486,19 @@ public class MainViewModel {
     }
 
     public boolean verificationVarBeforeExecution(){
-        boolean varExist = false;
-        if (actionValue.get() != null){
-            int pos = actionIndex.get();
-            for (int i = 0; i <= pos && !varExist; ++i){
-                Action action = getProgramActions().get(i);
-                if (action.actionType() == ActionType.VAR_DECLARATION){
-                    String varName = action.getExpression().toString();
-                    if (actionValue.get().equals(varName)){
-                        varExist = true;
+        boolean varExist = actionValue.get() != null;
+
+        if (varExist){
+            if (!program.isInteger(actionValue.get().trim())){
+                varExist = false;
+                Action currentAction = getProgramActions().get(actionIndex.get());
+                int pos = actionIndex.get();
+                for (int i = 0; i <= pos && !varExist; ++i){
+                    Action actionList = getProgramActions().get(i);
+                    if (actionList.actionType() == ActionType.VAR_DECLARATION){
+                        String declarationName = actionList.getExpression().toString();
+                        String currentName = currentAction.getExpression().toString();
+                        varExist = currentName.equals(declarationName);
                     }
                 }
             }
@@ -562,6 +567,17 @@ public class MainViewModel {
     public void setTime(double val){
         if (timeline != null){
             timeline.setRate(val);
+        }
+    }
+
+    public void refreshValue(){
+        actionIndex.set(getProgramActions().isEmpty() ? -1 : actionIndex.get());
+        if (actionIndex.get() != -1){
+            Action currentAction = getProgramActions().get(actionIndex.get());
+            actionValue.set(currentAction.getExpression().toString());
+        }
+        else{
+            actionValue.set("");
         }
     }
 }
