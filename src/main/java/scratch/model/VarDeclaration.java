@@ -1,12 +1,9 @@
 package scratch.model;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
 public class VarDeclaration extends Action{
 
-    public VarDeclaration(Expression name){
-        super(name);
+    public VarDeclaration(Expression value){
+        super(value);
     }
 
     @Override
@@ -26,14 +23,15 @@ public class VarDeclaration extends Action{
 
     @Override
     public void execute(Cursor cursor, Program program) {
-        program.declareVariable(super.getExpression().expressionName());
+        program.declareVariable(super.getExpression().toString());
     }
 
     public String toString(){
 //        if (super.getVar() == null || super.getVar().isEmpty()){
 //            return "Déclaration variable";
 //        }
-        return "Déclaration variable " + super.getExpression().expressionName();
+        String value = super.getExpression().toString().equals("0") ? "" : super.getExpression().toString();
+        return "Déclaration variable " + value;
     }
 
 }

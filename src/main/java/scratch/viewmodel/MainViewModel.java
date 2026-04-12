@@ -10,7 +10,6 @@ import javafx.util.Duration;
 import scratch.model.Cursor;
 import scratch.model.Point;
 import scratch.model.*;
-import javafx.beans.Observable;
 import java.io.File;
 
 public class MainViewModel {
@@ -158,10 +157,6 @@ public class MainViewModel {
         program.duplicate(action);
     }
 
-//    public BooleanBinding canDuplicate() {
-//        return Bindings.createBooleanBinding(() -> !getProgramActions().isEmpty(), getProgramActions());
-//    }
-
     public BooleanBinding canDuplicate() {
         return Bindings.isNotEmpty(getProgramActions())
                 .and(actionIndex.greaterThanOrEqualTo(0));
@@ -246,8 +241,8 @@ public class MainViewModel {
             if (isValidIndex()){
                 Action action = getProgramActions().get(actionIndex.get());
                 textField = switch (action.actionType()) {
-                    case TURN_LEFT, TURN_RIGHT, MOVE_FORWARD, VAR_DECLARATION, VAR_ASSIGNMENT, REPEAT -> true;
-                    default -> false;
+                    case PEN_UP, PEN_DOWN, END_REPEAT -> false;
+                    default -> true;
                 };
             }
             return textField;
@@ -256,43 +251,47 @@ public class MainViewModel {
 
     public BooleanBinding verificationVarInList(){
         return Bindings.createBooleanBinding(() -> {
-            boolean textField = false;
+            boolean textField = true;
             if (isValidIndex()){
-                Action action = getProgramActions().get(actionIndex.get());
                 int pos = actionIndex.get();
-                if (action.getExpression().expressionName() != null){
-                    for (int i = 0; i < pos && !textField; ++i){
-                        Action varDeclaration = getProgramActions().get(i);
-                        if (varDeclaration.actionType() == ActionType.VAR_DECLARATION){
-                            String nameAction = action.getExpression().expressionName();
-                            String nameVar = varDeclaration.getExpression().expressionName();
-                            if (nameAction.equals(nameVar)){
-                                textField = true;
-                            }
+                Action action = getProgramActions().get(pos);
+                if (action.actionType() == ActionType.VAR_ASSIGNMENT){
+                    textField = verificationVarBeforeExecution();
+                }
+            }
+            return textField;
+        }, actionValueProperty(), getProgramActions(), actionIndexProperty());
+    }
+
+    public BooleanBinding varDeclarationIsBefore(){
+        return Bindings.createBooleanBinding(() -> {
+            boolean isBefore = true;
+
+            for(Action action : getProgramActions()){
+                if ((action.actionType() == ActionType.VAR_DECLARATION ||  action.actionType() == ActionType.VAR_ASSIGNMENT) && isBefore){
+                    int index = getProgramActions().indexOf(action);
+                    for (int i = 0; i < index && isBefore; ++i){
+                        ActionType type = getProgramActions().get(i).actionType();
+                        if (type != ActionType.VAR_DECLARATION && type != ActionType.VAR_ASSIGNMENT){
+                            isBefore = false;
                         }
                     }
                 }
             }
-            return textField;
-        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
+            return isBefore;
+        }, getProgramActions(), actionValueProperty());
     }
 
-//    public void configureBindingsAndListeners() {
-//        actionValue.addListener((obs, oldVal, newVal) -> {
-//            if (isValidIndex() && newVal != null) {
-//                Action action = getProgramActions().get(actionIndex.get());
-//                action.setSelectionnedValue(newVal, errorValue, actionIndex.get(), getProgramActions());
-//
-//            }
-//        });
-//        actionIndex.addListener((obs, oldVal, newVal) -> {
-//            if (isValidIndex()) {
-//                String test = String.valueOf((long) Math.abs(getProgramActions().get(actionIndex.get()).getValue()));
-//                actionValue.set(test);
-//            }
-//        });
-//
-//    }
+    public BooleanBinding disableVarField(){
+        return Bindings.createBooleanBinding(() -> {
+            boolean isValid = false;
+            if (isValidIndex()){
+                Action action = getProgramActions().get(actionIndex.get());
+                isValid = action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE;
+            }
+            return isValid;
+        }, getProgramActions(), actionIndexProperty());
+    }
 
     public void configureBindingsAndListeners() {
 
@@ -302,7 +301,7 @@ public class MainViewModel {
             }
             if (isValidIndex() && newVal != null && !newVal.isEmpty()) {
                 Action action = getProgramActions().get(actionIndex.get());
-                if (action.actionType() == ActionType.VAR_ASSIGNMENT) {
+                if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
                     setTargetName(action, newVal);
                 }
                 else {
@@ -336,7 +335,7 @@ public class MainViewModel {
                     actionValue.set(action.getVariableTargetName());
                 }
                 else{
-                    actionValue.set(action.getExpression().expressionName());
+                    actionValue.set(action.getExpression().toString());
                 }
                 updatingActionValue = false;
 //                System.out.println(errorValue.getValue());
@@ -444,36 +443,6 @@ public class MainViewModel {
         executionFinished.set(false);
     }
 
-
-    public BooleanBinding varDeclarationIsBefore(){
-        return Bindings.createBooleanBinding(() -> {
-            boolean isBefore = true;
-
-            for(Action action : getProgramActions()){
-                if (action.actionType() == ActionType.VAR_DECLARATION && isBefore){
-                    int index = getProgramActions().indexOf(action);
-                    for (int i = 0; i < index && isBefore; ++i){
-                        if (getProgramActions().get(i).actionType() != ActionType.VAR_DECLARATION){
-                            isBefore = false;
-                        }
-                    }
-                }
-            }
-            return isBefore;
-        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
-    }
-
-    public BooleanBinding disableVarField(){
-        return Bindings.createBooleanBinding(() -> {
-            boolean isValid = false;
-            if (isValidIndex()){
-                Action action = getProgramActions().get(actionIndex.get());
-                isValid = action.actionType() == ActionType.VAR_ASSIGNMENT;
-            }
-            return isValid;
-        }, getProgramActions(), actionIndexProperty());
-    }
-
     public void setValue(Action action, String value){
         if (program.isInteger(value)){
             int val = Integer.parseInt(value);
@@ -493,10 +462,9 @@ public class MainViewModel {
                     errorValue.set(false);
                 }
                 break;
-            case TURN_LEFT, VAR_ASSIGNMENT, REPEAT:
+            case TURN_LEFT, VAR_ASSIGNMENT, REPEAT, INCREMENT_VARIABLE:
                 if (action.valueIsCorrect(value)){
                     action.setExpression(new LitteralExpression(value));
-                    System.out.println(action.getExpression().expressionName());
                     errorValue.set(false);
                 }
                 break;
@@ -509,12 +477,28 @@ public class MainViewModel {
             errorValue.set(false);
             if (nameIsCorrect(name)){
                 action.setExpression(new VariableExpression(name));
-                System.out.println(action.getExpression().expressionName());
             }
             else{
                 errorValue.set(true);
             }
         }
+    }
+
+    public boolean verificationVarBeforeExecution(){
+        boolean varExist = false;
+        if (actionValue.get() != null){
+            int pos = actionIndex.get();
+            for (int i = 0; i <= pos && !varExist; ++i){
+                Action action = getProgramActions().get(i);
+                if (action.actionType() == ActionType.VAR_DECLARATION){
+                    String varName = action.getExpression().toString();
+                    if (actionValue.get().equals(varName)){
+                        varExist = true;
+                    }
+                }
+            }
+        }
+        return varExist;
     }
 
     public boolean isLetterOrUnderscore(Character name){
@@ -537,7 +521,7 @@ public class MainViewModel {
             errorValue.set(false);
             if (nameIsCorrect(name)){
                 action.setVariableTargetName(name);
-                System.out.println(action.getVariableTargetName());
+//                System.out.println(action.getVariableTargetName());
             }
             else{
                 errorValue.set(true);

@@ -9,7 +9,7 @@ public class VarAssignment extends Action{
 
     @Override
     public void execute(Cursor cursor, Program program) {
-        int value = super.getExpression().expressionValue(program);
+        int value = super.getExpression().valueOfVariableOrLitteral(program);
         program.setVariableValueByName(super.getVariableTargetName(), value);
     }
 
@@ -20,6 +20,6 @@ public class VarAssignment extends Action{
 
     @Override
     public String toString() {
-        return "Assignation : " + super.getVariableTargetName() + " = " + super.getExpression().expressionName();
+        return "Assignation : " + super.getVariableTargetName() + " = " + super.getExpression();
     }
 }

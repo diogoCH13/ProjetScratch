@@ -45,7 +45,7 @@ public class Repeat extends Action {
     }
 
     public String toString(){
-        return "Répéter " + super.getExpression().expressionName() + " fois";
+        return "Répéter " + super.getExpression() + " fois";
     }
 
 //    @Override

@@ -15,12 +15,12 @@ public class VariableExpression implements Expression{
     }
 
     @Override
-    public int expressionValue(Program program) {
+    public int valueOfVariableOrLitteral(Program program) {
         return program.getVariableValueByName(name);
     }
 
     @Override
-    public String expressionName() {
+    public String toString() {
         return name;
     }
 }

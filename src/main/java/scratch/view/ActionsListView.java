@@ -189,11 +189,11 @@ public class ActionsListView extends VBox {
         actionListView.getItems().addListener((Observable obs) -> {
             if (vm.isValidIndex()){
                 Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-                if (action.actionType() == ActionType.VAR_ASSIGNMENT) {
+                if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
                     vm.actionValueProperty().set(action.getVariableTargetName());
                 }
                 else{
-                    vm.actionValueProperty().set(action.getExpression().expressionName());
+                    vm.actionValueProperty().set(action.getExpression().toString());
                 }
                 beautifyValueField();
             }
@@ -214,7 +214,7 @@ public class ActionsListView extends VBox {
     private void beautifyValueField(){
         if (vm.isValidIndex()){
             Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-            if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT){
+            if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
                 valueField.setPrefWidth(60);
                 valueField.setMaxWidth(60);
             }

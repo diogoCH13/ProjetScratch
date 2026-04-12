@@ -54,7 +54,7 @@ public class Program {
 
         if (action.actionType() == ActionType.REPEAT){
             Expression value = action.getExpression();
-            int cpt = value.expressionValue(this);
+            int cpt = value.valueOfVariableOrLitteral(this);
             if (cpt <= 0){
                 int endIndex = findMatchingEndRepeat(index);
                 context.setCurrentIndex(endIndex + 1);
@@ -130,6 +130,7 @@ public class Program {
 
     public void removeAll(){
         actions.clear();
+        declarationList.clear();
     }
     public void up(int index){
         if (index > 0 && index < actions.size()){
@@ -174,7 +175,7 @@ public class Program {
     public void save(File file) {
         try (PrintWriter writer = new PrintWriter(file)) {
             for (Action action : actions) {
-                writer.println(action.actionType().name() + ";" + action.getExpression().expressionName());
+                writer.println(action.actionType().name() + ";" + action.getExpression());
             }
 
         } catch (IOException e) {
@@ -259,5 +260,15 @@ public class Program {
 
     public void declareVariable(String name){
         declarationList.put(name, 0);
+    }
+
+    public void increment(String targetName, int value){
+        int oldValue = declarationList.get(targetName);
+        declarationList.put(targetName, oldValue + value);
+    }
+
+    public void decrement(String targetName, int value){
+        int oldValue = declarationList.get(targetName);
+        declarationList.put(targetName, oldValue - value);
     }
 }

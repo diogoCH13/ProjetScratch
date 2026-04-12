@@ -1,7 +1,5 @@
 package scratch.model;
 
-import javafx.beans.InvalidationListener;
-
 public class LitteralExpression implements Expression{
 
     private final int value;
@@ -15,12 +13,12 @@ public class LitteralExpression implements Expression{
     }
 
     @Override
-    public int expressionValue(Program program) {
+    public int valueOfVariableOrLitteral(Program program) {
         return value;
     }
 
     @Override
-    public String expressionName() {
+    public String toString() {
         return value < 0 ? String.valueOf(-value) : String.valueOf(value);
     }
 }

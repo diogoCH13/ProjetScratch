@@ -29,7 +29,7 @@ public class ActionFactory {
                 return new VarAssignment(new VariableExpression(""), "");
             }
             case INCREMENT_VARIABLE -> {
-                return new IncrementVariable(new LitteralExpression(0));
+                return new IncrementVariable(new LitteralExpression(0), "");
             }
             case END_REPEAT -> {
                 return new EndRepeat(new LitteralExpression(0));

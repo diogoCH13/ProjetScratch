@@ -64,6 +64,7 @@ public abstract class Action {
             case VAR_DECLARATION -> "Déclaration de la variable";
             case VAR_ASSIGNMENT -> "Assignation de la variable";
             case REPEAT -> "Répéter";
+            case INCREMENT_VARIABLE -> "Incrémentation de la variable";
             default -> "Lever stylo";
         };
     }
@@ -74,6 +75,7 @@ public abstract class Action {
             case TURN_LEFT, TURN_RIGHT -> "degrés";
             case VAR_ASSIGNMENT -> "valeur:";
             case REPEAT -> "fois";
+            case INCREMENT_VARIABLE -> "de";
             default -> "";
         };
     }

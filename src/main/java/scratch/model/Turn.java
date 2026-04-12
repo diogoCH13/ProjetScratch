@@ -1,8 +1,5 @@
 package scratch.model;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-
 public class Turn extends Action {
 
 //    private double angle;
@@ -25,7 +22,7 @@ public class Turn extends Action {
 
     @Override
     public void execute(Cursor cursor, Program program) {
-        int val = super.getExpression().expressionValue(program);
+        int val = super.getExpression().valueOfVariableOrLitteral(program);
         val = val < 0 ? -val : val;
         if (!valueIsCorrect(val)){
             throw new RuntimeException("RUNTIME ERROR !");
@@ -60,9 +57,9 @@ public class Turn extends Action {
 //    }
 
     public String toString(){
-        String val = "Tourner à droite de " + super.getExpression().expressionName();
+        String val = "Tourner à droite de " + super.getExpression();
         if (direction == ActionType.TURN_LEFT){
-            val = "Tourner à gauche de " + super.getExpression().expressionName();
+            val = "Tourner à gauche de " + super.getExpression();
         }
         return val;
 //        if(super.valueProperty().get() > 0){
