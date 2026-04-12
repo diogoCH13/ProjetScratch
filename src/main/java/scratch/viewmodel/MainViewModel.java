@@ -1,22 +1,27 @@
 package scratch.viewmodel;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.binding.*;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
+import javafx.util.Duration;
 import scratch.model.Cursor;
 import scratch.model.Point;
 import scratch.model.*;
-import javafx.beans.Observable;
+
 import java.io.File;
 
 public class MainViewModel {
+    private Timeline timeline;
     private final Cursor cursor;
     private final Program program;
     private final CursorWorld world;
 
     private final IntegerProperty catalogIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
-    private final IntegerProperty executionIndex = new SimpleIntegerProperty(-1);
+//    private final IntegerProperty executionIndex = new SimpleIntegerProperty(-1);
     private final StringProperty actionValue = new SimpleStringProperty();
     private final BooleanProperty errorValue = new SimpleBooleanProperty(false);
 
@@ -29,6 +34,7 @@ public class MainViewModel {
     private final BooleanProperty running = new SimpleBooleanProperty(false);
     private final BooleanProperty executionFinished = new SimpleBooleanProperty(false);
     private boolean updatingActionValue = false;
+    private final BooleanProperty autoMode = new SimpleBooleanProperty(false);
 
 
     public MainViewModel(Cursor cursor) {
@@ -64,6 +70,10 @@ public class MainViewModel {
 
     public BooleanProperty runningProperty(){
         return running;
+    }
+
+    public BooleanProperty autoModeProperty(){
+        return autoMode;
     }
 
     public BooleanProperty errorValueProperty(){
@@ -107,6 +117,8 @@ public class MainViewModel {
         if (isValidIndex()) {
             program.deleteAction(i);
         }
+        programLoaded.set(false);
+        running.set(false);
     }
 
     public void upAction() {
@@ -172,6 +184,10 @@ public class MainViewModel {
 
     public boolean isRunning(){
         return running.get();
+    }
+
+    public boolean isAutoMode(){
+        return autoMode.get();
     }
 
     public BooleanProperty programLoadedProperty() {
@@ -293,6 +309,9 @@ public class MainViewModel {
         executionFinished.set(false);
         running.set(false);
         program.resetStack();
+        if (timeline != null){
+            timeline.stop();
+        }
     }
 
     public void loadProgram(){
@@ -303,6 +322,8 @@ public class MainViewModel {
     }
 
     public void execute(){
+        world.clearSegments();
+        cursor.reset();
         running.set(true);
         executionFinished.set(false);
         program.startExecution();
@@ -391,5 +412,41 @@ public class MainViewModel {
             }
             return isBefore;
         }, actionIndexProperty(), getProgramActions(), actionValueProperty());
+    }
+
+    public void autoNext(){
+
+        if (timeline != null){
+            timeline.stop();
+        }
+
+        timeline = new Timeline(new KeyFrame(Duration.millis(500), e->{
+            next();
+            if (program.isExecutionFinished()){
+                timeline.stop();
+                running.set(false);
+                executionFinished.set(true);
+            }
+        }));
+
+        timeline.setCycleCount(Animation.INDEFINITE);  //boucle qui s'arrête pas
+        running.set(true);
+        executionFinished.set(false);
+        timeline.play();
+
+    }
+
+    public void stopAutoMode(){
+        timeline.stop();
+        running.set(false);
+//        executionFinished.set(true);
+
+    }
+
+
+    public void setTime(double val){
+        if (timeline != null){
+            timeline.setRate(val);
+        }
     }
 }
