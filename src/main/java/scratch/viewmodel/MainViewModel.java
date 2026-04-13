@@ -124,6 +124,7 @@ public class MainViewModel {
             program.deleteAction(i);
             refreshValue();
         }
+        errorValue.set(false);
         programLoaded.set(false);
         running.set(false);
     }
@@ -201,7 +202,6 @@ public class MainViewModel {
 
     public BooleanBinding canLoad() {
         return Bindings.isNotEmpty(program.getActions()).and(actionsValide).and(varDeclarationIsBefore());
-        //.and(allActionIsValid());
         //.and(canLoadProgram).and(allActionIsValid());
     }
 
@@ -323,20 +323,21 @@ public class MainViewModel {
         }, getProgramActions(), actionValueProperty(), actionIndexProperty(), actionVarProperty());
     }
 
-//    public BooleanBinding allActionIsValid(){
+//    public BooleanBinding checkIfActionIsInit(){
 //        return Bindings.createBooleanBinding(() -> {
-//            boolean isValid = true;
-//            if (!getProgramActions().isEmpty()){
-//                for (int i = 0; i < getProgramActions().size() && isValid; ++i){
-//                    Action action = getProgramActions().get(i);
-//                    System.out.println(action.getIsValid());
-//                    if (!action.getIsValid()){
-//                        isValid = false;
+//            boolean isInit = true;
+//            if (isValidIndex() && !getProgramActions().isEmpty()){
+//                for (Action action : getProgramActions()){
+//                    String name = action.getExpression().toString();
+//                    if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.INCREMENT_VARIABLE){
+//                        if (name.equals("0") || name.isEmpty()){
+//                            isInit = false;
+//                        }
 //                    }
 //                }
 //            }
-//            return isValid;
-//        }, getProgramActions(), actionValueProperty(), actionVarProperty());
+//            return isInit;
+//        }, getProgramActions(), actionValueProperty());
 //    }
 
 //    public BooleanBinding declarationIsValid(){

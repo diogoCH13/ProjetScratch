@@ -231,6 +231,10 @@ public class ActionsListView extends VBox {
     private void configSelectionModels() {
         actionListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
             vm.actionIndexProperty().set(t1.intValue());
+            if (t1.intValue() >= 0 && t1.intValue() < vm.getProgramActions().size()){
+                Action action = vm.getProgramActions().get(t1.intValue());
+                valueField.visibleProperty().set(action.actionType() != ActionType.PEN_UP && action.actionType() != ActionType.PEN_DOWN);
+            }
         });
 
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
@@ -238,22 +242,17 @@ public class ActionsListView extends VBox {
             beautifyValueField();
         });
 
-//        actionListView.getItems().addListener((Observable obs) -> {
-//            if (vm.isValidIndex()){
-//                Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-//                if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
-//                    vm.actionValueProperty().set(action.getVariableTargetName());
-//                }
-//                else{
-//                    vm.actionValueProperty().set(action.getExpression().toString());
-//                }
-//                beautifyValueField();
-//            }
-//            else{
-//                vm.actionValueProperty().set("");
-//                vm.errorValueProperty().set(false);
-//            }
-//        });
+        actionListView.getItems().addListener((Observable obs) -> {
+            if (vm.isValidIndex()){
+                Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
+                valueField.visibleProperty().set(action.actionType() != ActionType.PEN_UP && action.actionType() != ActionType.PEN_DOWN);
+                beautifyValueField();
+            }
+            else{
+                vm.actionValueProperty().set("");
+                vm.errorValueProperty().set(false);
+            }
+        });
     }
 
     private void configureBindingsAndListeners() {
