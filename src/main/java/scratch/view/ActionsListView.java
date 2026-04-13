@@ -242,17 +242,22 @@ public class ActionsListView extends VBox {
             beautifyValueField();
         });
 
-        actionListView.getItems().addListener((Observable obs) -> {
-            if (vm.isValidIndex()){
-                Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-                valueField.visibleProperty().set(action.actionType() != ActionType.PEN_UP && action.actionType() != ActionType.PEN_DOWN);
-                beautifyValueField();
-            }
-            else{
-                vm.actionValueProperty().set("");
-                vm.errorValueProperty().set(false);
-            }
-        });
+//        actionListView.getItems().addListener((Observable obs) -> {
+//            if (vm.isValidIndex()){
+//                Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
+//                if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
+//                    vm.actionValueProperty().set(action.getVariableTargetName());
+//                }
+//                else{
+//                    vm.actionValueProperty().set(action.getExpression().toString());
+//                }
+//                beautifyValueField();
+//            }
+//            else{
+//                vm.actionValueProperty().set("");
+//                vm.errorValueProperty().set(false);
+//            }
+//        });
     }
 
     private void configureBindingsAndListeners() {

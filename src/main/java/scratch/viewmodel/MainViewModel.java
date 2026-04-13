@@ -216,6 +216,17 @@ public class MainViewModel {
     }
 
     public BooleanBinding canLoad() {
+        return Bindings.isNotEmpty(program.getActions()).and(actionsValide).and(varDeclarationIsBefore()).
+                and(Bindings.createBooleanBinding(()-> program.isRepeatCounterModificationValid(),
+                        program.getActions()
+                        ,actionValueProperty()
+                )).and(Bindings.createBooleanBinding(()->
+                        program.isEndRepeatExist(),
+                        program.getActions()
+                        )).and((Bindings.createBooleanBinding(() ->
+                        program.actionsNotEmpty(),
+                        program.getActions(), actionValue)));
+        //.and(allActionIsValid());
         return Bindings.isNotEmpty(program.getActions()).and(actionsValide).and(varDeclarationIsBefore()).and
                 (Bindings.createBooleanBinding(() -> program.actionsNotEmpty(),program.getActions(), actionValue));
         //.and(canLoadProgram).and(allActionIsValid());
