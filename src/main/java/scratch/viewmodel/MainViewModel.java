@@ -227,8 +227,6 @@ public class MainViewModel {
                         program.actionsNotEmpty(),
                         program.getActions(), actionValue)));
         //.and(allActionIsValid());
-        return Bindings.isNotEmpty(program.getActions()).and(actionsValide).and(varDeclarationIsBefore()).and
-                (Bindings.createBooleanBinding(() -> program.actionsNotEmpty(),program.getActions(), actionValue));
         //.and(canLoadProgram).and(allActionIsValid());
     }
 
