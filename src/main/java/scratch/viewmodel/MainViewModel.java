@@ -216,7 +216,8 @@ public class MainViewModel {
     }
 
     public BooleanBinding canLoad() {
-        return Bindings.isNotEmpty(program.getActions()).and(actionsValide).and(varDeclarationIsBefore());
+        return Bindings.isNotEmpty(program.getActions()).and(actionsValide).and(varDeclarationIsBefore()).and
+                (Bindings.createBooleanBinding(() -> program.actionsNotEmpty(),program.getActions(), actionValue));
         //.and(canLoadProgram).and(allActionIsValid());
     }
 
@@ -382,7 +383,7 @@ public class MainViewModel {
             if (updatingActionValue) {
                 return;
             }
-            if (isValidIndex() && newVal != null && !newVal.isEmpty()) {
+            if (isValidIndex() && newVal != null) {
                 Action action = getProgramActions().get(actionIndex.get());
                 if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
                     setTargetName(action, newVal);
@@ -565,13 +566,18 @@ public class MainViewModel {
 
     public void verificationNameRules(Action action, String name){
         errorValue.set(true);
-        if (isLetterOrUnderscore(name.charAt(0))){
-            errorValue.set(false);
-            if (nameIsCorrect(name)){
-                action.setExpression(new VariableExpression(name));
-            }
-            else{
-                errorValue.set(true);
+        if (action.actionType() == ActionType.VAR_DECLARATION && name.isEmpty()){
+            action.setExpression(new VariableExpression(name));
+        }
+        else{
+            if (isLetterOrUnderscore(name.charAt(0))){
+                errorValue.set(false);
+                if (nameIsCorrect(name)){
+                    action.setExpression(new VariableExpression(name));
+                }
+                else{
+                    errorValue.set(true);
+                }
             }
         }
     }
@@ -613,13 +619,18 @@ public class MainViewModel {
 
     public void setTargetName(Action action, String name){
         errorValue.set(true);
-        if (isLetterOrUnderscore(name.charAt(0))){
-            errorValue.set(false);
-            if (nameIsCorrect(name)){
-                action.setVariableTargetName(name);
-            }
-            else{
-                errorValue.set(true);
+        if (name.isEmpty()){
+            action.setVariableTargetName(name);
+        }
+        else{
+            if (isLetterOrUnderscore(name.charAt(0))){
+                errorValue.set(false);
+                if (nameIsCorrect(name)){
+                    action.setVariableTargetName(name);
+                }
+                else{
+                    errorValue.set(true);
+                }
             }
         }
     }

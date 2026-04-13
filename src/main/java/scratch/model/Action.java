@@ -4,7 +4,6 @@ package scratch.model;
 import javafx.beans.property.*;
 
 public abstract class Action {
-    private boolean isValid = true;
     private ObjectProperty<Expression> expressionProperty = new SimpleObjectProperty<>();
     private StringProperty variableTarget = new SimpleStringProperty();
 
@@ -38,14 +37,6 @@ public abstract class Action {
 
     public void setVariableTargetName(String variableTarget) {
         this.variableTarget.set(variableTarget);
-    }
-
-    public void setIsValid(boolean isValid){
-        this.isValid = isValid;
-    }
-
-    public boolean getIsValid(){
-        return isValid;
     }
 
     public boolean valueIsCorrect(int value){

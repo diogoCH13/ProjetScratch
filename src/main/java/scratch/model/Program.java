@@ -333,5 +333,22 @@ public class Program {
 
     }
 
+    public boolean actionsNotEmpty(){
+        boolean isNotEmpty = true;
+        for (Action action : actions){
+            if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
+                if (action.getVariableTargetName().trim().isEmpty() || action.getVariableTargetName().equals("0")){
+                    isNotEmpty = false;
+                }
+            }
+            else if (action.actionType() == ActionType.VAR_DECLARATION){
+                if (action.getExpression().toString().isEmpty() || action.getExpression().toString().equals("0")){
+                    isNotEmpty = false;
+                }
+            }
+        }
+        return isNotEmpty;
+    }
+
 
 }
