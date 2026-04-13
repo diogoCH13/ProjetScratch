@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -15,11 +16,12 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import scratch.model.Segment;
 import scratch.model.VarDeclaration;
+import scratch.model.VariableRow;
 import scratch.viewmodel.MainViewModel;
 
 public class SceneTurtleView extends VBox {
     private final MainViewModel vm;
-    private final TableView<VarDeclaration> tableView = new TableView<>();
+    private final TableView<VariableRow> tableView = new TableView<>();
     private final Label varibaleLabel = new Label("Variables");
     Button stopBtn = new Button("Arrêter");
     private final Slider slider = new Slider(0.01, 5, 1);
@@ -53,6 +55,7 @@ public class SceneTurtleView extends VBox {
         this.vm = vm;
 
         beautify();
+        loadData();
         configActions();
         configButtonsDisabling();
         configureBindingsAndListeners();
@@ -101,6 +104,7 @@ public class SceneTurtleView extends VBox {
         setSpacing(12);
 
         gc.setStroke(Color.RED);
+
     }
     private void drawTurtle(double x, double y, double angle) {
         // angle on degrees
@@ -240,8 +244,7 @@ public class SceneTurtleView extends VBox {
 
     private void configButtonsDisabling() {
         loadBtn.disableProperty().bind(vm.canLoad().not());
-
-//                .or(vm.errorValueProperty())
+//        .or(vm.errorValueProperty())
 //                .or(vm.varDeclarationIsBefore().not().or(vm.verificationVarInList().not())));
 //        executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
 
@@ -359,8 +362,10 @@ public class SceneTurtleView extends VBox {
 
     public VBox configTable(){
         VBox tableBox = new VBox();
-        TableColumn<VarDeclaration, String> firstColumn = new TableColumn<>("Nom");
-        TableColumn<VarDeclaration, String> SecondColumn = new TableColumn<>("Valeur");
+        TableColumn<VariableRow, String> firstColumn = new TableColumn<>("Nom");
+        TableColumn<VariableRow, Integer> SecondColumn = new TableColumn<>("Valeur");
+        firstColumn.setCellValueFactory(cellData -> cellData.getValue().nomProperty());
+        SecondColumn.setCellValueFactory(cellData -> cellData.getValue().valeurProperty().asObject());
         tableView.getColumns().addAll(firstColumn, SecondColumn);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -407,6 +412,10 @@ public class SceneTurtleView extends VBox {
         sliderBox.getChildren().add(slider);
         return sliderBox;
 
+    }
+
+    private void loadData() {
+        tableView.setItems(vm.getVariableValueList());
     }
 
 
