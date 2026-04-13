@@ -747,6 +747,4 @@ public class MainViewModel {
             }
         }
     }
-
-
 }

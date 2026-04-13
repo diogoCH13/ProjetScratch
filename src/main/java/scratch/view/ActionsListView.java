@@ -231,6 +231,10 @@ public class ActionsListView extends VBox {
     private void configSelectionModels() {
         actionListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
             vm.actionIndexProperty().set(t1.intValue());
+            if (t1.intValue() >= 0 && t1.intValue() < vm.getProgramActions().size()){
+                Action action = vm.getProgramActions().get(t1.intValue());
+                valueField.visibleProperty().set(action.actionType() != ActionType.PEN_UP && action.actionType() != ActionType.PEN_DOWN);
+            }
         });
 
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
