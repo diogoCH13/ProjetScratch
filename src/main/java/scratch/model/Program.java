@@ -16,11 +16,19 @@ public class Program {
         return FXCollections.unmodifiableObservableList(actions);
     }
 
-    public void addAction(int index){
+
+    public Map<String, Integer> getDeclarationList() {
+        return declarationList;
+    }
+
+    public void addAction(int index, int destinationIndex){
         ActionType type = ActionsCatalog.getAction(index);
         if (type != null){
             Action action = ActionFactory.createAction(type);
-            actions.add(action);
+//            actions.add(action);
+            if(destinationIndex <= actions.size()){
+                actions.add(destinationIndex, action);
+            }
         }
     }
 
@@ -175,28 +183,54 @@ public class Program {
     public void save(File file) {
         try (PrintWriter writer = new PrintWriter(file)) {
             for (Action action : actions) {
-                writer.println(action.actionType().name() + ";" + action.getExpression());
+                if (action.actionType() == ActionType.PEN_UP || action.actionType() == ActionType.PEN_DOWN || action.actionType() == ActionType.END_REPEAT){
+                    writer.println(action.actionType().name() + ";");
+                } else if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
+                    writer.println(action.actionType().name() + ";" + action.getVariableTargetName() +";" + action.getExpression());
+                } else {
+                    writer.println(action.actionType().name() + ";" + action.getExpression());
+                }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void load(File file) {
-
+        declarationList.clear();
         actions.clear();
-
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(";");
+                if (line.isBlank()) continue;
 
+                String[] parts = line.split(";");
                 ActionType type = ActionType.valueOf(parts[0]);
-                Expression value = parseExpression(parts[1]);
 
                 Action action = ActionFactory.createAction(type);
-                action.setExpression(value);
+
+                switch (type) {
+                    case VAR_ASSIGNMENT, INCREMENT_VARIABLE -> {
+                        if (parts.length >= 3) {
+                            action.setVariableTargetName(parts[1]);
+                            action.setExpression(parseExpression(parts[2]));
+                        }
+                    }
+                    case MOVE_FORWARD, TURN_LEFT, TURN_RIGHT, REPEAT, VAR_DECLARATION -> {
+                        if (parts.length >= 2 && !parts[1].isEmpty()) {
+                            String val = parts[1];
+                            if (isInteger(val)) {
+                                int value = Integer.parseInt(val);
+                                if (type == ActionType.MOVE_FORWARD || type == ActionType.TURN_RIGHT) {
+                                    value = -value;
+                                }
+                                action.setExpression(new LitteralExpression(value));
+                            } else {
+                                action.setExpression(parseExpression(val));
+                            }
+                        }
+                    }
+                }
                 actions.add(action);
             }
 
@@ -291,4 +325,13 @@ public class Program {
             currentAction.expressionProperty().set(new LitteralExpression(value - 1));
         }
     }
+
+    public void clearAll(){
+        actions.clear();
+        declarationList.clear();
+        executionStack.clear();
+
+    }
+
+
 }

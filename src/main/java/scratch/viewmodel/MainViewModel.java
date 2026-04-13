@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.*;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Duration;
 import scratch.model.Cursor;
@@ -12,6 +13,7 @@ import scratch.model.Point;
 import scratch.model.*;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public class MainViewModel {
 
@@ -38,6 +40,9 @@ public class MainViewModel {
     private boolean updatingActionValue = false;
     private final BooleanProperty autoMode = new SimpleBooleanProperty(false);
 
+    private ObservableList<VariableRow> variableValueList = FXCollections.observableArrayList();
+
+
 
     public MainViewModel(Cursor cursor) {
         this.cursor = cursor;
@@ -48,6 +53,10 @@ public class MainViewModel {
                 program.getActions()
         );
         configureBindingsAndListeners();
+    }
+
+    public ObservableList<VariableRow> getVariableValueList() {
+        return variableValueList;
     }
 
     public Cursor getCursor(){
@@ -111,8 +120,14 @@ public class MainViewModel {
     }
 
     public void addAction() {
+        int destinationIndex = actionIndex.get();
         int i = catalogIndex.get();
-        program.addAction(i);
+        if (destinationIndex >= 0){
+            program.addAction(i, destinationIndex + 1);
+        }
+        else {
+            program.addAction(i, program.getActions().size());
+        }
         programLoaded.set(false);
         running.set(false);
 //        executionIndex.set(-1);
@@ -467,6 +482,7 @@ public class MainViewModel {
 //            running.set(false);
 //        }
         program.executeNext(cursor);
+        updateVariablesList();
         int index = program.getCurrentIndex();
         if(index >= 0){
             actionIndex.set(index);
@@ -498,10 +514,14 @@ public class MainViewModel {
     }
 
     public void newFile(){
-        clearAction();
+        program.clearAll();
         world.clearSegments();
         cursor.reset();
         catalogIndex.set(-1);
+        actionIndex.set(-1);
+
+        running.set(false);
+        programLoaded.set(false);
         executionFinished.set(false);
     }
 
@@ -510,11 +530,9 @@ public class MainViewModel {
     }
 
     public void openFile(File file){
+        reset();
         program.load(file);
-//        executionIndex.set(-1);
-        running.set(false);
         programLoaded.set(false);
-        executionFinished.set(false);
     }
 
     public void setValue(Action action, String value){
@@ -628,7 +646,7 @@ public class MainViewModel {
             timeline.stop();
         }
 
-        timeline = new Timeline(new KeyFrame(Duration.millis(200), e->{
+        timeline = new Timeline(new KeyFrame(Duration.millis(500), e->{
             next();
             if (program.isExecutionFinished()){
                 timeline.stop();
@@ -654,7 +672,7 @@ public class MainViewModel {
 
     public void setTime(double val){
         if (timeline != null){
-            timeline.setRate(val);
+            timeline.setRate(1 / val);
         }
     }
 
@@ -689,6 +707,13 @@ public class MainViewModel {
             }
         }
         return level;
+    }
+
+    public void updateVariablesList(){
+        variableValueList.clear();
+        for (Map.Entry<String, Integer>entry : program.getDeclarationList().entrySet()){
+            variableValueList.add(new VariableRow(entry.getKey(), entry.getValue()));
+        }
     }
 
     public void increment(){
