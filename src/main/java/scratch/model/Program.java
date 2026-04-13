@@ -262,13 +262,33 @@ public class Program {
         declarationList.put(name, 0);
     }
 
-    public void increment(String targetName, int value){
-        int oldValue = declarationList.get(targetName);
-        declarationList.put(targetName, oldValue + value);
+    public void incrementDuringExecution(String targetName, int value){
+        if (declarationList.containsKey(targetName)){
+            int oldValue = declarationList.get(targetName);
+            declarationList.put(targetName, oldValue + value);
+        }
     }
 
-    public void decrement(String targetName, int value){
-        int oldValue = declarationList.get(targetName);
-        declarationList.put(targetName, oldValue - value);
+    public void decrementDuringExecution(String targetName, int value){
+        if (declarationList.containsKey(targetName)){
+            int oldValue = declarationList.get(targetName);
+            declarationList.put(targetName, oldValue - value);
+        }
+    }
+
+    public void incrementDuringCompilation(Action currentAction){
+        String expression = currentAction.getExpression().toString();
+        if (isInteger(expression)){
+            int value = Integer.valueOf(currentAction.getExpression().toString());
+            currentAction.expressionProperty().set(new LitteralExpression(value + 1));
+        }
+    }
+
+    public void decrementDuringCompilation(Action currentAction){
+        String expression = currentAction.getExpression().toString();
+        if (isInteger(expression)){
+            int value = Integer.valueOf(currentAction.getExpression().toString());
+            currentAction.expressionProperty().set(new LitteralExpression(value - 1));
+        }
     }
 }

@@ -239,8 +239,10 @@ public class SceneTurtleView extends VBox {
     }
 
     private void configButtonsDisabling() {
-        loadBtn.disableProperty().bind(vm.canLoad().not().or(vm.errorValueProperty())
-                .or(vm.varDeclarationIsBefore().not().or(vm.verificationVarInList().not())));
+        loadBtn.disableProperty().bind(vm.canLoad().not());
+
+//                .or(vm.errorValueProperty())
+//                .or(vm.varDeclarationIsBefore().not().or(vm.verificationVarInList().not())));
 //        executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
 
         executeBtn.disableProperty().bind(

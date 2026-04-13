@@ -5,16 +5,17 @@ public class IncrementVariable extends Action {
     public IncrementVariable(Expression expression, String variableTargetName) {
         super(expression);
         super.setVariableTargetName(variableTargetName);
+        super.setIsValid(false);
     }
 
     @Override
     public void execute(Cursor cursor, Program program) {
         int val = super.getExpression().valueOfVariableOrLitteral(program);
         if (val > 0){
-            program.increment(super.getVariableTargetName(), val);
+            program.incrementDuringExecution(super.getVariableTargetName(), val);
         }
         else{
-            program.decrement(super.getVariableTargetName(), val);
+            program.decrementDuringExecution(super.getVariableTargetName(), val);
         }
     }
 

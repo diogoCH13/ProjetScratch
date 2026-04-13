@@ -26,15 +26,6 @@ public class MoveForward extends Action {
         return value >= 1 && value <= 100;
     }
 
-//    @Override
-//    public double getValue() {
-//        return super.valueProperty().getValue();
-//    }
-//
-//    public void setExpression(double value) {
-//        super.valueProperty().setValue(value);
-//    }
-
     @Override
     public String toString() {
         return "Avancer de " + super.getExpression();

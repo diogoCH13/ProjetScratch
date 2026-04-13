@@ -4,6 +4,7 @@ public class VarDeclaration extends Action{
 
     public VarDeclaration(Expression value){
         super(value);
+        super.setIsValid(false);
     }
 
     @Override

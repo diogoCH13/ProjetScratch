@@ -201,6 +201,14 @@ public class ActionsListView extends VBox {
         clearBtn.setOnAction(e -> {
             vm.clearAction();
         });
+
+        increment.setOnAction(e -> {
+            vm.increment();
+        });
+
+        decrement.setOnAction(e -> {
+            vm.decrement();
+        });
     }
 
     private void configButtonsDisabling() {
@@ -214,10 +222,10 @@ public class ActionsListView extends VBox {
         duplicateBtn.disableProperty().bind(vm.canDuplicate().not());
         varField.visibleProperty().bind(vm.disableVarField());
         varField.managedProperty().bind(vm.disableVarField());
-        increment.visibleProperty().bind(vm.disableVarField());
-        increment.managedProperty().bind(vm.disableVarField());
-        decrement.visibleProperty().bind(vm.disableVarField());
-        decrement.managedProperty().bind(vm.disableVarField());
+        increment.visibleProperty().bind((vm.disableIncrement()));
+        increment.managedProperty().bind((vm.disableIncrement()));
+        decrement.visibleProperty().bind((vm.disableIncrement()));
+        decrement.managedProperty().bind((vm.disableIncrement()));
     }
 
     private void configSelectionModels() {

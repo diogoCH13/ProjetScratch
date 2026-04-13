@@ -168,6 +168,7 @@ public class MainViewModel {
         program.removeAll();
         actionIndex.set(-1);
         refreshValue();
+        errorValue.set(false);
         programLoaded.set(false);
         running.set(false);
         executionFinished.set(false);
@@ -199,7 +200,9 @@ public class MainViewModel {
     }
 
     public BooleanBinding canLoad() {
-        return Bindings.isNotEmpty(program.getActions()).and(actionsValide);
+        return Bindings.isNotEmpty(program.getActions()).and(actionsValide).and(varDeclarationIsBefore());
+        //.and(allActionIsValid());
+        //.and(canLoadProgram).and(allActionIsValid());
     }
 
     public BooleanProperty canExecute() {
@@ -293,6 +296,70 @@ public class MainViewModel {
         }, getProgramActions(), actionIndexProperty());
     }
 
+    public BooleanBinding disableIncrement(){
+        return Bindings.createBooleanBinding(() -> {
+            boolean isLitteral = false;
+            if (isValidIndex()){
+                Action currentAction = getProgramActions().get(actionIndex.get());
+                switch (currentAction.actionType()){
+                    case VAR_ASSIGNMENT, INCREMENT_VARIABLE:
+                        if (actionVar.get() != null){
+                            String value = actionVar.get();
+                            if (program.isInteger(value)){
+                                isLitteral = true;
+                            }
+                        }
+                        break;
+                    case MOVE_FORWARD, TURN_LEFT, TURN_RIGHT, REPEAT:
+                        if (actionValue.get() != null){
+                            String value = actionValue.get();
+                            if (program.isInteger(value)){
+                                isLitteral = true;
+                            }
+                        }
+                }
+            }
+            return isLitteral;
+        }, getProgramActions(), actionValueProperty(), actionIndexProperty(), actionVarProperty());
+    }
+
+//    public BooleanBinding allActionIsValid(){
+//        return Bindings.createBooleanBinding(() -> {
+//            boolean isValid = true;
+//            if (!getProgramActions().isEmpty()){
+//                for (int i = 0; i < getProgramActions().size() && isValid; ++i){
+//                    Action action = getProgramActions().get(i);
+//                    System.out.println(action.getIsValid());
+//                    if (!action.getIsValid()){
+//                        isValid = false;
+//                    }
+//                }
+//            }
+//            return isValid;
+//        }, getProgramActions(), actionValueProperty(), actionVarProperty());
+//    }
+
+//    public BooleanBinding declarationIsValid(){
+//        return Bindings.createBooleanBinding(() -> {
+//           boolean isValid = false;
+//           if (isValidIndex() && !getProgramActions().isEmpty()){
+//               Action action = getProgramActions().get(actionIndex.get());
+//               if (action.actionType() == ActionType.VAR_DECLARATION){
+//                   String name = action.getExpression().toString();
+//                   System.out.println(action.getIsValid());
+//                   action.setIsValid(!name.equals("0") && !name.isEmpty());
+//                   System.out.println(action.getIsValid());
+//                   isValid = action.getIsValid();
+//               }
+//               else{
+//                   isValid = true;
+//               }
+//
+//           }
+//           return isValid;
+//        }, actionValueProperty(), actionIndexProperty());
+//    }
+
     public void configureBindingsAndListeners() {
 
         actionValue.addListener((obs, oldVal, newVal) -> {
@@ -323,6 +390,11 @@ public class MainViewModel {
             if (isValidIndex() && newVal != null && !newVal.isEmpty()) {
                 Action action = getProgramActions().get(actionIndex.get());
                 setValue(action, newVal);
+            }
+            if (running.get()) {
+                running.set(false);
+                programLoaded.set(false);
+//                    executionIndex.set(-1);
             }
         });
 
@@ -526,13 +598,28 @@ public class MainViewModel {
             errorValue.set(false);
             if (nameIsCorrect(name)){
                 action.setVariableTargetName(name);
-//                System.out.println(action.getVariableTargetName());
             }
             else{
                 errorValue.set(true);
             }
         }
     }
+
+//    public boolean checkIfNameExist(String name){
+//        boolean nameExist = false;
+//        if (isValidIndex() && !getProgramActions().isEmpty()){
+//            for (Action action : getProgramActions()){
+//                if (action.actionType() == ActionType.VAR_DECLARATION){
+//                    String nameInList = action.getExpression().toString();
+//                    if (name.equals(nameInList)){
+//                        nameExist = true;
+//                        action.setIsValid(true);
+//                    }
+//                }
+//            }
+//        }
+//        return nameExist;
+//    }
 
     public void autoNext(){
 
@@ -601,5 +688,31 @@ public class MainViewModel {
             }
         }
         return level;
+    }
+
+    public void increment(){
+        if (isValidIndex() && !getProgramActions().isEmpty()){
+            Action currentAction = getProgramActions().get(actionIndex.get());
+            program.incrementDuringCompilation(currentAction);
+            if (currentAction.actionType() == ActionType.VAR_ASSIGNMENT || currentAction.actionType() == ActionType.INCREMENT_VARIABLE){
+                actionVar.set(currentAction.getExpression().toString());
+            }
+            else{
+                actionValue.set(currentAction.getExpression().toString());
+            }
+        }
+    }
+
+    public void decrement(){
+        if (isValidIndex() && !getProgramActions().isEmpty()){
+            Action currentAction = getProgramActions().get(actionIndex.get());
+            program.decrementDuringCompilation(currentAction);
+            if (currentAction.actionType() == ActionType.VAR_ASSIGNMENT || currentAction.actionType() == ActionType.INCREMENT_VARIABLE){
+                actionVar.set(currentAction.getExpression().toString());
+            }
+            else{
+                actionValue.set(currentAction.getExpression().toString());
+            }
+        }
     }
 }

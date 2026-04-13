@@ -5,6 +5,7 @@ public class VarAssignment extends Action{
     public VarAssignment(Expression expression, String variableTargetName) {
         super(expression);
         super.setVariableTargetName(variableTargetName);
+        super.setIsValid(false);
     }
 
     @Override
