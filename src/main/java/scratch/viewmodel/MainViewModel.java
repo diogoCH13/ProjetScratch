@@ -225,7 +225,10 @@ public class MainViewModel {
                         program.getActions()
                         )).and((Bindings.createBooleanBinding(() ->
                         program.actionsNotEmpty(),
-                        program.getActions(), actionValue)));
+                        program.getActions(), actionValue))).and(Bindings.createBooleanBinding(()->
+                            program.varIsExist(),
+                            program.getActions()
+                        ));
         //.and(allActionIsValid());
         //.and(canLoadProgram).and(allActionIsValid());
     }

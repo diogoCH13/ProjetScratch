@@ -95,8 +95,6 @@ public class Program {
             }
             return;
         }
-
-
     }
 
     public int findMatchingEndRepeat(int index){
@@ -116,33 +114,24 @@ public class Program {
         return -1;
     }
 
-//    public boolean isRepeatCounterModificationValid(){
-//        Deque<String> repeatCounters = new ArrayDeque<>();
-//        for (int i = 0; i < actions.size(); ++i){
-//            Action action = actions.get(i);
-//            if (action.actionType() == ActionType.REPEAT){
-//                String res = action.getExpression().toString();
-//                if (!isInteger(res)){
-//                    repeatCounters.push(res);
-//                }
-//            }
-//            if (action.actionType() == ActionType.INCREMENT_VARIABLE || action.actionType() == ActionType.VAR_ASSIGNMENT){
-//                String varName = action.getExpression().toString();
-//                for (String var: repeatCounters){
-//                    if (var.equals(varName)){
-//                        return false;
-//                    }
-//                }
-//            }
-//
-//            if (action.actionType() == ActionType.END_REPEAT){
-//                if (!repeatCounters.isEmpty()){
-//                    repeatCounters.pop();
-//                }
-//            }
-//        }
-//        return true;
-//    }
+    public boolean varIsExist(){
+        Set<String>declarsVars = new HashSet<>();
+        for (Action action: actions){
+
+            if (action.actionType() == ActionType.VAR_DECLARATION){
+                declarsVars.add(action.getExpression().toString());
+            }
+
+            if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
+                String var = action.getVariableTargetName();
+                if (!declarsVars.contains(var)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 
     public boolean isRepeatCounterModificationValid() {
         Deque<String> repeatCounters = new ArrayDeque<>();
