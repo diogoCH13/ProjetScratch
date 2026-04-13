@@ -116,6 +116,90 @@ public class Program {
         return -1;
     }
 
+//    public boolean isRepeatCounterModificationValid(){
+//        Deque<String> repeatCounters = new ArrayDeque<>();
+//        for (int i = 0; i < actions.size(); ++i){
+//            Action action = actions.get(i);
+//            if (action.actionType() == ActionType.REPEAT){
+//                String res = action.getExpression().toString();
+//                if (!isInteger(res)){
+//                    repeatCounters.push(res);
+//                }
+//            }
+//            if (action.actionType() == ActionType.INCREMENT_VARIABLE || action.actionType() == ActionType.VAR_ASSIGNMENT){
+//                String varName = action.getExpression().toString();
+//                for (String var: repeatCounters){
+//                    if (var.equals(varName)){
+//                        return false;
+//                    }
+//                }
+//            }
+//
+//            if (action.actionType() == ActionType.END_REPEAT){
+//                if (!repeatCounters.isEmpty()){
+//                    repeatCounters.pop();
+//                }
+//            }
+//        }
+//        return true;
+//    }
+
+    public boolean isRepeatCounterModificationValid() {
+        Deque<String> repeatCounters = new ArrayDeque<>();
+
+        for (int i = 0; i < actions.size(); ++i) {
+            Action action = actions.get(i);
+
+            if (action.actionType() == ActionType.REPEAT) {
+                String counter = action.getExpression().toString();
+
+                if (!isInteger(counter)) {
+                    repeatCounters.push(counter);
+                } else {
+                    repeatCounters.push("#LITERAL#");
+                }
+            }
+            if (action.actionType() == ActionType.INCREMENT_VARIABLE
+                    || action.actionType() == ActionType.VAR_ASSIGNMENT) {
+                String targetName = action.getVariableTargetName();
+
+                for (String var : repeatCounters) {
+                    if (var.equals(targetName)) {
+                        return false;
+                    }
+                }
+            }
+            if (action.actionType() == ActionType.END_REPEAT) {
+                if (!repeatCounters.isEmpty()) {
+                    repeatCounters.pop();
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean isEndRepeatExist(){
+        Deque<ActionType> endRepeatStack = new ArrayDeque<>();
+        for (int i = 0; i < actions.size(); ++i) {
+            Action action = actions.get(i);
+
+            if (action.actionType() == ActionType.REPEAT) {
+                endRepeatStack.push(action.actionType());
+            }
+
+            if (action.actionType() == ActionType.END_REPEAT){
+                if (!endRepeatStack.isEmpty()){
+                    endRepeatStack.pop();
+                }else {
+                    return false;
+                }
+            }
+
+        }return endRepeatStack.isEmpty();
+
+    }
+
     public int getCurrentIndex(){
         if (!executionStack.isEmpty()){
             return executionStack.peek().getCurrentIndex();
