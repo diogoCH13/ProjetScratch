@@ -20,6 +20,6 @@ public class VarAssignment extends Action{
 
     @Override
     public String toString() {
-        return "Assignation : " + super.getVariableTargetName() + " = " + super.getExpression();
+        return "Assignation : " + super.getVariableTargetName() + " = " + super.getExpression().toString();
     }
 }

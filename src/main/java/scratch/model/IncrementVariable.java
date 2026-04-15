@@ -10,12 +10,7 @@ public class IncrementVariable extends Action {
     @Override
     public void execute(Cursor cursor, Program program) {
         int val = super.getExpression().valueOfVariableOrLitteral(program);
-        if (val > 0){
-            program.incrementDuringExecution(super.getVariableTargetName(), val);
-        }
-        else{
-            program.decrementDuringExecution(super.getVariableTargetName(), val);
-        }
+        program.incrementDuringExecution(super.getVariableTargetName(), val);
     }
 
     @Override

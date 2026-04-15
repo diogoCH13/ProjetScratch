@@ -19,11 +19,6 @@ public class Pen extends Action {
         return write ? ActionType.PEN_DOWN : ActionType.PEN_UP;
     }
 
-//    @Override
-//    public double getValue() {
-//        return super.valueProperty().getValue();
-//    }
-
     public String toString(){
         return write ? "Abaisser le stylo" : "Lever le stylo";
     }

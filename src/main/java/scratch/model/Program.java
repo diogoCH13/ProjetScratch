@@ -122,10 +122,19 @@ public class Program {
                 declarsVars.add(action.getExpression().toString());
             }
 
-            if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
+            else if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
                 String var = action.getVariableTargetName();
                 if (!declarsVars.contains(var)){
                     return false;
+                }
+            }
+
+            else {
+                String var = action.getExpression().toString();
+                if (!isInteger(var)){
+                    if (!declarsVars.contains(var)){
+                        return false;
+                    }
                 }
             }
         }
@@ -206,7 +215,18 @@ public class Program {
 
 
     public void deleteAction(int index){
-        actions.remove(index);
+        if (index >= 0 && index < actions.size()){
+            Action action = getActions().get(index);
+            switch(action.actionType()){
+                case VAR_ASSIGNMENT:
+                    declareVariable(action.getVariableTargetName());
+                    break;
+                case VAR_DECLARATION:
+                    declarationList.remove(action.getExpression().toString());
+                    break;
+            }
+            actions.remove(index);
+        }
     }
 
     public void removeAll(){
@@ -227,23 +247,33 @@ public class Program {
         }
     }
 
-    public void duplicate(Action action) {
+    public void duplicate(int destinationIndex, Action action) {
         Expression value = action.getExpression();
 
-        switch (action.actionType()) {
+        if(destinationIndex <= actions.size()){
+            switch (action.actionType()) {
 
-            case PEN_UP -> actions.add(new Pen(false));
+                case PEN_UP -> actions.add(destinationIndex, new Pen(false));
 
-            case PEN_DOWN -> actions.add(new Pen(true));
+                case PEN_DOWN -> actions.add(destinationIndex, new Pen(true));
 
-            case TURN_LEFT -> actions.add(new Turn(ActionType.TURN_LEFT, value));
+                case TURN_LEFT -> actions.add(destinationIndex, new Turn(ActionType.TURN_LEFT, value));
 
-            case TURN_RIGHT -> actions.add(new Turn(ActionType.TURN_RIGHT, value));
+                case TURN_RIGHT -> actions.add(destinationIndex, new Turn(ActionType.TURN_RIGHT, value));
 
-            case VAR_DECLARATION -> actions.add(new VarDeclaration(value));
+                case VAR_DECLARATION -> actions.add(destinationIndex, new VarDeclaration(value));
 
-            default -> actions.add(new MoveForward(value));
-        };
+                case VAR_ASSIGNMENT -> actions.add(destinationIndex, new VarAssignment(value, action.getVariableTargetName()));
+
+                case INCREMENT_VARIABLE -> actions.add(destinationIndex, new IncrementVariable(value, action.getVariableTargetName()));
+
+                case REPEAT -> actions.add(destinationIndex, new Repeat(value));
+
+                case END_REPEAT -> actions.add(destinationIndex, new EndRepeat(value));
+
+                default -> actions.add(destinationIndex, new MoveForward(value));
+            };
+        }
     }
 
 //    public void executeNext(int index, Cursor cursor){
@@ -365,6 +395,22 @@ public class Program {
         }
     }
 
+    public boolean declarationIsFirstAction(){
+        boolean isBefore = true;
+        for(Action action : actions){
+            if (action.actionType() == ActionType.VAR_DECLARATION && isBefore){
+                int index = actions.indexOf(action);
+                for (int i = 0; i < index && isBefore; ++i){
+                    ActionType type = actions.get(i).actionType();
+                    if (type != ActionType.VAR_DECLARATION){
+                        isBefore = false;
+                    }
+                }
+            }
+        }
+        return isBefore;
+    }
+
     public void declareVariable(String name){
         declarationList.put(name, 0);
     }
@@ -376,26 +422,11 @@ public class Program {
         }
     }
 
-    public void decrementDuringExecution(String targetName, int value){
-        if (declarationList.containsKey(targetName)){
-            int oldValue = declarationList.get(targetName);
-            declarationList.put(targetName, oldValue - value);
-        }
-    }
-
-    public void incrementDuringCompilation(Action currentAction){
+    public void incrementDuringCompilation(Action currentAction, int count){
         String expression = currentAction.getExpression().toString();
         if (isInteger(expression)){
             int value = Integer.valueOf(currentAction.getExpression().toString());
-            currentAction.expressionProperty().set(new LitteralExpression(value + 1));
-        }
-    }
-
-    public void decrementDuringCompilation(Action currentAction){
-        String expression = currentAction.getExpression().toString();
-        if (isInteger(expression)){
-            int value = Integer.valueOf(currentAction.getExpression().toString());
-            currentAction.expressionProperty().set(new LitteralExpression(value - 1));
+            currentAction.expressionProperty().set(new LitteralExpression(value + count));
         }
     }
 
@@ -423,5 +454,39 @@ public class Program {
         return isNotEmpty;
     }
 
+    public boolean declareIsUnique(){
+        boolean isUnique = true;
 
+        if (!actions.isEmpty()){
+            boolean otherAction = false;
+
+            for (int i = 0 ; i < actions.size() && isUnique && !otherAction; ++i){
+                Action action = actions.get(i);
+                otherAction = action.actionType() != ActionType.VAR_DECLARATION;
+                if (action.actionType() == ActionType.VAR_DECLARATION){
+                    if (declareNotUnique(action, i)){
+                        isUnique = false;
+                    }
+                }
+            }
+
+        }
+        return isUnique;
+    }
+
+    public boolean declareNotUnique(Action action, int index){
+        boolean notUnique = false;
+        boolean otherAction = false;
+        String firstNameDeclare = action.getExpression().toString();
+
+        for (int i = index + 1; i < getActions().size() && !notUnique && !otherAction; ++i){
+            Action actionList = getActions().get(i);
+            otherAction = actionList.actionType() != ActionType.VAR_DECLARATION;
+            if (actionList.actionType() == ActionType.VAR_DECLARATION){
+                String secondNameDeclare = actionList.getExpression().toString();
+                notUnique = firstNameDeclare.equals(secondNameDeclare);
+            }
+        }
+        return notUnique;
+    }
 }

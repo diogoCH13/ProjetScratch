@@ -10,10 +10,6 @@ public class VariableExpression implements Expression{
         this.name = name;
     }
 
-    public String getName(){
-        return name;
-    }
-
     @Override
     public int valueOfVariableOrLitteral(Program program) {
         return program.getVariableValueByName(name);

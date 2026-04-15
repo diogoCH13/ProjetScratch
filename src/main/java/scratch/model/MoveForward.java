@@ -28,7 +28,7 @@ public class MoveForward extends Action {
 
     @Override
     public String toString() {
-        return "Avancer de " + super.getExpression();
+        return "Avancer de " + super.getExpression().toString();
     }
 
 }
