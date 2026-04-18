@@ -11,7 +11,18 @@ public class Pen extends Action {
 
     @Override
     public void execute(Cursor cursor, Program program) {
-        cursor.setPen(write);
+//        cursor.setPen(write);
+        if (write){
+            if (cursor.isPenDown()){
+                throw new RuntimeException("RUNTIME ERROR");
+            }
+            cursor.setPen(true);
+        }else {
+            if (!cursor.isPenDown()){
+                throw new RuntimeException("RUNTIME ERROR");
+            }
+            cursor.setPen(false);
+        }
     }
 
     @Override

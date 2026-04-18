@@ -25,7 +25,6 @@ public class Program {
         ActionType type = ActionsCatalog.getAction(index);
         if (type != null){
             Action action = ActionFactory.createAction(type);
-//            actions.add(action);
             if(destinationIndex <= actions.size()){
                 actions.add(destinationIndex, action);
             }

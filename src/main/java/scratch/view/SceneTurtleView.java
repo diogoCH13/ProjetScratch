@@ -207,11 +207,6 @@ public class SceneTurtleView extends VBox {
         });
 
         executeBtn.setOnAction(e->{
-//            if (!vm.isRunning()){
-//                vm.execute();
-//            }else {
-//                vm.next();
-//            }
             if (!vm.isRunning()){
                 vm.execute();
 
@@ -244,9 +239,6 @@ public class SceneTurtleView extends VBox {
 
     private void configButtonsDisabling() {
         loadBtn.disableProperty().bind(vm.canLoad().not());
-//        .or(vm.errorValueProperty())
-//                .or(vm.varDeclarationIsBefore().not().or(vm.verificationVarInList().not())));
-//        executeBtn.disableProperty().bind(vm.canExecute().not().or(vm.isExecutionFinished()));
 
         executeBtn.disableProperty().bind(
                 vm.canExecute().not()
@@ -265,13 +257,6 @@ public class SceneTurtleView extends VBox {
                         .otherwise("Charger")
         );
 
-//        executeBtn.textProperty().bind(
-//                Bindings.when(vm.runningProperty())
-//                        .then("Suivant")
-//                        .otherwise("Exécuter")
-//        );
-
-
         executeBtn.textProperty().bind(
                 Bindings.when(vm.runningProperty().and(vm.autoModeProperty().not()))
                         .then("Suivant")
@@ -287,22 +272,18 @@ public class SceneTurtleView extends VBox {
 
         vm.cursorXProperty().addListener((observableValue, number, t1) -> {
             redrawTurtle();
-//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
         });
 
         vm.cursorYProperty().addListener((observableValue, number, t1) -> {
             redrawTurtle();
-//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
         });
 
         vm.cursorAngelProperty().addListener((observableValue, number, t1) -> {
-//            drawTurtle(vm.cursorXProperty().get(), vm.cursorYProperty().get(), vm.cursorAngelProperty().get());
             redrawTurtle();
         });
 
-        slider.valueProperty().addListener((observableValue, number, t1) -> {
-            vm.setTime(t1.doubleValue());
-        });
+
+        slider.valueProperty().bindBidirectional(vm.speedProperty());
 
 
 
@@ -316,19 +297,6 @@ public class SceneTurtleView extends VBox {
         drawSegments();
     }
 
-//    public void drawSegments(){
-//
-//        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-//
-//        for (Segment segment : vm.getWorld().getSegments()) {
-//            gc.strokeLine(
-//                    segment.getStart().getX(),
-//                    segment.getStart().getY(),
-//                    segment.getEnd().getX(),
-//                    segment.getEnd().getY()
-//            );
-//        }
-//    }
 
     public void drawSegments(){
 
