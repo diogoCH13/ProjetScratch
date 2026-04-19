@@ -379,6 +379,7 @@ public class MainViewModel {
 
     public void reset(){
         world.clearSegments();
+        variableValueList.clear();
         cursor.reset();
         actionIndex.set(-1);
 //        executionIndex.set(0);
@@ -401,6 +402,7 @@ public class MainViewModel {
 
     public void execute(){
         world.clearSegments();
+        program.clearDeclarationList();
         cursor.reset();
         running.set(true);
         executionFinished.set(false);

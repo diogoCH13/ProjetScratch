@@ -21,6 +21,10 @@ public class Program {
         return declarationList;
     }
 
+    public void clearDeclarationList(){
+        declarationList.clear();
+    }
+
     public void addAction(int index, int destinationIndex){
         ActionType type = ActionsCatalog.getAction(index);
         if (type != null){
