@@ -402,6 +402,7 @@ public class Program {
         }
     }
 
+    //permet de vérifier que declaration est avant toutes les autres actions
     public boolean declarationIsFirstAction(){
         boolean isBefore = true;
         for(Action action : actions){
@@ -444,6 +445,7 @@ public class Program {
 
     }
 
+    //permet de vérifier que assignation ou déclaration ou incrémente n'est pas vide
     public boolean actionsNotEmpty(){
         boolean isNotEmpty = true;
         for (Action action : actions){
@@ -461,6 +463,7 @@ public class Program {
         return isNotEmpty;
     }
 
+    //permet de verifier que le nom de la déclaration est unique
     public boolean declareIsUnique(){
         boolean isUnique = true;
 
@@ -469,6 +472,8 @@ public class Program {
 
             for (int i = 0 ; i < actions.size() && isUnique && !otherAction; ++i){
                 Action action = actions.get(i);
+                /*si on tombe sur une autre action que déclaration alors on arrête la recherche
+                car declaration doit etre avant toutes les autres actions*/
                 otherAction = action.actionType() != ActionType.VAR_DECLARATION;
                 if (action.actionType() == ActionType.VAR_DECLARATION){
                     if (declareNotUnique(action, i)){

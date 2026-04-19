@@ -12,6 +12,7 @@ public class VariableExpression implements Expression{
 
     @Override
     public int valueOfVariableOrLitteral(Program program) {
+        //retourne la valeur de la variable dans la liste
         return program.getVariableValueByName(name);
     }
 

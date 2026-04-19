@@ -2,17 +2,6 @@ package scratch.model;
 
 public class Turn extends Action {
 
-//    private double angle;
-//    private DoubleProperty angle = new SimpleDoubleProperty();
-//
-//    private DoubleProperty angleProperty(){
-//        return angle;
-//    }
-
-//    public Turn(double angle){
-//        super.valueProperty().setValue(angle);
-//    }
-
     private final ActionType direction;
 
     public Turn(ActionType direction, Expression expression){

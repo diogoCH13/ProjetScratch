@@ -236,28 +236,38 @@ public class MainViewModel {
         return Bindings.createBooleanBinding(() -> !getProgramActions().isEmpty(), getProgramActions());
     }
 
+    //créer un booleanBindings qui ce recalul à chaque fois que actionIndex, ou la liste, ou actionValue reçois une modification
     public StringBinding actionDetailsBinding() {
         return Bindings.createStringBinding(() -> {
+            //si on a sélectionné aucune action de la liste (actionList) alors on affiche
             String detail = "aucune action sélectionnées";
 
+            //si la liste n'est pas vide et qu'on a sélectionné un élément de la liste
             if (!getProgramActions().isEmpty() && isValidIndex()) {
+                //on récupère l'action courante
                 Action action = getProgramActions().get(actionIndex.get());
+                //on récupère le détail de l'action en fonction de son type
                 detail = action.actionDetail();
             }
+            //on retourne le résultat final de detail
             return detail;
-        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
+
+            //le bindings ce recalcul à chaque fois que l'un de ces property change
+        }, actionIndexProperty(), getProgramActions());
     }
 
     public StringBinding actionDetailValueBindings() {
         return Bindings.createStringBinding(() -> {
+
             String detailValue = "";
 
+            //
             if (!getProgramActions().isEmpty() && isValidIndex()) {
                 Action action = getProgramActions().get(actionIndex.get());
                 detailValue = action.actionDetailValue();
             }
             return detailValue;
-        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
+        }, actionIndexProperty(), getProgramActions());
     }
 
     public BooleanBinding disableTextFieldByActionType(){

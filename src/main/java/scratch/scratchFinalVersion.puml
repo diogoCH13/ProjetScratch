@@ -1,0 +1,377 @@
+@startuml
+
+package scratch{
+    package model{
+        abstract class Action{
+            -expressionProperty : ObjectProperty
+            +Action(Expression)
+            -variableTarget : StringProperty
+            +execute(Cursorn Programme) : void
+            +actionType() : ActionType
+            +getExpression : Expression
+            +expressionProperty : ObjectProperty<Expression>
+            +actionDetail(ActionType) : ActionType
+            +setExpression : void
+            +valueIsCorrect : boolean
+            +actionDetailValue(ActionType) : String
+        }
+        class ActionFactory{
+            +createAction(ActionType) : Action
+        }
+        class ActionCatalog{
+            -palettActions : ObservableList<ActionType>
+
+            +getPalettActions() : ObservableList<ActionType>
+            +getAction(int) : ActionType
+        }
+        enum ActionType{
+            MOVE_FORWARD
+            TURN_LEFT
+            TURN_RIGHT
+            PEN_UP
+            PEN_DOWN
+
+            -label : String
+
+            +ActionType(String)
+            +getLabel() : String
+            +toString() : String
+            +getColor() : Color
+        }
+        class Cursor{
+            -world : CursorWorld
+            -point : Position
+            -penDown : boolean
+            -startPosition : Point
+            -angle : DoubleProperty
+
+            +Cursor(CursorWorld, Point)
+            +getPosition() : Point
+            +getAngle() : double
+            +angleProperty() : DoubleProperty
+            +moveForward(double) : void
+            +rotate(double) : void
+            +isPenDown() : boolean
+            +setPen(boolean) : void
+            +reset() : void
+            +getWorld() : CursorWorld
+        }
+        class CursorWorld{
+            -segments : List<Segment>
+            +getSegments() : List<Segment>
+            +addSegment(Segment) : void
+            +clearSegments() : void
+        }
+        class MoveForward{
+            +MoveForward(Expression)
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +getValue() : double
+            +setValue(double) : void
+            +toString() : String
+            +valueIsCorrect() : boolean
+        }
+        class Pen{
+            -write : boolean
+
+            +Pen(boolean)
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +setValue(double) : void
+            +getValue() : double
+            +toString() : String
+        }
+        class Point{
+            -x : DoubleProperty
+            -y : DoubleProperty
+
+            +Point(double, double)
+            +setX() : void
+            +setY() : void
+            +getX() : double
+            +getY() : double
+        }
+        class Program{
+            -action : ObservableList<Action>
+            -declarationList : Map<String, Integer>
+            -executionStack : Deque<ExecutionContext>
+
+            +getActions() : ObservableList<Action>
+            +addAction(int) : void
+            +deleteAction(int) : void
+            +removeAll() : void
+            +up(int) : void
+            +down(int) : void
+            +duplicateAction) : void
+            +executeNext(int, Cursor) : void
+            +save(File) : void
+            +load(File) : void
+            +isPenStateValid() : boolean
+            +executeNext() : void
+
+            ...()
+        }
+        class Segment{
+            -start : Point
+            -end : Point
+
+            +getStart() : Point
+            +setStart(Point) : void
+            +getEnd() : Point
+            +setEnd(Point) : void
+        }
+        class Turn{
+            +Turn(Expression)
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +getValue() : double
+            +setValue(double) : void
+            +toString() : String
+        }
+
+        class EndRepeat{
+            +EndRepeat(Expression)
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +toString() : String
+        }
+
+        class Repeat{
+            +EndRepeat(Expression)
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +toString() : String
+        }
+
+        class ExecutionContext{
+            -currentActions : ObservableList<Action>
+            -currentIndex : int
+            -remainingIterations : int
+            -repeatEndIndex : int
+            -repeatStartIndex : int
+
+            +ExecutionContext(currentActions, currentIndex)
+            +ExecutionContext(currentActions, currentIndex, remainingIterations, repeatStartIndex, repeatEndIndex)
+            +getCurrentIndex() : int
+            +setCurrentIndex() : void
+            +getRemainingIterations() : int
+            +setRemainingIterations() : void
+            +getRepeatStartIndex() : int
+            +getRepeatEndIndex() : int
+        }
+
+        interface Expression{
+            +valueOfVariableOrLitteral() : int
+        }
+
+        class Litteral{
+            -value : int
+
+            +LitteralExpression(int)
+            +valueOfVariableOrLitteral(Program) : int
+            +toString() : String
+        }
+
+        class VariableExpression{
+            -name : String
+
+            +VariableExpression(String)
+            +valueOfVariableOrLitteral(Program) : int
+            +toString() : String
+        }
+
+        class IncrementVariable{
+            +IncrementVariable(Expression, String)
+
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +toString() : String
+        }
+
+        class VarDeclaration{
+            +VarDeclaration(Expression)
+
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +toString() : String
+        }
+
+        class VarAssignment{
+            +VarDeclaration(Expression, String)
+
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +toString() : String
+        }
+
+        class VariableRow{
+            +VariableRow(String, int)
+
+            +execute(Cursor, Programme) : void
+            +actionType() : ActionType
+            +toString() : String
+        }
+
+        class VarDeclaration{
+                    +VarDeclaration(Expression)
+
+                    +execute(Cursor, Programme) : void
+                    +actionType() : ActionType
+                    +toString() : String
+                }
+
+
+
+    }
+    package viewmodel{
+        class MainViewModel{
+            -cursor : Cursor
+            -program : Program
+            -world : CursorWorld
+            -actionIndex : IntegerProperty
+            -executionIndex : IntegerProperty
+            -programLoaded : BooleanProperty
+            -running : BooleanProperty
+            ...
+
+            +MainViewModel(Cursor)
+            +getPalettAction() : ObservableList<ActionType>
+            +getProgramActions() : ObservableList<Action>
+            +addAction() : void
+            +deleteAction() : void
+            +canDown() : BooleanBinding
+            +canExecute() : BooleanProperty
+            +actionDetailsBinding() : StringBindings
+            +configureBindingsAndListeners() : void
+            +cursorXProperty() : DoubleProperty
+            +cursorYProperty() : DoubleProperty
+            +newFile() : void
+            +saveFile() : void
+
+            ...()
+
+        }
+    }
+    package view{
+        class MainView{
+            -TURTLE_HEAD_SIZE = 2
+            -TURTLE_SIZE = 20
+            -vm : MainViewModel
+            -turtle : Polygon
+
+            ...
+
+            +MainView(MainViewModel)
+            +beautify() : void
+            +configureMenuBox() : void
+            +configLeft() : void
+            +configCenter() : void
+            +configRight() : void
+            +loadData() : void
+            +configActions() : void
+            +configSelectionModels() : void
+            +configButtonsDisabling() : void
+            +configureBindingsAndListeners() : void
+
+            +openFile() : void
+
+            ...()
+        }
+
+        class PalettAction{
+            -palletListView : ListView<ActionType>
+
+            +configSelectionModels() : void
+            +configButtonsDisabling() : void
+            +configureBindingsAndListeners() : void
+        }
+
+        class SceneTurtleView{
+            -actionListView : ListView<Action>
+
+            +redrawTurtle() : void
+            +drawSegments() : void
+            +configSelectionModels() : void
+            +configButtonsDisabling() : void
+            +configureBindingsAndListeners() : void
+            +toScreenY() : double
+            +toScreenX() : double
+        }
+    }
+
+    class App{
+        +start(Stage) : void
+        +main(String[]) : void
+    }
+
+    App *--> CursorWorld : <create>
+    App *--> Cursor : <create>
+    App *--> MainViewModel : <create>
+    App *--> MainView : <create>
+
+    MoveForward --|> Action
+    Pen --|> Action
+    Turn --|> Action
+    Repeat --|> Action
+    EndRepeat --|> Action
+    IncrementVariable --|> Action
+    VarDeclaration --|> Action
+    VarAssignment --|> Action
+
+    MainView *-->  MainViewModel
+
+    MainViewModel *-->  Cursor
+    MainViewModel -->  VariableRow : <use>
+    MainViewModel *-->  CursorWorld
+    MainViewModel *-->  Program
+
+    Action  --> ActionType : <use>
+    Action  --> Expression : <use>
+    ActionFactory ..> Action : <create>
+    ActionCatalog ..> ActionType : <depend>
+    ActionFactory ..> ActionType : <depend>
+
+    Cursor --> CursorWorld : <use>
+    Cursor --> Point : <use>
+
+    CursorWorld o-- Segment
+
+    Program o-- Action
+
+    Segment *--> Point
+
+    EndRepeat ..> ActionType : <depend>
+
+    ExecutionContext o-- Action
+
+    Expression ..> ActionType : <depend>
+    Litteral  ..|> Expression
+    VariableExpression  ..|> Expression
+
+    MainView*-->  PalettAction
+    MainView *-->  SceneTurtleView
+}
+
+@enduml
+
+abstract class AbstractList
+abstract AbstractCollection
+interface List
+interface Collection
+
+List <|-- AbstractList
+Collection <|-- AbstractCollection
+
+Collection <|- List
+AbstractCollection <|- AbstractList
+AbstractList <|-- ArrayList
+
+class ArrayList {
+Object[] elementData
+size()
+}
+
+enum TimeUnit {
+DAYS
+HOURS
+MINUTES

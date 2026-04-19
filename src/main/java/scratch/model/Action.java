@@ -4,7 +4,10 @@ package scratch.model;
 import javafx.beans.property.*;
 
 public abstract class Action {
+    //permet de créer un property de l'objet expression pour voir ces changement
     private ObjectProperty<Expression> expressionProperty = new SimpleObjectProperty<>();
+
+    //uniquement pour increment et assignation
     private StringProperty variableTarget = new SimpleStringProperty();
 
     public Action(Expression expression){
