@@ -6,6 +6,7 @@ module scratch {
     requires javafx.graphics;
     requires javafx.base;
 
+
     opens scratch to javafx.fxml;
     exports scratch;
 }
