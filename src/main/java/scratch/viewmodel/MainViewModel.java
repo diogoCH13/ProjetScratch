@@ -26,7 +26,6 @@ public class MainViewModel {
 
     private final IntegerProperty catalogIndex = new SimpleIntegerProperty(-1);
     private final IntegerProperty actionIndex = new SimpleIntegerProperty(-1);
-//    private final IntegerProperty executionIndex = new SimpleIntegerProperty(-1);
     private final StringProperty actionValue = new SimpleStringProperty();
     private final StringProperty actionVar = new SimpleStringProperty();
     private final BooleanProperty errorValue = new SimpleBooleanProperty(false);
@@ -40,6 +39,7 @@ public class MainViewModel {
     private final BooleanProperty running = new SimpleBooleanProperty(false);
     private final BooleanProperty executionFinished = new SimpleBooleanProperty(false);
     private final BooleanProperty autoMode = new SimpleBooleanProperty(false);
+    private final DoubleProperty speed = new SimpleDoubleProperty(1);
 
     private ObservableList<VariableRow> variableValueList = FXCollections.observableArrayList();
 
@@ -77,10 +77,6 @@ public class MainViewModel {
     public StringProperty actionVarProperty() {
         return actionVar;
     }
-
-//    public IntegerProperty executionIndexProperty(){
-//        return executionIndex;
-//    }
 
     public BooleanProperty runningProperty(){
         return running;
@@ -125,7 +121,6 @@ public class MainViewModel {
         }
         programLoaded.set(false);
         running.set(false);
-//        executionIndex.set(-1);
     }
 
     public void deleteAction() {
@@ -193,7 +188,6 @@ public class MainViewModel {
         programLoaded.set(false);
         running.set(false);
         executionFinished.set(false);
-//        executionIndex.set(-1);
     }
 
     public BooleanBinding canRemove() {
@@ -336,7 +330,6 @@ public class MainViewModel {
                 if (running.get()) {
                     running.set(false);
                     programLoaded.set(false);
-//                    executionIndex.set(-1);
                 }
             }
         });
@@ -352,7 +345,6 @@ public class MainViewModel {
             if (running.get()) {
                 running.set(false);
                 programLoaded.set(false);
-//                    executionIndex.set(-1);
             }
         });
 
@@ -371,6 +363,12 @@ public class MainViewModel {
                 errorValue.set(false);
             }
         });
+
+        speedProperty().addListener((obs, oldVal, newVal) -> {
+            if (timeline != null) {
+                timeline.setRate(1 / newVal.doubleValue());
+            }
+        });
     }
 
     public BooleanProperty executionFinishedProperty() {
@@ -382,7 +380,6 @@ public class MainViewModel {
         variableValueList.clear();
         cursor.reset();
         actionIndex.set(-1);
-//        executionIndex.set(0);
         catalogIndex.set(0);
         executionFinished.set(false);
         running.set(false);
@@ -408,22 +405,9 @@ public class MainViewModel {
         executionFinished.set(false);
         program.startExecution();
         actionIndex.set(program.getCurrentIndex());
-
-//        actionIndex.set(0);
-//        executionIndex.set(0);
-
     }
 
     public void next(){
-//        int i = executionIndex.get();
-//        program.executeNext(cursor);
-//        i++;
-//        executionIndex.set(i);
-//        if (i < program.getActions().size()){
-//            actionIndex.set(i);
-//        }else{
-//            running.set(false);
-//        }
         try{
             program.executeNext(cursor);
             runtimeValue.set(false);
@@ -442,25 +426,7 @@ public class MainViewModel {
             running.set(false);
             executionFinished.set(true);
         }
-//        program.executeNext(cursor);
-//        updateVariablesList();
-//        int index = program.getCurrentIndex();
-//        if(index >= 0){
-//            actionIndex.set(index);
-//        }
-//
-//        if (program.isExecutionFinished()){
-//            running.set(false);
-//            executionFinished.set(true);
-//        }
     }
-
-//    public BooleanBinding isExecutionFinished(){
-//        return Bindings.createBooleanBinding(() ->
-//                executionIndex.get() >= program.getActions().size(),
-//                executionIndex, program.getActions()
-//        );
-//    }
 
     public DoubleProperty cursorXProperty(){
         return cursor.getPosition().xProperty();
@@ -472,6 +438,10 @@ public class MainViewModel {
 
     public DoubleProperty cursorAngelProperty(){
         return cursor.angleProperty();
+    }
+
+    public DoubleProperty speedProperty() {
+        return speed;
     }
 
     public void newFile(){
@@ -594,6 +564,7 @@ public class MainViewModel {
         timeline.setCycleCount(Animation.INDEFINITE);  //boucle qui s'arrête pas
         running.set(true);
         executionFinished.set(false);
+        timeline.setRate(1 / speed.get());
         timeline.play();
 
     }
@@ -603,13 +574,6 @@ public class MainViewModel {
         running.set(false);
 //        executionFinished.set(true);
 
-    }
-
-
-    public void setTime(double val){
-        if (timeline != null){
-            timeline.setRate(1 / val);
-        }
     }
 
     public void refreshValue(){
