@@ -36,7 +36,8 @@ public class Cursor {
         double radians = Math.toRadians(angle.get()) ;
 
         double dx = distance * Math.sin(radians);
-        double dy = distance * Math.cos(radians);
+//        double dy = distance * Math.cos(radians);
+        double dy = -distance * Math.cos(radians);
 
         double oldX = position.getX();
         double oldY = position.getY();

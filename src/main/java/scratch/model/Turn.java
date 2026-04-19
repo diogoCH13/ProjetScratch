@@ -1,8 +1,5 @@
 package scratch.model;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-
 public class Turn extends Action {
 
 //    private double angle;
@@ -12,38 +9,44 @@ public class Turn extends Action {
 //        return angle;
 //    }
 
-    public Turn(double angle){
-        super.value.set(angle);
+//    public Turn(double angle){
+//        super.valueProperty().setValue(angle);
+//    }
+
+    private final ActionType direction;
+
+    public Turn(ActionType direction, Expression expression){
+        super(expression);
+        this.direction = direction;
     }
 
     @Override
-    public void execute(Cursor cursor) {
-        cursor.rotate(super.value.get());
+    public void execute(Cursor cursor, Program program) {
+        int val = super.getExpression().valueOfVariableOrLitteral(program);
+        if (!valueIsCorrect(val)){
+            throw new RuntimeException("RUNTIME ERROR !");
+        }
+        cursor.rotate(val);
     }
 
     @Override
     public ActionType actionType() {
-        return super.value.get() > 0 ? ActionType.TURN_LEFT : ActionType.TURN_RIGHT;
+        return direction;
     }
 
     @Override
-    public double getValue() {
-        return super.value.get();
-    }
-
-    @Override
-    public void setValue(double newVal) {
-        boolean valid = actionType() == ActionType.TURN_LEFT ? (newVal > 0 && newVal <= 180) : (newVal >= -180 && newVal <= -1);
-        if (valid){
-            super.value.set(newVal);
+    public boolean valueIsCorrect(int value){
+        if (value < 0){
+            value = -value;
         }
+        return value > 0 && value <= 180;
     }
-
 
     public String toString(){
-        if(super.value.get() > 0){
-            return "Tourner à gauche de " + String.format("%.0f", Math.abs(super.value.get()));
+        String val = "Tourner à droite de " + super.getExpression().toString();
+        if (direction == ActionType.TURN_LEFT){
+            val = "Tourner à gauche de " + super.getExpression().toString();
         }
-        return "Tourner à droite de " + String.format("%.0f", Math.abs(super.value.get()));
+        return val;
     }
 }

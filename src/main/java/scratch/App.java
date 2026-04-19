@@ -19,11 +19,11 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) {
         CursorWorld world = new CursorWorld();
-        Cursor cursor = new Cursor(world, new Point(250, 250));
+        Cursor cursor = new Cursor(world, new Point(0, 0));
         MainViewModel vm = new MainViewModel(cursor);
         MainView view = new MainView(vm);
 
-        Scene scene = new Scene(view, 1300, 700);
+        Scene scene = new Scene(view, 1500, 850);
         primaryStage.setTitle("Scratch");
         primaryStage.setScene(scene);
         primaryStage.show();
