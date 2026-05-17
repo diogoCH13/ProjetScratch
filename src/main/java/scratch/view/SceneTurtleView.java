@@ -15,12 +15,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import scratch.model.Segment;
-import scratch.model.VarDeclaration;
 import scratch.model.VariableRow;
-import scratch.viewmodel.MainViewModel;
+import scratch.viewmodel.SceneTurtleViewModel;
 
 public class SceneTurtleView extends VBox {
-    private final MainViewModel vm;
+    private final SceneTurtleViewModel vm;
     private final TableView<VariableRow> tableView = new TableView<>();
     private final Label varibaleLabel = new Label("Variables");
     Button stopBtn = new Button("Arrêter");
@@ -50,7 +49,7 @@ public class SceneTurtleView extends VBox {
 
     private GraphicsContext gc = canvas.getGraphicsContext2D();
 
-    public SceneTurtleView(MainViewModel vm) {
+    public SceneTurtleView(SceneTurtleViewModel vm) {
         this.vm = vm;
 
         beautify();

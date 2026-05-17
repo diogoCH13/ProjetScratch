@@ -1,9 +1,9 @@
 package scratch.model;
 
-public class EndRepeat extends Action{
+public class EndRepeat extends NoExpressionAction{
 
-    public EndRepeat(Expression expression) {
-        super(expression);
+    public EndRepeat() {
+
     }
 
     @Override
@@ -15,8 +15,19 @@ public class EndRepeat extends Action{
         return ActionType.END_REPEAT;
     }
 
+    @Override
+    public Action copy() {
+        return new EndRepeat();
+    }
+
 
     public String toString(){
         return "Fin répéter";
     }
+
+
+//    @Override
+//    public int valueOfExpression(Program program) {
+//        return 0;
+//    }
 }

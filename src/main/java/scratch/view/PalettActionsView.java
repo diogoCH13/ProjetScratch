@@ -9,17 +9,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import scratch.model.ActionType;
-import scratch.viewmodel.MainViewModel;
+import scratch.viewmodel.PalettListViewModel;
 
 public class PalettActionsView extends VBox {
 
     private final ListView<ActionType> palletListView = new ListView<>();
-    private final MainViewModel vm;
+    private final PalettListViewModel vm;
 
     private final Label palettLabel = new Label("Palette d'actions");
     private final Button addBtn = new Button("Ajouter au programme");
 
-    public PalettActionsView(MainViewModel vm){
+    public PalettActionsView(PalettListViewModel vm){
         this.vm = vm;
         beautify();
         loadData();

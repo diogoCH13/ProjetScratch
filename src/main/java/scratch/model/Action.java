@@ -1,50 +1,31 @@
 package scratch.model;
 
 
+import javafx.beans.Observable;
 import javafx.beans.property.*;
 
 public abstract class Action {
-    //permet de créer un property de l'objet expression pour voir ces changement
-    private ObjectProperty<Expression> expressionProperty = new SimpleObjectProperty<>();
-
-    //uniquement pour increment et assignation
-    private StringProperty variableTarget = new SimpleStringProperty();
-
-    public Action(Expression expression){
-        expressionProperty.set(expression);
-    }
-
     public abstract void execute(Cursor cursor, Program program);
 
     public abstract ActionType actionType();
 
-    public Expression getExpression() {
-        return expressionProperty.get();
-    }
+    public abstract Action copy();
 
-    public ObjectProperty<Expression> expressionProperty() {
-        return expressionProperty;
-    }
-
-    public void setExpression(Expression expression) {
-        this.expressionProperty.set(expression);
-    }
-
-    public String getVariableTargetName() {
-        return variableTarget.get();
-    }
-
-    public StringProperty VariableTargetNameProperty() {
-        return variableTarget;
-    }
-
-    public void setVariableTargetName(String variableTarget) {
-        this.variableTarget.set(variableTarget);
-    }
+    public abstract Observable[] observables();
 
     public boolean valueIsCorrect(int value){
         return true;
     }
+
+    public int parameterCount() {
+        return 0;
+    }
+
+    public String parameterValue(int index) {
+        return "";
+    }
+
+    public void setParameterValue(int index, String value, Program program) { }
 
     public String actionDetail(){
         return switch (actionType()) {
@@ -70,4 +51,38 @@ public abstract class Action {
             default -> "";
         };
     }
+
+    //    //permet de créer un property de l'objet expression pour voir ces changement
+//    private ObjectProperty<Expression> expressionProperty = new SimpleObjectProperty<>();
+
+//    //uniquement pour increment et assignation
+//    private StringProperty variableTarget = new SimpleStringProperty();
+
+//    public Action(Expression expression){
+//        expressionProperty.set(expression);
+//    }
+
+//    public Expression getExpression() {
+//        return expressionProperty.get();
+//    }
+//
+//    public ObjectProperty<Expression> expressionProperty() {
+//        return expressionProperty;
+//    }
+//
+//    public void setExpression(Expression expression) {
+//        this.expressionProperty.set(expression);
+//    }
+
+//    public String getVariableTargetName() {
+//        return variableTarget.get();
+//    }
+//
+//    public StringProperty VariableTargetNameProperty() {
+//        return variableTarget;
+//    }
+//
+//    public void setVariableTargetName(String variableTarget) {
+//        this.variableTarget.set(variableTarget);
+//    }
 }

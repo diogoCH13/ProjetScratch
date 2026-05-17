@@ -1,6 +1,6 @@
 package scratch.model;
 
-public class MoveForward extends Action {
+public class MoveForward extends OneExpressionAction {
 
     public MoveForward(Expression distance) {
         super(distance);
@@ -8,17 +8,24 @@ public class MoveForward extends Action {
 
     @Override
     public void execute(Cursor cursor, Program program) {
-        int val = super.getExpression().valueOfVariableOrLitteral(program);
-        val = val < 0 ? -val : val;
-        if (!valueIsCorrect(val)){
+        int val = super.getExpression().valueOfExpression(program);
+        val = Math.abs(val);
+
+        if (!valueIsCorrect(val)) {
             throw new RuntimeException("RUNTIME ERROR !");
         }
+
         cursor.moveForward(-val);
     }
 
     @Override
     public ActionType actionType() {
         return ActionType.MOVE_FORWARD;
+    }
+
+    @Override
+    public Action copy() {
+        return new MoveForward(super.getExpression());
     }
 
     @Override

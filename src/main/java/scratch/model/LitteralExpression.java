@@ -8,13 +8,18 @@ public class LitteralExpression implements Expression{
         this.value = value;
     }
 
-    @Override
-    public int valueOfVariableOrLitteral(Program program) {
-        return value;
-    }
+//    @Override
+//    public int valueOfExpression(Program program) {
+//        return value;
+//    }
 
     @Override
     public String toString() {
         return value < 0 ? String.valueOf(-value) : String.valueOf(value);
+    }
+
+    @Override
+    public int valueOfExpression(Program program) {
+        return value;
     }
 }

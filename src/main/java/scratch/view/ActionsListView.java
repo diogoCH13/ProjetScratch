@@ -10,10 +10,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import scratch.model.Action;
 import scratch.model.ActionType;
-import scratch.viewmodel.MainViewModel;
+import scratch.viewmodel.ActionListViewModel;
 
 public class ActionsListView extends VBox {
-    private final MainViewModel vm;
+    private final ActionListViewModel vm;
 
     private final TextField valueField = new TextField();
     private final TextField varField = new TextField();
@@ -35,7 +35,7 @@ public class ActionsListView extends VBox {
     private final ListView<Action> actionListView = new ListView<>();
     private final HBox buttonBox = new HBox(10);
 
-    public ActionsListView(MainViewModel vm){
+    public ActionsListView(ActionListViewModel vm){
         this.vm = vm;
 
         beautify();
