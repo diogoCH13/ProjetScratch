@@ -23,6 +23,12 @@ public class IncrementVariable extends OneVariableAndOneExpressionAction {
     }
 
     @Override
+    public String parameterPrefix(int index) {
+        return index == 0 ? "Incrémentation de la variable" : "de";
+    }
+
+
+    @Override
     public String toString() {
         return "Incrémentation de la variable " + super.getVariableTargetName() + " de " + super.getExpression();
     }

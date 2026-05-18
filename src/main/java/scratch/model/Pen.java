@@ -34,6 +34,22 @@ public class Pen extends NoExpressionAction {
         return new Pen(write);
     }
 
+    public String parameterPrefix(int index) {
+        return write ? "Abaisser le stylo" : "Lever le stylo";
+    }
+
+    public String parameterSuffix(int index) {
+        return "";
+    }
+
+    public boolean isExpressionParameter(int index) {
+        return false;
+    }
+
+    public boolean isVariableNameParameter(int index) {
+        return false;
+    }
+
     public String toString(){
         return write ? "Abaisser le stylo" : "Lever le stylo";
     }

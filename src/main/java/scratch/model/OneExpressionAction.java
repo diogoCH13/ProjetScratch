@@ -44,4 +44,9 @@ public abstract class OneExpressionAction extends Action {
     public void setParameterValue(int index, String value, Program program) {
         setExpression(program.parseExpression(value));
     }
+
+    @Override
+    public boolean isExpressionParameter(int index) {
+        return index == 0;
+    }
 }

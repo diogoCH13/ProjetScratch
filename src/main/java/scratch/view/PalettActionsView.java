@@ -44,25 +44,8 @@ public class PalettActionsView extends VBox {
                 else {
                     setGraphic(circle);
                     setText(action.toString());
-                    switch (action) {
-                        case TURN_LEFT, TURN_RIGHT :
-                            setTextFill(Color.RED);
-                            circle.setFill(Color.RED);
-                            break;
-
-                        case MOVE_FORWARD:
-                            setTextFill(Color.BLUE);
-                            circle.setFill(Color.BLUE);
-                            break;
-                        case REPEAT, END_REPEAT, VAR_DECLARATION, VAR_ASSIGNMENT, INCREMENT_VARIABLE:
-                            setTextFill(Color.DARKTURQUOISE);
-                            circle.setFill(Color.DARKTURQUOISE);
-                            break;
-
-                        default:
-                            setTextFill(Color.GREEN);
-                            circle.setFill(Color.GREEN);
-                    }
+                    setTextFill(action.getColor());
+                    circle.setFill(action.getColor());
                 }
             }
         });

@@ -25,7 +25,8 @@ public class MainViewModel {
         this.actionListViewModel = new ActionListViewModel(program, programLoaded, running, executionFinished, runtimeValue);
         this.palettListViewModel = new PalettListViewModel(program, actionListViewModel.actionIndexProperty(), programLoaded, running);
         this.sceneTurtleViewModel = new SceneTurtleViewModel(cursor, program, actionListViewModel.actionIndexProperty(),
-                palettListViewModel.catalogIndexProperty(), programLoaded, running, executionFinished, runtimeValue, autoMode);
+                palettListViewModel.catalogIndexProperty(), programLoaded, running, executionFinished, runtimeValue,
+                actionListViewModel.errorValueProperty(), autoMode);
     }
 
     public ActionListViewModel getActionListViewModel() {

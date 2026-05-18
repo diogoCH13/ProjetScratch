@@ -44,6 +44,22 @@ public class Turn extends OneExpressionAction {
         return value > 0 && value <= 180;
     }
 
+    public String parameterPrefix(int index) {
+        return direction == ActionType.TURN_LEFT ? "Angle vers la gauche" : "Angle vers la droite";
+    }
+
+    public String parameterSuffix(int index) {
+        return "degrés";
+    }
+
+    public boolean isExpressionParameter(int index) {
+        return true;
+    }
+
+    public boolean parameterValueIsCorrect(int index, int value) {
+        return valueIsCorrect(value);
+    }
+
     public String toString(){
         String val = "Tourner à droite de " + super.getExpression().toString();
         if (direction == ActionType.TURN_LEFT){

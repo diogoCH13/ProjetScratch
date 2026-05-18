@@ -36,6 +36,7 @@ public class SceneTurtleViewModel {
     private final BooleanProperty running;
     private final BooleanProperty executionFinished;
     private final BooleanProperty runtimeValue;
+    private final BooleanProperty actionError;
     private final BooleanProperty autoMode;
     private final DoubleProperty speed = new SimpleDoubleProperty(1);
 
@@ -43,7 +44,7 @@ public class SceneTurtleViewModel {
 
     public SceneTurtleViewModel(Cursor cursor, Program program, IntegerProperty actionIndex, IntegerProperty catalogIndex,
                                 BooleanProperty programLoaded, BooleanProperty running, BooleanProperty executionFinished,
-                                BooleanProperty runtimeValue, BooleanProperty autoMode) {
+                                BooleanProperty runtimeValue, BooleanProperty actionError, BooleanProperty autoMode) {
         this.cursor = cursor;
         this.program = program;
         this.world = cursor.getWorld();
@@ -53,6 +54,7 @@ public class SceneTurtleViewModel {
         this.running = running;
         this.executionFinished = executionFinished;
         this.runtimeValue = runtimeValue;
+        this.actionError = actionError;
         this.autoMode = autoMode;
         this.actionsValide = Bindings.createBooleanBinding(
                 () -> program.isPenStateValid(),
@@ -114,8 +116,9 @@ public class SceneTurtleViewModel {
                     program.isEndRepeatExist() &&
                     program.actionsNotEmpty() &&
                     program.varIsExist() &&
-                    program.declareIsUnique();
-        }, program.getActions(), actionIndex);
+                    program.declareIsUnique() &&
+                    !actionError.get();
+        }, program.getActions(), actionIndex, actionError);
     }
 
     public BooleanProperty canExecute() {

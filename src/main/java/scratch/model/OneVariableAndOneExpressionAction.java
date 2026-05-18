@@ -65,4 +65,14 @@ public abstract class OneVariableAndOneExpressionAction extends Action{
             setExpression(program.parseExpression(value));
         }
     }
+
+    @Override
+    public boolean isVariableNameParameter(int index) {
+        return index == 0;
+    }
+
+    @Override
+    public boolean isExpressionParameter(int index) {
+        return index == 1;
+    }
 }

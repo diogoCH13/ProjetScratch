@@ -1,5 +1,6 @@
 package scratch.view;
 
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -9,19 +10,19 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import scratch.model.Action;
-import scratch.model.ActionType;
 import scratch.viewmodel.ActionListViewModel;
+import scratch.viewmodel.ActionParameterViewModel;
 
 public class ActionsListView extends VBox {
     private final ActionListViewModel vm;
 
-    private final TextField valueField = new TextField();
-    private final TextField varField = new TextField();
+//    private final TextField valueField = new TextField();
+//    private final TextField varField = new TextField();
 
     private final Label programLabel = new Label("Programme");
     private final Label detailLabel = new Label("aucune action sélectionnées");
-    private final Label detailLabel2 = new Label();
-    private final Label errorLabel = new Label("Erreur valeur");
+//    private final Label detailLabel2 = new Label();
+    private final Label errorLabel = new Label("Error");
     private final Label runtimeLabel = new Label("Runtime Error");
 
     private final Button upBtn = new Button("Monter");
@@ -29,11 +30,12 @@ public class ActionsListView extends VBox {
     private final Button duplicateBtn = new Button("Dupliquer");
     private final Button deleteBtn = new Button("Supprimer");
     private final Button clearBtn = new Button("Vider tout");
-    private final Button incrementBtn = new Button("+");
-    private final Button decrementBtn = new Button("-");
+//    private final Button incrementBtn = new Button("+");
+//    private final Button decrementBtn = new Button("-");
 
     private final ListView<Action> actionListView = new ListView<>();
     private final HBox buttonBox = new HBox(10);
+    private final HBox parameterContent = new HBox(10);
 
     public ActionsListView(ActionListViewModel vm){
         this.vm = vm;
@@ -42,7 +44,6 @@ public class ActionsListView extends VBox {
         loadData();
         configActions();
         configButtonsDisabling();
-        configSelectionModels();
         configureBindingsAndListeners();
     }
 
@@ -60,19 +61,19 @@ public class ActionsListView extends VBox {
         duplicateBtn.setPrefWidth(80);
         deleteBtn.setPrefWidth(80);
         clearBtn.setPrefWidth(80);
-        valueField.setPrefWidth(40);
-        valueField.setMaxWidth(40);
-        varField.setPrefWidth(50);
-        varField.setMaxWidth(50);
-
-        varField.setVisible(false);
-        varField.setManaged(false);
+//        valueField.setPrefWidth(40);
+//        valueField.setMaxWidth(40);
+//        varField.setPrefWidth(50);
+//        varField.setMaxWidth(50);
+//
+//        varField.setVisible(false);
+//        varField.setManaged(false);
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
-        incrementBtn.setVisible(false);
-        incrementBtn.setManaged(false);
-        decrementBtn.setVisible(false);
-        decrementBtn.setManaged(false);
+//        incrementBtn.setVisible(false);
+//        incrementBtn.setManaged(false);
+//        decrementBtn.setVisible(false);
+//        decrementBtn.setManaged(false);
         runtimeLabel.setVisible(false);
         runtimeLabel.setManaged(false);
 
@@ -128,14 +129,13 @@ public class ActionsListView extends VBox {
         detailPane.setText("Détail de l'action");
 
         VBox detail = new VBox();
-        HBox detailContent = new HBox(10);
 
-        detailContent.setAlignment(Pos.CENTER_LEFT);
-        detailContent.setPadding(new Insets(10));
-        detailContent.getChildren().addAll(detailLabel, valueField, detailLabel2, varField, incrementBtn, decrementBtn);
+        parameterContent.setAlignment(Pos.CENTER_LEFT);
+        parameterContent.setPadding(new Insets(10));
+        parameterContent.getChildren().addAll(detailLabel);
 
         errorLabel.setPadding(new Insets(0,0,0,10));
-        detail.getChildren().addAll(detailContent, errorLabel, runtimeLabel);
+        detail.getChildren().addAll(parameterContent, errorLabel, runtimeLabel);
 
         detailPane.setContent(detail);
         detailPane.setExpanded(true);
@@ -170,15 +170,15 @@ public class ActionsListView extends VBox {
             vm.clearAction();
         });
 
-        incrementBtn.setOnAction(e -> {
-            boolean increment = true;
-            vm.increment(increment);
-        });
-
-        decrementBtn.setOnAction(e -> {
-            boolean increment = false;
-            vm.increment(increment);
-        });
+//        incrementBtn.setOnAction(e -> {
+//            boolean increment = true;
+//            vm.increment(increment);
+//        });
+//
+//        decrementBtn.setOnAction(e -> {
+//            boolean increment = false;
+//            vm.increment(increment);
+//        });
     }
 
     private void configButtonsDisabling() {
@@ -187,54 +187,89 @@ public class ActionsListView extends VBox {
         clearBtn.disableProperty().bind(vm.canClearAll().not());
         downBtn.disableProperty().bind(vm.canDown().not());
         duplicateBtn.disableProperty().bind(vm.canDuplicate().not());
-        incrementBtn.visibleProperty().bind((vm.disableIncrement()));
-        incrementBtn.managedProperty().bind((vm.disableIncrement()));
-        decrementBtn.visibleProperty().bind((vm.disableIncrement()));
-        decrementBtn.managedProperty().bind((vm.disableIncrement()));
-
-        valueField.disableProperty().bind(vm.disableTextFieldByActionType().not());
-        varField.visibleProperty().bind(vm.disableVarField());
-        varField.managedProperty().bind(vm.disableVarField());
+//        incrementBtn.visibleProperty().bind((vm.disableIncrement()));
+//        incrementBtn.managedProperty().bind((vm.disableIncrement()));
+//        decrementBtn.visibleProperty().bind((vm.disableIncrement()));
+//        decrementBtn.managedProperty().bind((vm.disableIncrement()));
+//
+//        valueField.disableProperty().bind(vm.disableTextFieldByActionType().not());
+//        varField.visibleProperty().bind(vm.disableVarField());
+//        varField.managedProperty().bind(vm.disableVarField());
         errorLabel.visibleProperty().bind(vm.errorValueProperty());
         errorLabel.managedProperty().bind(vm.errorValueProperty());
         runtimeLabel.visibleProperty().bind(vm.runtimeValueProperty());
         runtimeLabel.managedProperty().bind(vm.runtimeValueProperty());
     }
 
-    private void configSelectionModels() {
+    private void configureBindingsAndListeners() {
+        detailLabel.textProperty().bind(vm.actionDetailsBinding());
+        for (ActionParameterViewModel parameter : vm.getParameters()){
+            Label prefix = new Label(parameter.prefix());
+            TextField field = new TextField();
+        }
+
+        vm.getParameters().addListener((javafx.collections.ListChangeListener<ActionParameterViewModel>) change -> {
+            rebuildParameterFields();
+        });
+
         actionListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
             vm.actionIndexProperty().set(t1.intValue());
-            if (t1.intValue() >= 0 && t1.intValue() < vm.getProgramActions().size()){
-                Action action = vm.getProgramActions().get(t1.intValue());
-                valueField.visibleProperty().set(action.actionType() != ActionType.PEN_UP && action.actionType() != ActionType.PEN_DOWN);
-            }
+//            if (t1.intValue() >= 0 && t1.intValue() < vm.getProgramActions().size()){
+//                Action action = vm.getProgramActions().get(t1.intValue());
+//                valueField.visibleProperty().set(action.actionType() != ActionType.PEN_UP && action.actionType() != ActionType.PEN_DOWN);
+//            }
         });
 
         vm.actionIndexProperty().addListener((observableValue, number, t1) -> {
             actionListView.getSelectionModel().select(t1.intValue());
             beautifyValueField();
         });
-    }
-
-    private void configureBindingsAndListeners() {
-        detailLabel.textProperty().bind(vm.actionDetailsBinding());
-        valueField.textProperty().bindBidirectional(vm.actionValueProperty());
-        detailLabel2.textProperty().bind(vm.actionDetailValueBindings());
-        varField.textProperty().bindBidirectional(vm.actionVarProperty());
+//        valueField.textProperty().bindBidirectional(vm.actionValueProperty());
+//        detailLabel2.textProperty().bind(vm.actionDetailValueBindings());
+//        varField.textProperty().bindBidirectional(vm.actionVarProperty());
     }
 
     private void beautifyValueField(){
         if (vm.isValidIndex()){
             Action action = vm.getProgramActions().get(vm.actionIndexProperty().get());
-            if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
-                valueField.setPrefWidth(60);
-                valueField.setMaxWidth(60);
-            }
+//            if (action.actionType() == ActionType.VAR_DECLARATION || action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
+//                valueField.setPrefWidth(60);
+//                valueField.setMaxWidth(60);
+//            }
+//
+//            else{
+//                valueField.setPrefWidth(40);
+//                valueField.setMaxWidth(40);
+//            }
+        }
+    }
 
-            else{
-                valueField.setPrefWidth(40);
-                valueField.setMaxWidth(40);
-            }
+    private void rebuildParameterFields() {
+        parameterContent.getChildren().clear();
+        parameterContent.getChildren().add(detailLabel);
+
+        for (ActionParameterViewModel parameter : vm.getParameters()) {
+            Label label = new Label(parameter.prefix());
+
+            TextField valueField = new TextField();
+            valueField.setPrefWidth(60);
+            valueField.textProperty().bindBidirectional(parameter.valueProperty());
+
+            Label suffix = new Label(parameter.suffix());
+
+            Button plus = new Button("+");
+            Button minus = new Button("-");
+
+            plus.visibleProperty().bind(parameter.canIncrement());
+            plus.managedProperty().bind(parameter.canIncrement());
+
+            minus.visibleProperty().bind(parameter.canIncrement());
+            minus.managedProperty().bind(parameter.canIncrement());
+
+            plus.setOnAction(e -> parameter.increment(1));
+            minus.setOnAction(e -> parameter.increment(-1));
+
+            parameterContent.getChildren().addAll(label, valueField, suffix, plus, minus);
         }
     }
 }

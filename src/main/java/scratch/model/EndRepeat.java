@@ -20,6 +20,10 @@ public class EndRepeat extends NoExpressionAction{
         return new EndRepeat();
     }
 
+    @Override
+    public String parameterPrefix(int index) {
+        return "Fin répéter";
+    }
 
     public String toString(){
         return "Fin répéter";

@@ -34,6 +34,22 @@ public class MoveForward extends OneExpressionAction {
     }
 
     @Override
+    public String parameterPrefix(int index) {
+        return "Avancer de";
+    }
+
+    @Override
+    public String parameterSuffix(int index) {
+        return "pixels";
+    }
+
+    @Override
+    public boolean isExpressionParameter(int index) {
+        return true;
+    }
+
+
+    @Override
     public String toString() {
         return "Avancer de " + super.getExpression().toString();
     }

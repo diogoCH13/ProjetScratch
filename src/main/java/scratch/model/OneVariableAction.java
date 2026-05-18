@@ -43,4 +43,9 @@ public abstract class OneVariableAction extends Action{
     public void setParameterValue(int index, String value, Program program) {
         setVariableTargetName(value);
     }
+
+    @Override
+    public boolean isVariableNameParameter(int index) {
+        return index == 0;
+    }
 }

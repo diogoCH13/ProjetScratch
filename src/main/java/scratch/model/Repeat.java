@@ -22,6 +22,18 @@ public class Repeat extends OneExpressionAction {
     public void execute(Cursor cursor, Program program) {
     }
 
+    public String parameterPrefix(int index) {
+        return "Répeter";
+    }
+
+    public String parameterSuffix(int index) {
+        return "fois";
+    }
+
+    public boolean isExpressionParameter(int index) {
+        return true;
+    }
+
     public String toString(){
         return "Répéter " + super.getExpression().toString() + " fois";
     }
