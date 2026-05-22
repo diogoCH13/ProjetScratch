@@ -56,7 +56,7 @@ public class ActionListViewModel {
     }
 
     public ObservableList<Action> getProgramActions() {
-        return program.getActions();
+        return program.getActionsList();
     }
 
     public void deleteAction() {
@@ -102,7 +102,7 @@ public class ActionListViewModel {
             program.duplicate(destinationIndex + 1, action);
         }
         else {
-            program.duplicate(program.getActions().size(), action);
+            program.duplicate(program.getActionsList().size(), action);
         }
         programLoaded.set(false);
         running.set(false);
@@ -169,27 +169,18 @@ public class ActionListViewModel {
                 hasError = true;
             }
         }
-
         errorValue.set(hasError);
     }
 
     public void configureBindingsAndListeners() {
-
         actionIndex.addListener((obs, oldVal, newVal) -> {
             refreshParameters();
-//                if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
-//                    actionValue.set(action.parameterValue(0));
-//                    actionVar.set(action.parameterValue(1));
-//                }
-//                else {
-//                    actionValue.set(action.parameterValue(0));
-//                }
         });
     }
 
     public int getIndentationLevel(int index) {
         int level = 0;
-        List<Action> actionList = program.getActions();
+        List<Action> actionList = program.getActionsList();
         for (int i = 0; i < index; ++i) {
             Action action = actionList.get(i);
             if (action.actionType() == ActionType.REPEAT) {
@@ -221,209 +212,4 @@ public class ActionListViewModel {
 
         }, actionIndexProperty(), getProgramActions());
     }
-
-//    public StringProperty actionValueProperty() {
-//        return actionValue;
-//    }
-//
-//    public StringProperty actionVarProperty() {
-//        return actionVar;
-//    }
-//
-//    public StringBinding actionDetailValueBindings() {
-//        return Bindings.createStringBinding(() -> {
-//            String detailValue = "";
-//
-//            if (!getProgramActions().isEmpty() && isValidIndex()) {
-//                Action action = getProgramActions().get(actionIndex.get());
-//                detailValue = action.actionDetailValue();
-//            }
-//            return detailValue;
-//        }, actionIndexProperty(), getProgramActions());
-//    }
-
-
-
-//    public BooleanBinding disableTextFieldByActionType() {
-//        return Bindings.createBooleanBinding(() -> {
-//            boolean textField = false;
-//            if (isValidIndex()) {
-//                Action action = getProgramActions().get(actionIndex.get());
-//                textField = switch (action.actionType()) {
-//                    case PEN_UP, PEN_DOWN, END_REPEAT -> false;
-//                    default -> true;
-//                };
-//            }
-//            return textField;
-//        }, actionIndexProperty(), getProgramActions(), actionValueProperty());
-//    }
-//
-//    public BooleanBinding disableVarField() {
-//        return Bindings.createBooleanBinding(() -> {
-//            boolean isValid = false;
-//            if (isValidIndex()) {
-//                Action action = getProgramActions().get(actionIndex.get());
-//                isValid = action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE;
-//            }
-//            return isValid;
-//        }, getProgramActions(), actionIndexProperty());
-//    }
-//
-//    public BooleanBinding disableIncrement() {
-//        return Bindings.createBooleanBinding(() -> {
-//            boolean isLitteral = false;
-//            if (isValidIndex()) {
-//                Action currentAction = getProgramActions().get(actionIndex.get());
-//                switch (currentAction.actionType()) {
-//                    case VAR_ASSIGNMENT, INCREMENT_VARIABLE:
-//                        if (actionVar.get() != null) {
-//                            String value = actionVar.get();
-//                            if (program.isInteger(value)) {
-//                                isLitteral = true;
-//                            }
-//                        }
-//                        break;
-//                    case MOVE_FORWARD, TURN_LEFT, TURN_RIGHT, REPEAT:
-//                        if (actionValue.get() != null) {
-//                            String value = actionValue.get();
-//                            if (program.isInteger(value)) {
-//                                isLitteral = true;
-//                            }
-//                        }
-//                }
-//            }
-//            return isLitteral;
-//        }, getProgramActions(), actionValueProperty(), actionIndexProperty(), actionVarProperty());
-//    }
-//        actionValue.addListener((obs, oldVal, newVal) -> {
-//            if (updatingActionValue) {
-//                return;
-//            }
-//            if (isValidIndex() && newVal != null) {
-//                Action action = getProgramActions().get(actionIndex.get());
-//                if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
-//                    setTargetName(action, newVal);
-//                }
-//                else {
-//                    setValue(action, newVal);
-//                }
-//
-//                if (running.get()) {
-//                    running.set(false);
-//                    programLoaded.set(false);
-//                }
-//            }
-//        });
-//
-//        actionVar.addListener((obs, oldVal, newVal) -> {
-//            if (updatingActionValue) {
-//                return;
-//            }
-//            if (isValidIndex() && newVal != null && !newVal.isEmpty()) {
-//                Action action = getProgramActions().get(actionIndex.get());
-//                setValue(action, newVal);
-//            }
-//            if (running.get()) {
-//                running.set(false);
-//                programLoaded.set(false);
-//            }
-//        });
-    }
-
-//    public void setValue(Action action, String value) {
-//        if (program.isInteger(value)) {
-//            int val = Integer.parseInt(value);
-//            verificationValueRules(action, val);
-//        }
-//        else {
-//            verificationNameRules(action, value);
-//        }
-//    }
-
-//    public void verificationValueRules(Action action, int value) {
-//        errorValue.set(true);
-//
-//        int parameterIndex = 0;
-//
-//        if (action.actionType() == ActionType.VAR_ASSIGNMENT
-//                || action.actionType() == ActionType.INCREMENT_VARIABLE) {
-//            parameterIndex = 1;
-//        }
-//
-//        switch (action.actionType()) {
-//            case MOVE_FORWARD, TURN_RIGHT:
-//                if (action.valueIsCorrect(value)) {
-//                    action.setParameterValue(parameterIndex, String.valueOf(-value), program);
-//                    errorValue.set(false);
-//                }
-//                break;
-//
-//            case TURN_LEFT, VAR_ASSIGNMENT, REPEAT, INCREMENT_VARIABLE:
-//                if (action.valueIsCorrect(value)) {
-//                    action.setParameterValue(parameterIndex, String.valueOf(value), program);
-//                    errorValue.set(false);
-//                }
-//                break;
-//        }
-//    }
-//
-//    public void verificationNameRules(Action action, String name) {
-//        errorValue.set(true);
-//        if (action.actionType() == ActionType.VAR_DECLARATION && name.isEmpty()) {
-//            action.setParameterValue(0, name, program);
-////            action.setExpression(new VariableExpression(name));
-//        }
-//        else {
-//            if (!name.isEmpty() && isLetterOrUnderscore(name.charAt(0))) {
-//                errorValue.set(false);
-//                if (nameIsCorrect(name)) {
-//                    action.setParameterValue(0, name, program);
-////                    action.setExpression(new VariableExpression(name));
-//                }
-//                else {
-//                    errorValue.set(true);
-//                }
-//            }
-//        }
-//    }
-//    public void setTargetName(Action action, String name) {
-//        errorValue.set(true);
-//        if (name.isEmpty()) {
-//            action.setParameterValue(0, name, program);
-//        }
-//        else {
-//            if (isLetterOrUnderscore(name.charAt(0))) {
-//                errorValue.set(false);
-//                if (nameIsCorrect(name)) {
-//                    action.setParameterValue(0, name, program);
-//                }
-//                else {
-//                    errorValue.set(true);
-//                }
-//            }
-//        }
-//    }
-//
-//    public void refreshValue() {
-//        actionIndex.set(getProgramActions().isEmpty() ? -1 : actionIndex.get());
-//        if (actionIndex.get() != -1) {
-//            Action currentAction = getProgramActions().get(actionIndex.get());
-//            actionValue.set(currentAction.parameterValue(0));
-//        }
-//        else {
-//            actionValue.set("");
-//        }
-//    }
-//    public void increment(boolean isIncrement) {
-//        if (isValidIndex() && !getProgramActions().isEmpty()) {
-//            Action currentAction = getProgramActions().get(actionIndex.get());
-//            if (currentAction.actionType() == ActionType.VAR_ASSIGNMENT || currentAction.actionType() == ActionType.INCREMENT_VARIABLE) {
-//                program.incrementDuringCompilation(currentAction, 1, isIncrement ? 1 : -1);
-//                actionVar.set(currentAction.parameterValue(1));
-//            }
-//            else{
-//                program.incrementDuringCompilation(currentAction, 0, isIncrement ? 1 : -1);
-//                actionValue.set(currentAction.parameterValue(0));
-//            }
-//        }
-//    }
+}

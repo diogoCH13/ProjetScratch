@@ -1,6 +1,5 @@
 package scratch.model;
 
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -9,13 +8,13 @@ import java.util.*;
 
 public class Program {
 
-    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> action.observables());
+    private final ObservableList<Action> actionsList = FXCollections.observableArrayList(action -> action.observables());
     private final Map<String, Integer> declarationList = new HashMap<>();
     private final Deque<ExecutionContext> executionStack = new ArrayDeque<>();
-    public ObservableList<Action> getActions() {
-        return FXCollections.unmodifiableObservableList(actions);
-    }
 
+    public ObservableList<Action> getActionsList() {
+        return FXCollections.unmodifiableObservableList(actionsList);
+    }
 
     public Map<String, Integer> getDeclarationList() {
         return declarationList;
@@ -29,15 +28,15 @@ public class Program {
         ActionType type = ActionsCatalog.getAction(index);
         if (type != null){
             Action action = ActionFactory.createAction(type);
-            if(destinationIndex <= actions.size()){
-                actions.add(destinationIndex, action);
+            if(destinationIndex <= actionsList.size()){
+                actionsList.add(destinationIndex, action);
             }
         }
     }
 
     public void startExecution(){
         executionStack.clear();
-        ExecutionContext context = new ExecutionContext(actions, 0);
+        ExecutionContext context = new ExecutionContext(actionsList, 0);
         executionStack.push(context);
     }
 
@@ -103,8 +102,8 @@ public class Program {
 
     public int findMatchingEndRepeat(int index){
         int cpt =  1;
-        for (int i = index + 1; i < actions.size(); ++i){
-            Action action = actions.get(i);
+        for (int i = index + 1; i < actionsList.size(); ++i){
+            Action action = actionsList.get(i);
             if (action.actionType() == ActionType.REPEAT){
                 ++cpt;
             }
@@ -118,37 +117,32 @@ public class Program {
         return -1;
     }
 
-    public boolean varIsExist(){
-        Set<String>declarsVars = new HashSet<>();
-        for (Action action: actions){
+    public boolean varIsExist() {
+        Set<String> declarsVars = new HashSet<>();
 
-            if (action.actionType() == ActionType.VAR_DECLARATION){
-                declarsVars.add(action.parameterValue(0));
-            }
+        for (Action action : actionsList) {
+            for (int i = 0; i < action.parameterCount(); i++) {
+                String value = action.parameterValue(i);
 
-            else if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
-                String var = action.parameterValue(0);
-                if (!declarsVars.contains(var)){
-                    return false;
+                if (action.parameterDeclareVariable(i)) {
+                    declarsVars.add(value);
                 }
-            }
-
-            else if (action.parameterCount() > 0) {
-                String var = action.parameterValue(0);
-                if (!isInteger(var) && !declarsVars.contains(var)) {
-                    return false;
+                else if (action.parameterUseVariable(i)) {
+                    if (!isInteger(value) && !declarsVars.contains(value)) {
+                        return false;
+                    }
                 }
             }
         }
+
         return true;
     }
-
 
     public boolean isRepeatCounterModificationValid() {
         Deque<String> repeatCounters = new ArrayDeque<>();
 
-        for (int i = 0; i < actions.size(); ++i) {
-            Action action = actions.get(i);
+        for (int i = 0; i < actionsList.size(); ++i) {
+            Action action = actionsList.get(i);
 
             if (action.actionType() == ActionType.REPEAT) {
                 String counter = action.parameterValue(0);
@@ -181,8 +175,8 @@ public class Program {
 
     public boolean isEndRepeatExist(){
         Deque<ActionType> endRepeatStack = new ArrayDeque<>();
-        for (int i = 0; i < actions.size(); ++i) {
-            Action action = actions.get(i);
+        for (int i = 0; i < actionsList.size(); ++i) {
+            Action action = actionsList.get(i);
 
             if (action.actionType() == ActionType.REPEAT) {
                 endRepeatStack.push(action.actionType());
@@ -217,9 +211,9 @@ public class Program {
 
 
     public void deleteAction(int index){
-        if (index >= 0 && index < actions.size()){
-            actions.remove(index);
-//            Action action = getActions().get(index);
+        if (index >= 0 && index < actionsList.size()){
+            actionsList.remove(index);
+//            Action action = getActionsList().get(index);
 //            for (int i = 0; i < action.parameterCount(); ++i){
 //
 //            }
@@ -236,31 +230,31 @@ public class Program {
     }
 
     public void removeAll(){
-        actions.clear();
+        actionsList.clear();
         declarationList.clear();
     }
 
     public void up(int index){
-        if (index > 0 && index < actions.size()){
-            Action action = actions.remove(index);
-            actions.add(index - 1, action);
+        if (index > 0 && index < actionsList.size()){
+            Action action = actionsList.remove(index);
+            actionsList.add(index - 1, action);
         }
     }
 
     public void down(int index){
-        if (index >= 0 && index < actions.size() - 1){
-            Action action = actions.remove(index);
-            actions.add(index + 1, action);
+        if (index >= 0 && index < actionsList.size() - 1){
+            Action action = actionsList.remove(index);
+            actionsList.add(index + 1, action);
         }
     }
 
     public void duplicate(int destinationIndex, Action action) {
-        actions.add(destinationIndex, action.copy());
+        actionsList.add(destinationIndex, action.copy());
     }
 
     public void save(File file) {
         try (PrintWriter writer = new PrintWriter(file)) {
-            for (Action action : actions) {
+            for (Action action : actionsList) {
                 writer.print(action.actionType().name());
 
                 for (int i = 0; i < action.parameterCount(); ++i) {
@@ -277,7 +271,7 @@ public class Program {
 
     public void load(File file) {
         declarationList.clear();
-        actions.clear();
+        actionsList.clear();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -293,7 +287,7 @@ public class Program {
                     action.setParameterValue(i, parts[i + 1], this);
                 }
 
-                actions.add(action);
+                actionsList.add(action);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -303,7 +297,7 @@ public class Program {
 
     public boolean isPenStateValid() {
         boolean penDown = true;
-        for (Action action : actions) {
+        for (Action action : actionsList) {
             if (action.actionType() == ActionType.PEN_DOWN) {
                 if (penDown) {
                     return false;
@@ -353,14 +347,14 @@ public class Program {
         }
     }
 
-    //permet de vérifier que declaration est avant toutes les autres actions
+    //permet de vérifier que declaration est avant toutes les autres actionsList
     public boolean declarationIsFirstAction(){
         boolean isBefore = true;
-        for(Action action : actions){
+        for(Action action : actionsList){
             if (action.actionType() == ActionType.VAR_DECLARATION && isBefore){
-                int index = actions.indexOf(action);
+                int index = actionsList.indexOf(action);
                 for (int i = 0; i < index && isBefore; ++i){
-                    ActionType type = actions.get(i).actionType();
+                    ActionType type = actionsList.get(i).actionType();
                     if (type != ActionType.VAR_DECLARATION){
                         isBefore = false;
                     }
@@ -395,7 +389,7 @@ public class Program {
     }
 
     public void clearAll(){
-        actions.clear();
+        actionsList.clear();
         declarationList.clear();
         executionStack.clear();
 
@@ -404,7 +398,7 @@ public class Program {
     public boolean actionsNotEmpty() {
         boolean isNotEmpty = true;
 
-        for (Action action : actions) {
+        for (Action action : actionsList) {
             for (int i = 0; i < action.parameterCount() && isNotEmpty; ++i) {
                 String value = action.parameterValue(i);
 
@@ -417,42 +411,23 @@ public class Program {
         return isNotEmpty;
     }
 
-    //permet de verifier que le nom de la déclaration est unique
-    public boolean declareIsUnique(){
+    public boolean declareIsUnique() {
         boolean isUnique = true;
+        Set<String> declaredNames = new HashSet<>();
 
-        if (!actions.isEmpty()){
-            boolean otherAction = false;
+        for (Action action : actionsList) {
+            for (int i = 0; i < action.parameterCount(); i++) {
+                if (action.parameterDeclareVariable(i)) {
+                    String name = action.parameterValue(i);
 
-            for (int i = 0 ; i < actions.size() && isUnique && !otherAction; ++i){
-                Action action = actions.get(i);
-                /*si on tombe sur une autre action que déclaration alors on arrête la recherche
-                car declaration doit etre avant toutes les autres actions*/
-                otherAction = action.actionType() != ActionType.VAR_DECLARATION;
-                if (action.actionType() == ActionType.VAR_DECLARATION){
-                    if (declareNotUnique(action, i)){
+                    if (declaredNames.contains(name)) {
                         isUnique = false;
                     }
+
+                    declaredNames.add(name);
                 }
             }
-
         }
         return isUnique;
-    }
-
-    public boolean declareNotUnique(Action action, int index){
-        boolean notUnique = false;
-        boolean otherAction = false;
-        String firstNameDeclare = action.parameterValue(0);
-
-        for (int i = index + 1; i < getActions().size() && !notUnique && !otherAction; ++i){
-            Action actionList = getActions().get(i);
-            otherAction = actionList.actionType() != ActionType.VAR_DECLARATION;
-            if (actionList.actionType() == ActionType.VAR_DECLARATION){
-                String secondNameDeclare = actionList.parameterValue(0);
-                notUnique = firstNameDeclare.equals(secondNameDeclare);
-            }
-        }
-        return notUnique;
     }
 }

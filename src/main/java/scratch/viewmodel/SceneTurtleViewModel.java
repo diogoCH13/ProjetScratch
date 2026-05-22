@@ -12,7 +12,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Duration;
-import scratch.model.Action;
 import scratch.model.Cursor;
 import scratch.model.CursorWorld;
 import scratch.model.Point;
@@ -58,7 +57,7 @@ public class SceneTurtleViewModel {
         this.autoMode = autoMode;
         this.actionsValide = Bindings.createBooleanBinding(
                 () -> program.isPenStateValid(),
-                program.getActions()
+                program.getActionsList()
         );
         configureBindingsAndListeners();
     }
@@ -109,7 +108,7 @@ public class SceneTurtleViewModel {
 
     public BooleanBinding canLoad() {
         return Bindings.createBooleanBinding(() -> {
-            return !program.getActions().isEmpty() &&
+            return !program.getActionsList().isEmpty() &&
                     actionsValide.get() &&
                     program.declarationIsFirstAction() &&
                     program.isRepeatCounterModificationValid() &&
@@ -118,7 +117,7 @@ public class SceneTurtleViewModel {
                     program.varIsExist() &&
                     program.declareIsUnique() &&
                     !actionError.get();
-        }, program.getActions(), actionIndex, actionError);
+        }, program.getActionsList(), actionIndex, actionError);
     }
 
     public BooleanProperty canExecute() {

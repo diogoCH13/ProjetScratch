@@ -21,7 +21,7 @@ public class ActionParameterViewModel {
         this.program = program;
         this.index = index;
         this.value.set(action.parameterValue(index));
-        this.error.set(!isValidParameterValue(value.get()));
+//        this.error.set(!isValidParameterValue(value.get()));
 
         this.value.addListener((obs, oldValue, newValue) -> updateActionParameter(newValue));
     }

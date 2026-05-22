@@ -29,9 +29,4 @@ public class EndRepeat extends NoExpressionAction{
         return "Fin répéter";
     }
 
-
-//    @Override
-//    public int valueOfExpression(Program program) {
-//        return 0;
-//    }
 }

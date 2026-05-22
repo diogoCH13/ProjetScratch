@@ -37,6 +37,16 @@ public class VarDeclaration extends OneVariableAction{
         program.declareVariable(super.getVariableTargetName());
     }
 
+    @Override
+    public boolean parameterDeclareVariable(int index) {
+        return index == 0;
+    }
+
+    @Override
+    public boolean parameterUseVariable(int index) {
+        return false;
+    }
+
     public String toString(){
         return "Déclaration variable " + super.getVariableTargetName();
     }

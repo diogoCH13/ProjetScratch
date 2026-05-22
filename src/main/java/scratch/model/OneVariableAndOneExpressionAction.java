@@ -61,7 +61,8 @@ public abstract class OneVariableAndOneExpressionAction extends Action{
     public void setParameterValue(int index, String value, Program program) {
         if (index == 0) {
             setVariableTargetName(value);
-        } else {
+        }
+        else {
             setExpression(program.parseExpression(value));
         }
     }

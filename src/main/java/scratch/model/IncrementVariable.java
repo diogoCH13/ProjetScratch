@@ -27,6 +27,10 @@ public class IncrementVariable extends OneVariableAndOneExpressionAction {
         return index == 0 ? "Incrémentation de la variable" : "de";
     }
 
+    @Override
+    public boolean parameterUseVariable(int index) {
+        return index == 0 || isExpressionParameter(index);
+    }
 
     @Override
     public String toString() {

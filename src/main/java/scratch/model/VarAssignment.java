@@ -50,6 +50,11 @@ public class VarAssignment extends OneVariableAndOneExpressionAction {
     }
 
     @Override
+    public boolean parameterUseVariable(int index) {
+        return index == 0 || isExpressionParameter(index);
+    }
+
+    @Override
     public String toString() {
         return "Assignation : " + super.getVariableTargetName() + " = " + super.getExpression().toString();
     }

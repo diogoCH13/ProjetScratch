@@ -41,7 +41,7 @@ public class PalettListViewModel {
             program.addAction(i, destinationIndex + 1);
         }
         else {
-            program.addAction(i, program.getActions().size());
+            program.addAction(i, program.getActionsList().size());
         }
         programLoaded.set(false);
         running.set(false);
