@@ -53,5 +53,6 @@ public class MainViewModel {
         sceneTurtleViewModel.reset();
         program.load(file);
         programLoaded.set(false);
+
     }
 }
