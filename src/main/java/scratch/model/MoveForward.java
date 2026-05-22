@@ -43,11 +43,6 @@ public class MoveForward extends OneExpressionAction {
         return "pixels";
     }
 
-    @Override
-    public boolean isExpressionParameter(int index) {
-        return true;
-    }
-
 
     @Override
     public String toString() {

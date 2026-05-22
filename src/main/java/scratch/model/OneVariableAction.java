@@ -35,17 +35,27 @@ public abstract class OneVariableAction extends Action{
     }
 
     @Override
-    public String parameterValue(int index) {
+    public String getParameterValue(int index) {
         return getVariableTargetName();
     }
 
     @Override
     public void setParameterValue(int index, String value, Program program) {
-        setVariableTargetName(value);
+        if (index == 0){
+            if (!program.isInteger(value)){
+                setVariableTargetName(value);
+            }
+        }
     }
 
     @Override
     public boolean isVariableNameParameter(int index) {
         return index == 0;
     }
+
+    @Override
+    public boolean parameterDeclareVariable(int index) {
+        return index == 0;
+    }
+
 }

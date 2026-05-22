@@ -30,10 +30,6 @@ public class Repeat extends OneExpressionAction {
         return "fois";
     }
 
-    public boolean isExpressionParameter(int index) {
-        return true;
-    }
-
     public String toString(){
         return "Répéter " + super.getExpression().toString() + " fois";
     }

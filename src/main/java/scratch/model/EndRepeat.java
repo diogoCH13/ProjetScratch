@@ -3,7 +3,6 @@ package scratch.model;
 public class EndRepeat extends NoExpressionAction{
 
     public EndRepeat() {
-
     }
 
     @Override

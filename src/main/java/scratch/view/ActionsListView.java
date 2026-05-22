@@ -17,7 +17,7 @@ public class ActionsListView extends VBox {
     private final ActionListViewModel vm;
 
     private final Label programLabel = new Label("Programme");
-    private final Label detailLabel = new Label("aucune action sélectionnées");
+    private final Label detailLabel = new Label("");
     private final Label errorLabel = new Label("Error");
     private final Label runtimeLabel = new Label("Runtime Error");
 
@@ -109,7 +109,7 @@ public class ActionsListView extends VBox {
         TitledPaneBox.setFillWidth(false);
         TitledPane detailPane = new TitledPane();
 
-        detailPane.setPrefWidth(460);
+        detailPane.setPrefWidth(700);
         detailPane.setText("Détail de l'action");
 
         VBox detail = new VBox();
@@ -170,10 +170,6 @@ public class ActionsListView extends VBox {
 
     private void configureBindingsAndListeners() {
         detailLabel.textProperty().bind(vm.actionDetailsBinding());
-        for (ActionParameterViewModel parameter : vm.getParameters()){
-            Label prefix = new Label(parameter.prefix());
-            TextField field = new TextField();
-        }
 
         vm.getParameters().addListener((InvalidationListener) e-> {
             rebuildParameterFields();

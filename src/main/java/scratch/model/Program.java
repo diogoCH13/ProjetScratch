@@ -24,8 +24,8 @@ public class Program {
         declarationList.clear();
     }
 
-    public void addAction(int index, int destinationIndex){
-        ActionType type = ActionsCatalog.getAction(index);
+
+    public void addAction(ActionType type, int destinationIndex){
         if (type != null){
             Action action = ActionFactory.createAction(type);
             if(destinationIndex <= actionsList.size()){
@@ -63,7 +63,7 @@ public class Program {
         }
 
         if (action.actionType() == ActionType.REPEAT){
-            Expression value = parseExpression(action.parameterValue(0));
+            Expression value = parseExpression(action.getParameterValue(0));
 
             int cpt = value.valueOfExpression(this);
             if (cpt <= 0){
@@ -122,7 +122,7 @@ public class Program {
 
         for (Action action : actionsList) {
             for (int i = 0; i < action.parameterCount(); i++) {
-                String value = action.parameterValue(i);
+                String value = action.getParameterValue(i);
 
                 if (action.parameterDeclareVariable(i)) {
                     declarsVars.add(value);
@@ -138,6 +138,27 @@ public class Program {
         return true;
     }
 
+    public boolean lastActionIsCorrect() {
+        return actionsList.isEmpty() || actionsList.get(actionsList.size() - 1).canBeLastAction();
+    }
+
+    public boolean parametersAreCorrect() {
+        boolean correct = true;
+
+        for (Action action : actionsList) {
+            for (int i = 0; i < action.parameterCount() && correct; ++i) {
+                String value = action.getParameterValue(i);
+
+                if (action.isExpressionParameter(i) && isInteger(value)) {
+                    int number = Integer.parseInt(value.trim());
+                    correct = action.parameterValueIsCorrect(i, number);
+                }
+            }
+        }
+
+        return correct;
+    }
+
     public boolean isRepeatCounterModificationValid() {
         Deque<String> repeatCounters = new ArrayDeque<>();
 
@@ -145,7 +166,7 @@ public class Program {
             Action action = actionsList.get(i);
 
             if (action.actionType() == ActionType.REPEAT) {
-                String counter = action.parameterValue(0);
+                String counter = action.getParameterValue(0);
 
                 if (!isInteger(counter)) {
                     repeatCounters.push(counter);
@@ -155,7 +176,7 @@ public class Program {
             }
             if (action.actionType() == ActionType.INCREMENT_VARIABLE
                     || action.actionType() == ActionType.VAR_ASSIGNMENT) {
-                String targetName = action.parameterValue(0);
+                String targetName = action.getParameterValue(0);
 
                 for (String var : repeatCounters) {
                     if (var.equals(targetName)) {
@@ -213,19 +234,6 @@ public class Program {
     public void deleteAction(int index){
         if (index >= 0 && index < actionsList.size()){
             actionsList.remove(index);
-//            Action action = getActionsList().get(index);
-//            for (int i = 0; i < action.parameterCount(); ++i){
-//
-//            }
-//            switch(action.actionType()){
-//                case VAR_ASSIGNMENT:
-//                    declareVariable(action.variableTargetName());
-//                    break;
-//                case VAR_DECLARATION:
-//                    declarationList.remove(action.getExpression);
-//                    break;
-//            }
-
         }
     }
 
@@ -257,8 +265,13 @@ public class Program {
             for (Action action : actionsList) {
                 writer.print(action.actionType().name());
 
-                for (int i = 0; i < action.parameterCount(); ++i) {
-                    writer.print(";" + action.parameterValue(i));
+                if (action.parameterCount() == 0) {
+                    writer.print(";");
+                }
+                else {
+                    for (int i = 0; i < action.parameterCount(); ++i) {
+                        writer.print(";" + action.getParameterValue(i));
+                    }
                 }
 
                 writer.println();
@@ -380,7 +393,7 @@ public class Program {
             return;
         }
 
-        String value = currentAction.parameterValue(parameterIndex);
+        String value = currentAction.getParameterValue(parameterIndex);
 
         if (isInteger(value)) {
             int number = Integer.parseInt(value);
@@ -400,9 +413,9 @@ public class Program {
 
         for (Action action : actionsList) {
             for (int i = 0; i < action.parameterCount() && isNotEmpty; ++i) {
-                String value = action.parameterValue(i);
+                String value = action.getParameterValue(i);
 
-                if (value.trim().isEmpty() || value.equals("0")) {
+                if (value.trim().isEmpty()) {
                     isNotEmpty = false;
                 }
             }
@@ -418,7 +431,7 @@ public class Program {
         for (Action action : actionsList) {
             for (int i = 0; i < action.parameterCount(); i++) {
                 if (action.parameterDeclareVariable(i)) {
-                    String name = action.parameterValue(i);
+                    String name = action.getParameterValue(i);
 
                     if (declaredNames.contains(name)) {
                         isUnique = false;

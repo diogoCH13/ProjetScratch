@@ -20,7 +20,7 @@ public abstract class Action {
         return 0;
     }
 
-    public String parameterValue(int index) {
+    public String getParameterValue(int index) {
         return "";
     }
 
@@ -52,5 +52,9 @@ public abstract class Action {
 
     public boolean parameterUseVariable(int index) {
         return isExpressionParameter(index);
+    }
+
+    public boolean canBeLastAction() {
+        return true;
     }
 }

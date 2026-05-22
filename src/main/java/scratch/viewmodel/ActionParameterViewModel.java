@@ -20,8 +20,8 @@ public class ActionParameterViewModel {
         this.action = action;
         this.program = program;
         this.index = index;
-        this.value.set(action.parameterValue(index));
-//        this.error.set(!isValidParameterValue(value.get()));
+        this.value.set(action.getParameterValue(index));
+        this.error.set(!isValidParameterValue(value.get()));
 
         this.value.addListener((obs, oldValue, newValue) -> updateActionParameter(newValue));
     }
@@ -44,13 +44,13 @@ public class ActionParameterViewModel {
 
     //à chaque fois que la valeur du paramètre change on verifie si on peut incrementer
     public BooleanBinding canIncrement() {
-        return Bindings.createBooleanBinding(() -> !error.get() && action.isExpressionParameter(index) && program.isInteger(value.get()), value, error);
+        return Bindings.createBooleanBinding(() -> action.isExpressionParameter(index) && program.isInteger(value.get()), value);
     }
 
     public void increment(int count) {
-        if (!error.get()) {
-            program.incrementDuringCompilation(action, index, count);
-            value.set(action.parameterValue(index));
+        if (action.isExpressionParameter(index) && program.isInteger(value.get())) {
+            int number = Integer.parseInt(value.get().trim());
+            value.set(String.valueOf(number + count));
         }
     }
 

@@ -209,6 +209,12 @@ public class ActionListViewModel {
             if (getProgramActions().isEmpty() || !isValidIndex()) {
                 detail = "aucune action sélectionnées";
             }
+            else {
+                Action action = getProgramActions().get(actionIndex.get());
+                if (action.parameterCount() == 0) {
+                    detail = action.parameterPrefix(0);
+                }
+            }
             return detail;
 
         }, actionIndexProperty(), getProgramActions());

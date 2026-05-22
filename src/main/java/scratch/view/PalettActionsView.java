@@ -2,6 +2,7 @@ package scratch.view;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -18,6 +19,7 @@ public class PalettActionsView extends VBox {
 
     private final Label palettLabel = new Label("Palette d'actions");
     private final Button addBtn = new Button("Ajouter au programme");
+    private final CheckBox advancedModeCheckBox = new CheckBox("Mode avancé");
 
     public PalettActionsView(PalettListViewModel vm){
         this.vm = vm;
@@ -29,8 +31,9 @@ public class PalettActionsView extends VBox {
     }
 
     private void beautify(){
-        getChildren().addAll(palettLabel, palletListView, addBtn);
+        getChildren().addAll(palettLabel, palletListView, addBtn, advancedModeCheckBox);
         setPadding(new Insets(16, 16, 12, 16));
+        advancedModeCheckBox.setPadding(new Insets(10, 10, 8, 10));
 
         palletListView.setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -68,6 +71,8 @@ public class PalettActionsView extends VBox {
     }
 
     private void configSelectionModels() {
+        advancedModeCheckBox.selectedProperty().bindBidirectional(vm.advancedModeProperty());
+
         palletListView.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, t1) -> {
             vm.catalogIndexProperty().set(t1.intValue());
         });

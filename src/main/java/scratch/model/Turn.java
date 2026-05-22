@@ -52,14 +52,6 @@ public class Turn extends OneExpressionAction {
         return "degrés";
     }
 
-    public boolean isExpressionParameter(int index) {
-        return true;
-    }
-
-    public boolean parameterValueIsCorrect(int index, int value) {
-        return valueIsCorrect(value);
-    }
-
     public String toString(){
         String val = "Tourner à droite de " + super.getExpression().toString();
         if (direction == ActionType.TURN_LEFT){

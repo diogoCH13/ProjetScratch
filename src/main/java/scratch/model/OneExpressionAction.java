@@ -36,7 +36,7 @@ public abstract class OneExpressionAction extends Action {
     }
 
     @Override
-    public String parameterValue(int index) {
+    public String getParameterValue(int index) {
         return getExpression().toString();
     }
 

@@ -54,6 +54,36 @@ public class Cursor {
         position.setY(newY);
     }
 
+    public void rectangle(double height, double width){
+
+        double x_start =  position.getX(),
+                y_start = position.getY(),
+                x_end = x_start + width,
+                y_end = y_start + height;
+
+        int i = 0;
+        while (i < 4){
+            if (i == 0){
+                Segment segment = new Segment(new Point(x_start, y_start), new Point(x_start, y_end));
+                world.addSegment(segment);
+            }
+            else if (i == 1){
+                Segment segment = new Segment(new Point(x_start, y_end), new Point(x_end, y_end));
+                world.addSegment(segment);
+            }
+            else if (i == 2){
+                Segment segment = new Segment(new Point(x_end, y_end), new Point(x_end, y_start));
+                world.addSegment(segment);
+            }
+            else {
+                Segment segment = new Segment(new Point(x_end, y_start), new Point(x_start, y_start));
+                world.addSegment(segment);
+            }
+
+            ++i;
+        }
+    }
+
     public void rotate(double deltaAngle) {
         double angleValue = this.angle.get();
         angleValue = (angleValue + deltaAngle) % 360;

@@ -4,7 +4,7 @@ import javafx.beans.Observable;
 
 public abstract class NoExpressionAction extends Action{
 
-    NoExpressionAction(){}
+    public NoExpressionAction(){}
 
     @Override
     public Observable[] observables() {

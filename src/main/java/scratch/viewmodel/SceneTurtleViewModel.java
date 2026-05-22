@@ -3,12 +3,10 @@ package scratch.viewmodel;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Duration;
@@ -16,6 +14,7 @@ import scratch.model.Cursor;
 import scratch.model.CursorWorld;
 import scratch.model.Point;
 import scratch.model.Program;
+import scratch.model.Action;
 import scratch.model.VariableRow;
 
 import java.util.Map;
@@ -26,6 +25,7 @@ public class SceneTurtleViewModel {
 
     private final Cursor cursor;
     private final Program program;
+    private final ObservableList<Action> programActions;
     private final CursorWorld world;
     private final IntegerProperty actionIndex;
     private final IntegerProperty catalogIndex;
@@ -39,13 +39,16 @@ public class SceneTurtleViewModel {
     private final BooleanProperty autoMode;
     private final DoubleProperty speed = new SimpleDoubleProperty(1);
 
-    private ObservableList<VariableRow> variableValueList = FXCollections.observableArrayList();
+    private final IntegerProperty sceneVersion = new SimpleIntegerProperty(0);
+
+    private final ObservableList<VariableRow> variableValueList = FXCollections.observableArrayList();
 
     public SceneTurtleViewModel(Cursor cursor, Program program, IntegerProperty actionIndex, IntegerProperty catalogIndex,
                                 BooleanProperty programLoaded, BooleanProperty running, BooleanProperty executionFinished,
                                 BooleanProperty runtimeValue, BooleanProperty actionError, BooleanProperty autoMode) {
         this.cursor = cursor;
         this.program = program;
+        this.programActions = program.getActionsList();
         this.world = cursor.getWorld();
         this.actionIndex = actionIndex;
         this.catalogIndex = catalogIndex;
@@ -57,9 +60,13 @@ public class SceneTurtleViewModel {
         this.autoMode = autoMode;
         this.actionsValide = Bindings.createBooleanBinding(
                 () -> program.isPenStateValid(),
-                program.getActionsList()
+                programActions
         );
         configureBindingsAndListeners();
+    }
+
+    public IntegerProperty sceneVersionProperty() {
+        return sceneVersion;
     }
 
     public ObservableList<VariableRow> getVariableValueList() {
@@ -108,7 +115,7 @@ public class SceneTurtleViewModel {
 
     public BooleanBinding canLoad() {
         return Bindings.createBooleanBinding(() -> {
-            return !program.getActionsList().isEmpty() &&
+            return !programActions.isEmpty() &&
                     actionsValide.get() &&
                     program.declarationIsFirstAction() &&
                     program.isRepeatCounterModificationValid() &&
@@ -116,8 +123,10 @@ public class SceneTurtleViewModel {
                     program.actionsNotEmpty() &&
                     program.varIsExist() &&
                     program.declareIsUnique() &&
+                    program.parametersAreCorrect() &&
+                    program.lastActionIsCorrect() &&
                     !actionError.get();
-        }, program.getActionsList(), actionIndex, actionError);
+        }, programActions, actionIndex, actionError);
     }
 
     public BooleanProperty canExecute() {
@@ -134,19 +143,16 @@ public class SceneTurtleViewModel {
                 timeline.setRate(1 / newVal.doubleValue());
             }
         });
+
+        programActions.addListener((InvalidationListener) observable -> {
+            invalidateExecutionDisplay();
+        });
     }
 
     public void reset() {
-        world.clearSegments();
-        variableValueList.clear();
-        cursor.reset();
+        clearExecutionDisplay();
         actionIndex.set(-1);
         catalogIndex.set(0);
-        executionFinished.set(false);
-        running.set(false);
-        runtimeValue.set(false);
-        program.resetStack();
-        stopTimeline();
     }
 
     public void loadProgram() {
@@ -156,9 +162,7 @@ public class SceneTurtleViewModel {
     }
 
     public void execute() {
-        world.clearSegments();
-        program.clearDeclarationList();
-        cursor.reset();
+        clearExecutionDisplay();
         running.set(true);
         executionFinished.set(false);
         program.startExecution();
@@ -167,16 +171,17 @@ public class SceneTurtleViewModel {
 
     public void next() {
         try {
-            program.executeNext(cursor);
-            runtimeValue.set(false);
-            updateVariablesList();
-
             int index = program.getCurrentIndex();
 
-            if (index >= 0) {
+            if (index >= 0 && index < programActions.size()) {
                 actionIndex.set(index);
-
             }
+
+            program.executeNext(cursor);
+            //permet de redessiner la scene à chaque nouvelle action
+            sceneVersion.set(sceneVersion.get() + 1);
+            runtimeValue.set(false);
+            updateVariablesList();
 
             if (program.isExecutionFinished()) {
                 running.set(false);
@@ -209,14 +214,10 @@ public class SceneTurtleViewModel {
 
     public void newFile() {
         program.clearAll();
-        world.clearSegments();
-        cursor.reset();
+        clearExecutionDisplay();
         catalogIndex.set(-1);
         actionIndex.set(-1);
-        runtimeValue.set(false);
-        running.set(false);
         programLoaded.set(false);
-        executionFinished.set(false);
     }
 
     public void autoNext() {
@@ -256,5 +257,23 @@ public class SceneTurtleViewModel {
         if (timeline != null) {
             timeline.stop();
         }
+    }
+
+    private void clearExecutionDisplay() {
+        world.clearSegments();
+        sceneVersion.set(sceneVersion.get() + 1);
+        variableValueList.clear();
+        program.clearDeclarationList();
+        cursor.reset();
+        runtimeValue.set(false);
+        running.set(false);
+        executionFinished.set(false);
+        program.resetStack();
+        stopTimeline();
+    }
+
+    private void invalidateExecutionDisplay() {
+        clearExecutionDisplay();
+        programLoaded.set(false);
     }
 }

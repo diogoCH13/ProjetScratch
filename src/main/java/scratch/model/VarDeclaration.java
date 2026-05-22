@@ -22,29 +22,8 @@ public class VarDeclaration extends OneVariableAction{
     }
 
     @Override
-    public boolean isVariableNameParameter(int index) {
-        return true;
-    }
-
-    public void setParameterValue(int index, String value, Program program) {
-        if (!program.isInteger(value)){
-            super.setParameterValue(index, value, program);
-        }
-    }
-
-    @Override
     public void execute(Cursor cursor, Program program) {
         program.declareVariable(super.getVariableTargetName());
-    }
-
-    @Override
-    public boolean parameterDeclareVariable(int index) {
-        return index == 0;
-    }
-
-    @Override
-    public boolean parameterUseVariable(int index) {
-        return false;
     }
 
     public String toString(){

@@ -53,16 +53,17 @@ public abstract class OneVariableAndOneExpressionAction extends Action{
     }
 
     @Override
-    public String parameterValue(int index) {
+    public String getParameterValue(int index) {
         return index == 0 ? getVariableTargetName() : getExpression().toString();
     }
 
-    @Override
     public void setParameterValue(int index, String value, Program program) {
-        if (index == 0) {
-            setVariableTargetName(value);
+        if (index == 0){
+            if (!program.isInteger(value)){
+                setVariableTargetName(value);
+            }
         }
-        else {
+        else{
             setExpression(program.parseExpression(value));
         }
     }
@@ -75,5 +76,10 @@ public abstract class OneVariableAndOneExpressionAction extends Action{
     @Override
     public boolean isExpressionParameter(int index) {
         return index == 1;
+    }
+
+    @Override
+    public boolean parameterUseVariable(int index) {
+        return index == 0 || index == 1;
     }
 }

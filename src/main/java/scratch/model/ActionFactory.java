@@ -34,6 +34,9 @@ public class ActionFactory {
             case END_REPEAT -> {
                 return new EndRepeat();
             }
+            case DRAW_RECTANGLE -> {
+                return new Rectangle(new LitteralExpression(20), new LitteralExpression(20));
+            }
 
         }
         throw new IllegalArgumentException("Unknown action type: " + type);
