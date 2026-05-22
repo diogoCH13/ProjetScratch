@@ -39,17 +39,20 @@ public class PalettActionsView extends VBox {
             @Override
             protected void updateItem(ActionType action, boolean empty) {
                 super.updateItem(action, empty);
-                Circle circle = new Circle(5);
 
-                if (empty) {
+                if (empty || action == null) {
                     setText(null);
+                    setGraphic(null);
+                    setTextFill(Color.BLACK);
+                    return;
                 }
-                else {
-                    setGraphic(circle);
-                    setText(action.toString());
-                    setTextFill(action.getColor());
-                    circle.setFill(action.getColor());
-                }
+
+                Circle circle = new Circle(5);
+                circle.setFill(action.getColor());
+
+                setGraphic(circle);
+                setText(action.toString());
+                setTextFill(action.getColor());
             }
         });
     }
