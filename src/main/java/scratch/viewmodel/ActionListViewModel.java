@@ -71,10 +71,11 @@ public class ActionListViewModel {
     }
 
     public void upAction() {
-        int i = actionIndex.get();
-        program.up(i);
-        if (i > 0) {
-            actionIndex.set(i - 1);
+        int index = actionIndex.get();
+
+        if (index > 0) {
+            program.up(index);
+            actionIndex.set(index - 1);
         }
     }
 

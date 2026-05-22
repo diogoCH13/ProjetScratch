@@ -146,9 +146,7 @@ public class SceneTurtleViewModel {
         running.set(false);
         runtimeValue.set(false);
         program.resetStack();
-        if (timeline != null) {
-            timeline.stop();
-        }
+        stopTimeline();
     }
 
     public void loadProgram() {
@@ -172,20 +170,24 @@ public class SceneTurtleViewModel {
             program.executeNext(cursor);
             runtimeValue.set(false);
             updateVariablesList();
+
             int index = program.getCurrentIndex();
+
             if (index >= 0) {
                 actionIndex.set(index);
+
             }
 
             if (program.isExecutionFinished()) {
                 running.set(false);
                 executionFinished.set(true);
+                stopTimeline();
             }
-        }
-        catch (RuntimeException exception) {
+        } catch (RuntimeException exception) {
             runtimeValue.set(true);
             running.set(false);
             executionFinished.set(true);
+            stopTimeline();
         }
     }
 
@@ -211,23 +213,21 @@ public class SceneTurtleViewModel {
         cursor.reset();
         catalogIndex.set(-1);
         actionIndex.set(-1);
-
+        runtimeValue.set(false);
         running.set(false);
         programLoaded.set(false);
         executionFinished.set(false);
     }
 
     public void autoNext() {
-        if (timeline != null) {
-            timeline.stop();
-        }
+        stopTimeline();
 
         timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
             if (!runtimeValueProperty().get()) {
                 next();
             }
-            if (program.isExecutionFinished()) {
-                timeline.stop();
+            if (runtimeValue.get() || program.isExecutionFinished()) {
+                stopTimeline();
                 running.set(false);
                 executionFinished.set(true);
             }
@@ -241,7 +241,7 @@ public class SceneTurtleViewModel {
     }
 
     public void stopAutoMode() {
-        timeline.stop();
+        stopTimeline();
         running.set(false);
     }
 
@@ -249,6 +249,12 @@ public class SceneTurtleViewModel {
         variableValueList.clear();
         for (Map.Entry<String, Integer> entry : program.getDeclarationList().entrySet()) {
             variableValueList.add(new VariableRow(entry.getKey(), entry.getValue()));
+        }
+    }
+
+    private void stopTimeline() {
+        if (timeline != null) {
+            timeline.stop();
         }
     }
 }
