@@ -1,8 +1,8 @@
 package scratch.model;
 
-public class VarDeclaration extends Action{
+public class VarDeclaration extends OneVariableAction{
 
-    public VarDeclaration(Expression value){
+    public VarDeclaration(String value){
         super(value);
     }
 
@@ -12,13 +12,22 @@ public class VarDeclaration extends Action{
     }
 
     @Override
+    public Action copy() {
+        return new VarDeclaration(super.getVariableTargetName());
+    }
+
+    @Override
+    public String parameterPrefix(int index) {
+        return "Déclaration de la variable";
+    }
+
+    @Override
     public void execute(Cursor cursor, Program program) {
-        program.declareVariable(super.getExpression().toString());
+        program.declareVariable(super.getVariableTargetName());
     }
 
     public String toString(){
-        String value = super.getExpression().toString().equals("0") ? "" : super.getExpression().toString();
-        return "Déclaration variable " + value;
+        return "Déclaration variable " + super.getVariableTargetName();
     }
 
 }

@@ -1,6 +1,5 @@
 package scratch.model;
 
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -9,13 +8,13 @@ import java.util.*;
 
 public class Program {
 
-    private final ObservableList<Action> actions = FXCollections.observableArrayList( action -> new Observable[]{ action.expressionProperty(), action.VariableTargetNameProperty() });
+    private final ObservableList<Action> actionsList = FXCollections.observableArrayList(action -> action.observables());
     private final Map<String, Integer> declarationList = new HashMap<>();
     private final Deque<ExecutionContext> executionStack = new ArrayDeque<>();
-    public ObservableList<Action> getActions() {
-        return FXCollections.unmodifiableObservableList(actions);
-    }
 
+    public ObservableList<Action> getActionsList() {
+        return FXCollections.unmodifiableObservableList(actionsList);
+    }
 
     public Map<String, Integer> getDeclarationList() {
         return declarationList;
@@ -25,19 +24,19 @@ public class Program {
         declarationList.clear();
     }
 
-    public void addAction(int index, int destinationIndex){
-        ActionType type = ActionsCatalog.getAction(index);
+
+    public void addAction(ActionType type, int destinationIndex){
         if (type != null){
             Action action = ActionFactory.createAction(type);
-            if(destinationIndex <= actions.size()){
-                actions.add(destinationIndex, action);
+            if(destinationIndex <= actionsList.size()){
+                actionsList.add(destinationIndex, action);
             }
         }
     }
 
     public void startExecution(){
         executionStack.clear();
-        ExecutionContext context = new ExecutionContext(actions, 0);
+        ExecutionContext context = new ExecutionContext(actionsList, 0);
         executionStack.push(context);
     }
 
@@ -64,8 +63,9 @@ public class Program {
         }
 
         if (action.actionType() == ActionType.REPEAT){
-            Expression value = action.getExpression();
-            int cpt = value.valueOfVariableOrLitteral(this);
+            Expression value = parseExpression(action.getParameterValue(0));
+
+            int cpt = value.valueOfExpression(this);
             if (cpt <= 0){
                 int endIndex = findMatchingEndRepeat(index);
                 context.setCurrentIndex(endIndex + 1);
@@ -102,8 +102,8 @@ public class Program {
 
     public int findMatchingEndRepeat(int index){
         int cpt =  1;
-        for (int i = index + 1; i < actions.size(); ++i){
-            Action action = actions.get(i);
+        for (int i = index + 1; i < actionsList.size(); ++i){
+            Action action = actionsList.get(i);
             if (action.actionType() == ActionType.REPEAT){
                 ++cpt;
             }
@@ -117,42 +117,56 @@ public class Program {
         return -1;
     }
 
-    public boolean varIsExist(){
-        Set<String>declarsVars = new HashSet<>();
-        for (Action action: actions){
+    public boolean varIsExist() {
+        Set<String> declarsVars = new HashSet<>();
 
-            if (action.actionType() == ActionType.VAR_DECLARATION){
-                declarsVars.add(action.getExpression().toString());
-            }
+        for (Action action : actionsList) {
+            for (int i = 0; i < action.parameterCount(); i++) {
+                String value = action.getParameterValue(i);
 
-            else if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
-                String var = action.getVariableTargetName();
-                if (!declarsVars.contains(var)){
-                    return false;
+                if (action.parameterDeclareVariable(i)) {
+                    declarsVars.add(value);
                 }
-            }
-
-            else {
-                String var = action.getExpression().toString();
-                if (!isInteger(var)){
-                    if (!declarsVars.contains(var)){
+                else if (action.parameterUseVariable(i)) {
+                    if (!isInteger(value) && !declarsVars.contains(value)) {
                         return false;
                     }
                 }
             }
         }
+
         return true;
     }
 
+    public boolean lastActionIsCorrect() {
+        return actionsList.isEmpty() || actionsList.get(actionsList.size() - 1).canBeLastAction();
+    }
+
+    public boolean parametersAreCorrect() {
+        boolean correct = true;
+
+        for (Action action : actionsList) {
+            for (int i = 0; i < action.parameterCount() && correct; ++i) {
+                String value = action.getParameterValue(i);
+
+                if (action.isExpressionParameter(i) && isInteger(value)) {
+                    int number = Integer.parseInt(value.trim());
+                    correct = action.parameterValueIsCorrect(i, number);
+                }
+            }
+        }
+
+        return correct;
+    }
 
     public boolean isRepeatCounterModificationValid() {
         Deque<String> repeatCounters = new ArrayDeque<>();
 
-        for (int i = 0; i < actions.size(); ++i) {
-            Action action = actions.get(i);
+        for (int i = 0; i < actionsList.size(); ++i) {
+            Action action = actionsList.get(i);
 
             if (action.actionType() == ActionType.REPEAT) {
-                String counter = action.getExpression().toString();
+                String counter = action.getParameterValue(0);
 
                 if (!isInteger(counter)) {
                     repeatCounters.push(counter);
@@ -162,7 +176,7 @@ public class Program {
             }
             if (action.actionType() == ActionType.INCREMENT_VARIABLE
                     || action.actionType() == ActionType.VAR_ASSIGNMENT) {
-                String targetName = action.getVariableTargetName();
+                String targetName = action.getParameterValue(0);
 
                 for (String var : repeatCounters) {
                     if (var.equals(targetName)) {
@@ -182,8 +196,8 @@ public class Program {
 
     public boolean isEndRepeatExist(){
         Deque<ActionType> endRepeatStack = new ArrayDeque<>();
-        for (int i = 0; i < actions.size(); ++i) {
-            Action action = actions.get(i);
+        for (int i = 0; i < actionsList.size(); ++i) {
+            Action action = actionsList.get(i);
 
             if (action.actionType() == ActionType.REPEAT) {
                 endRepeatStack.push(action.actionType());
@@ -218,85 +232,49 @@ public class Program {
 
 
     public void deleteAction(int index){
-        if (index >= 0 && index < actions.size()){
-            Action action = getActions().get(index);
-            switch(action.actionType()){
-                case VAR_ASSIGNMENT:
-                    declareVariable(action.getVariableTargetName());
-                    break;
-                case VAR_DECLARATION:
-                    declarationList.remove(action.getExpression().toString());
-                    break;
-            }
-            actions.remove(index);
+        if (index >= 0 && index < actionsList.size()){
+            actionsList.remove(index);
         }
     }
 
     public void removeAll(){
-        actions.clear();
+        actionsList.clear();
         declarationList.clear();
     }
 
     public void up(int index){
-        if (index > 0 && index < actions.size()){
-            Action action = actions.remove(index);
-            actions.add(index - 1, action);
+        if (index > 0 && index < actionsList.size()){
+            Action action = actionsList.remove(index);
+            actionsList.add(index - 1, action);
         }
     }
 
     public void down(int index){
-        if (index >= 0 && index < actions.size() - 1){
-            Action action = actions.remove(index);
-            actions.add(index + 1, action);
+        if (index >= 0 && index < actionsList.size() - 1){
+            Action action = actionsList.remove(index);
+            actionsList.add(index + 1, action);
         }
     }
 
     public void duplicate(int destinationIndex, Action action) {
-        Expression value = action.getExpression();
-
-        if(destinationIndex <= actions.size()){
-            switch (action.actionType()) {
-
-                case PEN_UP -> actions.add(destinationIndex, new Pen(false));
-
-                case PEN_DOWN -> actions.add(destinationIndex, new Pen(true));
-
-                case TURN_LEFT -> actions.add(destinationIndex, new Turn(ActionType.TURN_LEFT, value));
-
-                case TURN_RIGHT -> actions.add(destinationIndex, new Turn(ActionType.TURN_RIGHT, value));
-
-                case VAR_DECLARATION -> actions.add(destinationIndex, new VarDeclaration(value));
-
-                case VAR_ASSIGNMENT -> actions.add(destinationIndex, new VarAssignment(value, action.getVariableTargetName()));
-
-                case INCREMENT_VARIABLE -> actions.add(destinationIndex, new IncrementVariable(value, action.getVariableTargetName()));
-
-                case REPEAT -> actions.add(destinationIndex, new Repeat(value));
-
-                case END_REPEAT -> actions.add(destinationIndex, new EndRepeat(value));
-
-                default -> actions.add(destinationIndex, new MoveForward(value));
-            };
-        }
+        actionsList.add(destinationIndex, action.copy());
     }
-
-//    public void executeNext(int index, Cursor cursor){
-//        if (index < actions.size()){
-//            Action action = actions.get(index);
-//            action.execute(cursor);
-//        }
-//    }
 
     public void save(File file) {
         try (PrintWriter writer = new PrintWriter(file)) {
-            for (Action action : actions) {
-                if (action.actionType() == ActionType.PEN_UP || action.actionType() == ActionType.PEN_DOWN || action.actionType() == ActionType.END_REPEAT){
-                    writer.println(action.actionType().name() + ";");
-                } else if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE) {
-                    writer.println(action.actionType().name() + ";" + action.getVariableTargetName() +";" + action.getExpression());
-                } else {
-                    writer.println(action.actionType().name() + ";" + action.getExpression());
+            for (Action action : actionsList) {
+                writer.print(action.actionType().name());
+
+                if (action.parameterCount() == 0) {
+                    writer.print(";");
                 }
+                else {
+                    for (int i = 0; i < action.parameterCount(); ++i) {
+                        writer.print(";" + action.getParameterValue(i));
+                    }
+                }
+
+                writer.println();
             }
 
         } catch (IOException e) {
@@ -306,44 +284,24 @@ public class Program {
 
     public void load(File file) {
         declarationList.clear();
-        actions.clear();
+        actionsList.clear();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
+
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) continue;
 
                 String[] parts = line.split(";");
-
                 ActionType type = ActionType.valueOf(parts[0]);
-
                 Action action = ActionFactory.createAction(type);
 
-                switch (type) {
-                    case VAR_ASSIGNMENT, INCREMENT_VARIABLE -> {
-                        if (parts.length >= 3) {
-                            action.setVariableTargetName(parts[1]);
-                            action.setExpression(parseExpression(parts[2]));
-                        }
-                    }
-                    case MOVE_FORWARD, TURN_LEFT, TURN_RIGHT, REPEAT, VAR_DECLARATION -> {
-                        if (parts.length >= 2 && !parts[1].isEmpty()) {
-                            String val = parts[1];
-                            if (isInteger(val)) {
-                                int value = Integer.parseInt(val);
-                                if (type == ActionType.MOVE_FORWARD || type == ActionType.TURN_RIGHT) {
-                                    value = -value;
-                                }
-                                action.setExpression(new LitteralExpression(value));
-                            } else {
-                                action.setExpression(parseExpression(val));
-                            }
-                        }
-                    }
+                for (int i = 0; i < action.parameterCount() && i + 1 < parts.length; i++) {
+                    action.setParameterValue(i, parts[i + 1], this);
                 }
-                actions.add(action);
-            }
 
+                actionsList.add(action);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -352,7 +310,7 @@ public class Program {
 
     public boolean isPenStateValid() {
         boolean penDown = true;
-        for (Action action : actions) {
+        for (Action action : actionsList) {
             if (action.actionType() == ActionType.PEN_DOWN) {
                 if (penDown) {
                     return false;
@@ -402,14 +360,14 @@ public class Program {
         }
     }
 
-    //permet de vérifier que declaration est avant toutes les autres actions
+    //permet de vérifier que declaration est avant toutes les autres actionsList
     public boolean declarationIsFirstAction(){
         boolean isBefore = true;
-        for(Action action : actions){
+        for(Action action : actionsList){
             if (action.actionType() == ActionType.VAR_DECLARATION && isBefore){
-                int index = actions.indexOf(action);
+                int index = actionsList.indexOf(action);
                 for (int i = 0; i < index && isBefore; ++i){
-                    ActionType type = actions.get(i).actionType();
+                    ActionType type = actionsList.get(i).actionType();
                     if (type != ActionType.VAR_DECLARATION){
                         isBefore = false;
                     }
@@ -430,75 +388,59 @@ public class Program {
         }
     }
 
-    public void incrementDuringCompilation(Action currentAction, int count){
-        String expression = currentAction.getExpression().toString();
-        if (isInteger(expression)){
-            int value = Integer.valueOf(currentAction.getExpression().toString());
-            currentAction.expressionProperty().set(new LitteralExpression(value + count));
+    public void incrementDuringCompilation(Action currentAction, int parameterIndex, int count) {
+        if (parameterIndex < 0 || parameterIndex >= currentAction.parameterCount()) {
+            return;
+        }
+
+        String value = currentAction.getParameterValue(parameterIndex);
+
+        if (isInteger(value)) {
+            int number = Integer.parseInt(value);
+            currentAction.setParameterValue(parameterIndex, String.valueOf(number + count), this);
         }
     }
 
     public void clearAll(){
-        actions.clear();
+        actionsList.clear();
         declarationList.clear();
         executionStack.clear();
 
     }
 
-    //permet de vérifier que assignation ou déclaration ou incrémente n'est pas vide
-    public boolean actionsNotEmpty(){
+    public boolean actionsNotEmpty() {
         boolean isNotEmpty = true;
-        for (Action action : actions){
-            if (action.actionType() == ActionType.VAR_ASSIGNMENT || action.actionType() == ActionType.INCREMENT_VARIABLE){
-                if (action.getVariableTargetName().trim().isEmpty() || action.getVariableTargetName().equals("0")){
-                    isNotEmpty = false;
-                }
-            }
-            else if (action.actionType() == ActionType.VAR_DECLARATION){
-                if (action.getExpression().toString().isEmpty() || action.getExpression().toString().equals("0")){
+
+        for (Action action : actionsList) {
+            for (int i = 0; i < action.parameterCount() && isNotEmpty; ++i) {
+                String value = action.getParameterValue(i);
+
+                if (value.trim().isEmpty()) {
                     isNotEmpty = false;
                 }
             }
         }
+
         return isNotEmpty;
     }
 
-    //permet de verifier que le nom de la déclaration est unique
-    public boolean declareIsUnique(){
+    public boolean declareIsUnique() {
         boolean isUnique = true;
+        Set<String> declaredNames = new HashSet<>();
 
-        if (!actions.isEmpty()){
-            boolean otherAction = false;
+        for (Action action : actionsList) {
+            for (int i = 0; i < action.parameterCount(); i++) {
+                if (action.parameterDeclareVariable(i)) {
+                    String name = action.getParameterValue(i);
 
-            for (int i = 0 ; i < actions.size() && isUnique && !otherAction; ++i){
-                Action action = actions.get(i);
-                /*si on tombe sur une autre action que déclaration alors on arrête la recherche
-                car declaration doit etre avant toutes les autres actions*/
-                otherAction = action.actionType() != ActionType.VAR_DECLARATION;
-                if (action.actionType() == ActionType.VAR_DECLARATION){
-                    if (declareNotUnique(action, i)){
+                    if (declaredNames.contains(name)) {
                         isUnique = false;
                     }
+
+                    declaredNames.add(name);
                 }
             }
-
         }
         return isUnique;
-    }
-
-    public boolean declareNotUnique(Action action, int index){
-        boolean notUnique = false;
-        boolean otherAction = false;
-        String firstNameDeclare = action.getExpression().toString();
-
-        for (int i = index + 1; i < getActions().size() && !notUnique && !otherAction; ++i){
-            Action actionList = getActions().get(i);
-            otherAction = actionList.actionType() != ActionType.VAR_DECLARATION;
-            if (actionList.actionType() == ActionType.VAR_DECLARATION){
-                String secondNameDeclare = actionList.getExpression().toString();
-                notUnique = firstNameDeclare.equals(secondNameDeclare);
-            }
-        }
-        return notUnique;
     }
 }

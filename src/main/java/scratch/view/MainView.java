@@ -26,9 +26,9 @@ public class MainView extends BorderPane /*VBox*/ {
         configureMenuBox();
 
         this.setTop(menuBox);
-        this.setLeft(new PalettActionsView(vm));
-        this.setCenter(new ActionsListView(vm));
-        this.setRight(new SceneTurtleView(vm));
+        this.setLeft(new PalettActionsView(vm.getPalettListViewModel()));
+        this.setCenter(new ActionsListView(vm.getActionListViewModel()));
+        this.setRight(new SceneTurtleView(vm.getSceneTurtleViewModel()));
 
         configActions();
     }

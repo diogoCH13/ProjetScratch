@@ -9,12 +9,12 @@ public class LitteralExpression implements Expression{
     }
 
     @Override
-    public int valueOfVariableOrLitteral(Program program) {
-        return value;
+    public String toString() {
+        return value < 0 ? String.valueOf(-value) : String.valueOf(value);
     }
 
     @Override
-    public String toString() {
-        return value < 0 ? String.valueOf(-value) : String.valueOf(value);
+    public int valueOfExpression(Program program) {
+        return value;
     }
 }

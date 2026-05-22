@@ -1,6 +1,8 @@
 package scratch.view;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -15,15 +17,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import scratch.model.Segment;
-import scratch.model.VarDeclaration;
 import scratch.model.VariableRow;
-import scratch.viewmodel.MainViewModel;
+import scratch.viewmodel.SceneTurtleViewModel;
 
 public class SceneTurtleView extends VBox {
-    private final MainViewModel vm;
+    private final SceneTurtleViewModel vm;
     private final TableView<VariableRow> tableView = new TableView<>();
-    private final Label varibaleLabel = new Label("Variables");
-    Button stopBtn = new Button("Arrêter");
     private final Slider slider = new Slider(0.01, 5, 1);
 
     private final double TURTLE_HEAD_SIZE = 2;
@@ -33,10 +32,12 @@ public class SceneTurtleView extends VBox {
     private final Circle headTurtle = new Circle(TURTLE_HEAD_SIZE);
 
     private final Label sceneLabel = new Label("Scene");
+    private final Label varibaleLabel = new Label("Variables");
     private final Label turtleLabel = new Label();
 
     private final Button loadBtn = new Button("Charger");
     private final Button executeBtn = new Button("Exécuter");
+    Button stopBtn = new Button("Arrêter");
 
     private final RadioButton autoRadioBtn = new RadioButton("Exécution automatique");
     private final RadioButton manuelRadioBtn = new RadioButton("Exécution manuelle");
@@ -50,7 +51,7 @@ public class SceneTurtleView extends VBox {
 
     private GraphicsContext gc = canvas.getGraphicsContext2D();
 
-    public SceneTurtleView(MainViewModel vm) {
+    public SceneTurtleView(SceneTurtleViewModel vm) {
         this.vm = vm;
 
         beautify();
@@ -221,12 +222,11 @@ public class SceneTurtleView extends VBox {
             redrawTurtle();
         });
 
+        vm.sceneVersionProperty().addListener((obs, oldValue, newValue) -> {
+            drawSegments();
+        });
 
         slider.valueProperty().bindBidirectional(vm.speedProperty());
-
-
-
-
     }
 
     private void redrawTurtle(){

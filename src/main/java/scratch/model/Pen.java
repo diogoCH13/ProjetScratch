@@ -1,11 +1,11 @@
 package scratch.model;
 
-public class Pen extends Action {
+public class Pen extends NoExpressionAction {
 
     private final boolean write;
 
     public Pen(boolean write) {
-        super(new LitteralExpression(0));
+//        super(new LitteralExpression(0));
         this.write = write;
     }
 
@@ -27,6 +27,15 @@ public class Pen extends Action {
     @Override
     public ActionType actionType() {
         return write ? ActionType.PEN_DOWN : ActionType.PEN_UP;
+    }
+
+    @Override
+    public Action copy() {
+        return new Pen(write);
+    }
+
+    public String parameterPrefix(int index) {
+        return write ? "Abaisser le stylo" : "Lever le stylo";
     }
 
     public String toString(){

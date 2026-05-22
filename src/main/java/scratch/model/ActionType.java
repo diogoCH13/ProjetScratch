@@ -12,10 +12,21 @@ public enum ActionType {
     REPEAT("Répéter"),
     END_REPEAT("Fin répéter"),
     PEN_UP("Lever stylo"),
-    PEN_DOWN("Abaisser le stylo");
+    PEN_DOWN("Abaisser le stylo"),
+    DRAW_RECTANGLE("Rectangle");
+
+    private final String label;
+
+    ActionType(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 
     public Color getColor(){
-         switch(this){
+        switch(this){
             case PEN_UP, PEN_DOWN -> {
                 return Color.GREEN;
             }
@@ -26,21 +37,14 @@ public enum ActionType {
                 return Color.BLUE;
             }
 
+            case DRAW_RECTANGLE -> {
+                return Color.YELLOW;
+            }
+
             default -> {
-                 return Color.DARKTURQUOISE;
+                return Color.DARKTURQUOISE;
             }
         }
-    }
-
-
-    private final String label;
-
-    ActionType(String label) {
-        this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     @Override

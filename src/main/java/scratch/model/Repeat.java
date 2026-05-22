@@ -3,7 +3,7 @@ package scratch.model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class Repeat extends Action {
+public class Repeat extends OneExpressionAction {
 
     public Repeat(Expression expression) {
         super(expression);
@@ -14,7 +14,20 @@ public class Repeat extends Action {
     }
 
     @Override
+    public Action copy() {
+        return new Repeat(super.getExpression());
+    }
+
+    @Override
     public void execute(Cursor cursor, Program program) {
+    }
+
+    public String parameterPrefix(int index) {
+        return "Répeter";
+    }
+
+    public String parameterSuffix(int index) {
+        return "fois";
     }
 
     public String toString(){

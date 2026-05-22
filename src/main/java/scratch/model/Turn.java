@@ -1,6 +1,6 @@
 package scratch.model;
 
-public class Turn extends Action {
+public class Turn extends OneExpressionAction {
 
     private final ActionType direction;
 
@@ -11,10 +11,18 @@ public class Turn extends Action {
 
     @Override
     public void execute(Cursor cursor, Program program) {
-        int val = super.getExpression().valueOfVariableOrLitteral(program);
-        if (!valueIsCorrect(val)){
+        int val = super.getExpression().valueOfExpression(program);
+
+        if (!valueIsCorrect(val)) {
             throw new RuntimeException("RUNTIME ERROR !");
         }
+
+        val = Math.abs(val);
+
+        if (direction == ActionType.TURN_RIGHT) {
+            val = -val;
+        }
+
         cursor.rotate(val);
     }
 
@@ -24,11 +32,24 @@ public class Turn extends Action {
     }
 
     @Override
+    public Action copy() {
+        return new Turn(direction, super.getExpression());
+    }
+
+    @Override
     public boolean valueIsCorrect(int value){
         if (value < 0){
             value = -value;
         }
         return value > 0 && value <= 180;
+    }
+
+    public String parameterPrefix(int index) {
+        return direction == ActionType.TURN_LEFT ? "Angle vers la gauche" : "Angle vers la droite";
+    }
+
+    public String parameterSuffix(int index) {
+        return "degrés";
     }
 
     public String toString(){
